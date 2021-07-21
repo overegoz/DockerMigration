@@ -5,7 +5,6 @@ import signal, os
 localIP = "127.0.0.1"
 localPort = 20001
 
-
 serverIP = "127.0.0.1"
 serverPort = 20002
 
