@@ -8,6 +8,7 @@ localPort = 20001
 serverIP = "127.0.0.1"
 serverPort = 20002
 
+
 bufferSize = 1024
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # 주소와 IP로 Bind 

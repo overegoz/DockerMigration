@@ -11,6 +11,7 @@ import signal, os
 localIP = "0.0.0.0"
 localPort = 20002
 
+
 bufferSize = 1024
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # 주소와 IP로 Bind 
