@@ -23,6 +23,7 @@ def handler(signum, frame):
 
 signal.signal(signal.SIGINT, handler)
 counter = 0
+print("Client begins!")
 while(True): 
 
 	# 상대방에게 데이터 전송하기
@@ -30,6 +31,7 @@ while(True):
 	msg = "INCR " + str(counter)
 	counter = counter + 1
 	sock.sendto(msg.encode(), (serverIP, serverPort))
+	print("sent: ", msg)
 	
 	time.sleep(0.5)
 	
@@ -47,7 +49,7 @@ while(True):
 		"""
 	except socket.error:
 		# non-blocking recv: 빈손으로 리턴할때 예외가 발생하고, 이를 잡아줘야함
-		#print("recvfrom: nothing")
+		print("recvfrom: nothing")
 		bytes = ""
 		addr = ""
 	

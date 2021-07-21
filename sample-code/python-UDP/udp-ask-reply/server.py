@@ -18,7 +18,7 @@ def handler(signum, frame):
 	exit()
 
 signal.signal(signal.SIGINT, handler)
-
+print("Server start!")
 while(True): 
 	time.sleep(0.5)
 	
@@ -36,10 +36,11 @@ while(True):
 		time.sleep(0.5)
 		# 상대방에게 데이터 전송하기
 		sock.sendto(msg.encode(), (remoteIP, remotePort))
+		print("sent: ", msg)
 	except socket.error:
 		# 클라이언트로 부터 요청/질문을 받지 않으면 답변할 게 없음
 		# non-blocking recv: 빈손으로 리턴할때 예외가 발생하고, 이를 잡아줘야함
-		#print("recvfrom: nothing")
+		print("recvfrom: nothing")
 		bytes = ""
 		addr = ""	
 	
