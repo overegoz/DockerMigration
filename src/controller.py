@@ -27,6 +27,7 @@ common.send_log(sock, my_name, common.start_msg)
 # 현재, USER가 연결되어있는 AP
 # 처음에는 모른다고 하고, logger가 HELO 메시지를 전해주면 setting
 user_curr_ap = ""
+user_old_ap = ""
 
 while(True):
     """
@@ -36,24 +37,62 @@ while(True):
        어떤 방식의 migr을 할지를 old AP와 new AP에게 알려주기
     """
     # 메시지 수신
-    time.sleep(common.SHORT_SLEEP)
-    recv_msg, addr = common.udp_recv(sock, common.bufsiz)
+    recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP)
 
     if len(recv_msg) > 0:  # 수신한 메시지가 있다면...
-        sender_ip = addr[0]
-
+        words = recv_msg.split(common.delim)
+        sender = words[0]
         # LOGGER로 부터 받은 메시지라면... HELO/BYEE 이벤트에 대한 것이지
-        if sender_ip == common.ip[common.logger_name]:
-            words = recv_msg.decode().split(common.delim)
-            if words[2] == common.USER_HELLO:
-                    pass
+        if sender == common.logger_name:
+            cmd = words[1]
+            target = words[2]
+            if cmd == common.USER_HELLO:  # [CR1]
+                if len(user_curr_ap) == 0:
+                    # 처음으로 association 하는거면, migr 필요없음
+                    user_curr_ap = target
+                else:
+                    """
+                    handover로 인해서, user가 new AP에게 HELO를 보냈다
+                    user는 BYE보다 HELO를 먼저 보내니까, migr 작업을 여기서 시작하자
+                    """
+                    assert (user_curr_ap == common.ap1_name) and \
+                        (target == common.ap2_name)
+                    user_old_ap = user_curr_ap
+                    user_curr_ap = target
 
-        # AP로 부터 받은 것이라면, migr 기법 결정에 필요한 정보를 받은것이겠지
-        elif sender_ip == common.ip[common.ap1_name] \
-             or sender_ip == common.ip[common.ap2_name]:
-            pass
+                    # [CS1] oldAP에게 [migr 판단에 필요한 정보]를 요청
+                    send_msg = common.str2(my_name, common.INFO_REQ)
+                    common.udp_send(sock, my_name, user_old_ap, send_msg, common.SHORT_SLEEP)
+            elif cmd == common.USER_BYE:  # [CR2]
+                # 할 일 없음...
+                assert user_curr_ap == common.ap1_name
+                pass
+            else:
+                assert False
+        # [CR3] AP로 부터 받은 것이라면, 
+        # old AP로 부터 migr 기법 결정에 필요한 정보를 받은것이겠지
+        elif sender == common.ap1_name or sender == common.ap2_name:
+            assert len(user_curr_ap) > 0 and len(user_old_ap) > 0
+            assert sender == user_old_ap
+            assert words[1] == common.INFO_RES
 
-        else:
+            infos = words[2]  # AP가 보내온 정보, space 구분된 문자열
+
+            # 받은 정보를 기준으로 어떤 migr 기법이 최선인지 판단하기
+            # 받은 정보 = words[2], AP가 보내온 정보, space 구분된 문자열
+            best_migr = common.get_best_migr(infos)
+            assert len(best_migr) > 0
+
+            # 최선의 migr 기법을 old AP와 new AP 에게 알려주기
+            # 1. migr 출발지 준비시작! [CS3.1]
+            common.udp_send(sock, my_name, user_old_ap, 
+                            common.str3(my_name, common.MIGR_SRC, best_migr),
+                            common.SHORT_SLEEP)
+            # 2. migr 목적지 준비시작! [CS3.2]
+            common.udp_send(sock, my_name, user_curr_ap, 
+                            common.str3(my_name, common.MIGR_SRC, best_migr),
+                            common.SHORT_SLEEP)
+        else:  # 오류!
             assert False
 
     else: # 수신한 메시지가 없으면, 그냥 패스!

@@ -1,0 +1,2 @@
+network controller 프로그램은 sudo 권한이 필요
+등등... 문제 없이 구동하려면 root 권한으로 실행하는 것이 편할 듯
