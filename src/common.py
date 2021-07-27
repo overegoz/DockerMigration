@@ -161,7 +161,7 @@ def start_edgeserver(es_name, profile):
 		assert False
 
 	cmd = 'docker run -p {}:{} --name {} {}'.format(port,port,cont_name,img_name)
-		os.system(cmd)
+	os.system(cmd)
 
 def stop_edgeserver(profile):
 	# profile에 base image 이름을 포함
@@ -177,7 +177,7 @@ def return_migr_info_ap1(p):
 	"""
 
 	C_sec,l_diff_bits,l_check_bits,l_log_bits,t_replay_sec,th_bps,force \
-		= prof.p1_info()
+	= prof.p1_info()
 
 	return str(C_sec) + delim + \
 			str(l_diff_bits) + delim + \
