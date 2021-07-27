@@ -44,11 +44,11 @@ exit()  # 즉시 종료
 my_name = sys.argv[1]
 my_ap_name = ""
 if my_name == common.edge_server1_name:
-my_ap_name == common.ap1_name
+	my_ap_name == common.ap1_name
 elif my_name == common.edge_server2_name:
-my_ap_name == common.ap2_name
+	my_ap_name == common.ap2_name
 else:
-assert False
+	assert False
 
 # -------------------------------------------------------------------
 profile = int(sys.argv[2])
@@ -60,9 +60,9 @@ profile = int(sys.argv[2])
 """
 # listen 소켓 생성
 if( profile == -1 ):  # 도커 없이 실행하는, 테스트용 run
-localIP = common.ip[my_name]
+	localIP = common.ip[my_name]
 else:
-localIP = common.ip_fake[my_name]
+	localIP = common.ip_fake[my_name]
 
 localPort = common.port[my_name]
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
@@ -70,15 +70,15 @@ sock.bind((localIP, localPort))
 sock.setblocking(0)  # non-blocking socket으로 만들기
 
 def handler(signum, frame):
-print(common.sigint_msg)
-sock.close()
-exit()
+	print(common.sigint_msg)
+	sock.close()
+	exit()
 
 signal.signal(signal.SIGINT, handler)
 
 # 실행 되었다는 것을 Logger에 알리기
 common.send_log(sock, my_name, my_name, 
-			common.str2(common.start_msg, str(sys.argv)))
+				common.str2(common.start_msg, str(sys.argv)))
 
 # 프로파일에 따라서 사전 작업을 수행함
 profile = int(sys.argv[2])

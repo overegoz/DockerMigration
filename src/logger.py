@@ -19,21 +19,21 @@ sock.setblocking(0)  # non-blocking socket으로 만들기
 f = open(common.get_now() + ".log", 'w')
 # -------------------------------------------------------------------
 def file_write(f, msg):
-# 파일에 기록할 때, 개행문자를 추가하자
-f.write(msg + "\n")
+	# 파일에 기록할 때, 개행문자를 추가하자
+	f.write(msg + "\n")
 
 def logger_log(f, you, msg):
-log = common.str4(common.get_now(), my_name, you, msg)
-file_write(f, log)
+	log = common.str4(common.get_now(), my_name, you, msg)
+	file_write(f, log)
 
 # -------------------------------------------------------------------
 common.logger_log(f=f, you=my_name, msg=common.start_msg) # 로거가 시작했다는 로그 남기기
 # -------------------------------------------------------------------
 def handler(signum, frame):  # CTRL+C 시그널 핸들러 만들기
-print(common.sigint_msg)
-sock.close()
-f.close()
-exit()
+	print(common.sigint_msg)
+	sock.close()
+	f.close()
+	exit()
 
 signal.signal(signal.SIGINT, handler)  # 시그널 핸들러 등록
 # -------------------------------------------------------------------
