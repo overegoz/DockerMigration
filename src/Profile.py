@@ -21,7 +21,7 @@ class Profile:
 	# 도커 이미지 이름 : migr 목적지에서 실행하는 이미지 이름
 	img_name_ap1 = ['test']
 	# 컨테이너 이름
-	cont_name ['test'] 
+	cont_name = ['test'] 
 	# 체크포인트 이름
 	checkpoint_name = ['test']
 	# user가 몇번의 REQ를 보낸 후 handover 할지
@@ -32,28 +32,28 @@ class Profile:
 	def __init__(self):
 		pass
 
-	def get_C(p):
-		return C_sec[p]
+	def get_C(self, p):
+		return self.C_sec[p]
 
-	def get_img_name_ap1():
-		return img_name_ap1[p]
+	def get_img_name_ap1(self, p):
+		return self.img_name_ap1[p]
 
-	def get_img_name_ap2():
-		return img_name_ap2[p]        
+	def get_img_name_ap2(self, p):
+		return self.img_name_ap2[p]        
 
-	def get_cont_name():
-		return cont_name[p]
+	def get_cont_name(self, p):
+		return self.cont_name[p]
 
-	def get_req_int(p):
-		return req_int[p]
+	def get_req_int(self, p):
+		return self.req_int[p]
 
-	def get_ho_cnt(p):
-		return ho_cnt[p]
+	def get_ho_cnt(self, p):
+		return self.ho_cnt[p]
 
-	def id_min():
+	def id_min(self):
 		# 프로필 -1번 : 도커 없이 실행
 		# 프로필 0번 : 도커 있지만 migr 없음
 		return -1
 
-	def id_max():
-		return len(C_sec)
+	def id_max(self):
+		return len(self.C_sec)

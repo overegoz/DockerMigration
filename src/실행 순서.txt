@@ -4,7 +4,8 @@
 
 1. Logger
 2. Controller
-3. AP-1
-   - AP-1은 스스로 도커를 구동시킴
+3. AP-1 : $ python3 ap-edge.py <이름> <ES 프로파일>
+   (AP-1은 스스로 도커를 구동시킴)
+   $ python3 docker-server.py <이름> <프로파일>
 4. AP-2
-5. User
+5. User : $ python3 user.py <USER 프로필>

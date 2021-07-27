@@ -1,6 +1,6 @@
 import socket 
 import time
-import signal, os
+import signal, os, sys
 import datetime
 import common
 
@@ -36,29 +36,36 @@ my_name = sys.argv[1]
 my_edgeserver = ""
 other_ap = ""
 if my_name == common.ap1_name:
-	my_edgeserver == common.edge_server1_name
+	my_edgeserver = common.edge_server1_name
 	other_ap = common.ap2_name
 elif my_name == common.ap2_name:
-	my_edgeserver == common.edge_server2_name
+	my_edgeserver = common.edge_server2_name
 	other_ap = common.ap1_name
 else:
 	assert False
 
 assert len(my_edgeserver) > 0 and len(other_ap) > 0
 # -------------------------------------------------------------------
+# listen 소켓 생성
+local_ip,local_port = common.ip[my_name], common.port[my_name]
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # 주소와 IP로 Bind 
+sock.bind((local_ip, local_port)) 
+sock.setblocking(0)  # non-blocking socket으로 만들기
+# -------------------------------------------------------------------
 # 실행 되었다는 것을 Logger에 알리기
-common.send_log(sock, my_name, my_name, common.start_msg)
+common.send_log(sock, my_name, my_name, common.str2(common.start_msg,str(sys.argv)))
 # -------------------------------------------------------------------
 # 상태 정보를 기록할 변수들
-profile = sys.argv[2]
+profile = int(sys.argv[2])
 user_associated = False
 edge_server_ready = False
+# -------------------------------------------------------------------
 # Edge Server (Docker) 시작하기
 if my_name == common.ap1_name:
 	# AP-1은 시작과 동시에 ES 를 시작
-	common.start_edgeserver(ap_name=my_name, profile=profile)
+	common.start_edgeserver(es_name=my_edgeserver, profile=profile)
 	common.send_log(sock, my_name, common.edge_server1_name, 
-					common.start_msg + delim + " (initial launch)")
+					common.str2(common.start_msg, " (initial launch)"))
 elif my_name == common.ap2_name:
 	# AP2는 시작과 동시에 프로필을 시작할 필요 없음. 컨트롤러가 시키면 그 때 시작
 	edge_server_ready = False
@@ -80,12 +87,13 @@ delim = common.delim
 while(True):
 	# -------------------------------------------------------------------
 	# 데이터 수신
-	recv_msg, addr = udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
+	recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
 	# -------------------------------------------------------------------
 	if len(recv_msg) > 0:  # 수신한 데이터가 있으면...
 		words = recv_msg.split(common.delim)
+		#print(words)
 		sender = words[0]
-		cmd == words[1]
+		cmd = words[1]
 
 		if cmd == common.INFO_REQ:  # [AR1] 컨트롤러가 migr 관련 정보 요청
 			assert sender == common.controller_name
@@ -113,6 +121,10 @@ while(True):
 		elif cmd == common.USER_HELLO:  # [AR5] 새로운 user가 접속했다
 			assert user_associated == False  # user는 한명 뿐이거든...
 			user_associated = True
+			if edge_server_ready == True:
+				cmd = common.ES_READY
+				common.udp_send(sock, my_name, common.user_name, 
+								common.str2(my_name, cmd), common.SHORT_SLEEP)
 		elif cmd == common.USER_BYE:  # [AR6] 기존 user가 접속을 해제했다
 			assert user_associated == True
 			user_associated = False
@@ -130,7 +142,7 @@ while(True):
 			pass  # todo
 		elif cmd == common.ES_READY:  # [AR13] edge server가 서비스 가능한 상태로 변경되었음
 			edge_server_ready = True
-			if my_name == common.ap1_name and user_associated == True:
+			if (my_name == common.ap1_name) and (user_associated == True):
 				# [AS13] 이 때만 user에게 알려주기
 				common.udp_send(sock, my_name, common.user_name, 
 								common.str2(my_name, cmd), common.SHORT_SLEEP)

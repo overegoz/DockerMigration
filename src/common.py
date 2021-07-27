@@ -3,7 +3,7 @@
 - 참고: 도커가 인식하는 자신의 IP는 0.0.0.0이다
 """
 import time, datetime, socket, sys, os
-import Profile
+from Profile import Profile
 
 # -------------------------------------------------------------------
 # 총 4대의 VM을 사용하자
@@ -29,6 +29,7 @@ ip = {controller_name : "127.0.0.1",
 		ap2_name : "127.0.0.1",
 		edge_server1_name : "127.0.0.1",
 		edge_server2_name : "127.0.0.1"}
+
 # 도커가 인식하는 자신의 IP는 0.0.0.0이다        
 ip_fake = {edge_server1_name : "0.0.0.0",
 		edge_server2_name : "0.0.0.0"}
@@ -108,12 +109,18 @@ def send_log(sock, me, you, msg):
 	# 로그 메시지 만들기
 	log = get_now() + delim + me + delim + you + delim + msg
 	# Logger에게 전송하기
-	udp_send(sock, logger_name, log)
+	# udp_send(sock, me, logger_name, log, SHORT_SLEEP)  # 이렇게 하면 무한 루프
+	sock.sendto(log.encode(), (ip[logger_name], port[logger_name]))
+
 
 def udp_send(sock, me, you, msg, t):
 	time.sleep(t)
 	# 메시지 보내기
+	#print("msg : ", msg)
+	#print("you : ", you)
+	#print(msg, ip[you], port[you])
 	sock.sendto(msg.encode(), (ip[you], port[you]))
+
 	# 로그에 기록하기
 	send_log(sock, me, you, msg + delim + "(sent)")
 
@@ -126,12 +133,15 @@ def udp_recv(sock, me, bufsize, t):
 		# 수신 데이터 출력하기, decode 해서 string객체로 변환
 		msg = bytes.decode()
 		# 로그에 기록하기
-		send_log(sock, me, addr[0], msg + delim + "(recvd)")
+		if me != logger_name:  # 내가 LOGGER가 아닌 경우에만...
+			send_log(sock, me, addr[0], msg + delim + "(recvd)")
+
 	except socket.error:
 		# non-blocking recv: 빈손으로 리턴할때 예외가 발생하고, 이를 잡아줘야함
 		msg, addr = "", ""
 
 	return msg, addr
+
 
 def run_profile(my_name, p):
 	"""
@@ -151,16 +161,16 @@ def start_edgeserver(es_name, profile):
 	if profile == -1:  # 테스트 용
 		return
 
-	port = port[es_name]
+	my_port = port[es_name]
 	cont_name = prof.get_cont_name(profile)
-	if ap_name == edge_server1_name:  # 최초로 실행하는 것
+	if es_name == edge_server1_name:  # 최초로 실행하는 것
 		img_name = prof.get_img_name_ap1(profile)
-	elif ap_name == edge_server2_name:  # migr 으로 실행하는 것
+	elif es_name == edge_server2_name:  # migr 으로 실행하는 것
 		img_name = prof.get_img_name_ap2(profile)
 	else:
 		assert False
 
-	cmd = 'docker run -p {}:{} --name {} {}'.format(port,port,cont_name,img_name)
+	cmd = 'docker run -p {}:{} --name {} {}'.format(my_port,my_port,cont_name,img_name)
 	os.system(cmd)
 
 def stop_edgeserver(profile):

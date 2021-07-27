@@ -3,7 +3,7 @@ EdgeServer 즉 도커 컨테이너에서 실행할 코드이다.
 """
 import socket 
 import time
-import signal, os
+import signal, os, sys
 import datetime
 import common
 
@@ -20,33 +20,33 @@ $ python3 docker-server.py <이름> <프로파일>
 # -------------------------------------------------------------------
 err_msg = ""
 if len(sys.argv) != 3:
-# 인자 갯수가 정확하지 않음
-err_msg = "Need 3 args! " + str(sys.argv)
+	# 인자 갯수가 정확하지 않음
+	err_msg = "Need 3 args! " + str(sys.argv)
 elif sys.argv[1] != common.edge_server1_name \
 	and sys.argv[1] != common.edge_server2_name:
-# EdgeServer 이름이 정확하지 않음
-err_msg = "Incorrect EdgeServer name! " + str(sys.argv[1])
+	# EdgeServer 이름이 정확하지 않음
+	err_msg = "Incorrect EdgeServer name! " + str(sys.argv[1])
 elif int(sys.argv[2]) not in common.profile_ids:
-# 정의되지 않은 프로필 번호가 주어짐	
-err_msg = "Incorrect profile id! " + str(sys.argv[2])
+	# 정의되지 않은 프로필 번호가 주어짐	
+	err_msg = "Incorrect profile id! " + str(sys.argv[2])
 else:  # 아무 문제가 없음
-pass
+	pass
 
 if len(err_msg) > 0:
-# 오류가 있었다는 것임
-# 도커는 터미널 출력을 보기 어려우니까, 오류 메시지를 로그로 전송
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-common.send_log(sock, my_name, my_name, err_msg)
-sock.close()
-exit()  # 즉시 종료
+	# 오류가 있었다는 것임
+	# 도커는 터미널 출력을 보기 어려우니까, 오류 메시지를 로그로 전송
+	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+	common.send_log(sock, "EdgeServer-X", "EdgeServer-X", err_msg)
+	sock.close()
+	exit()  # 즉시 종료
 
 # -------------------------------------------------------------------
 my_name = sys.argv[1]
 my_ap_name = ""
 if my_name == common.edge_server1_name:
-	my_ap_name == common.ap1_name
+	my_ap_name = common.ap1_name
 elif my_name == common.edge_server2_name:
-	my_ap_name == common.ap2_name
+	my_ap_name = common.ap2_name
 else:
 	assert False
 
@@ -85,7 +85,8 @@ profile = int(sys.argv[2])
 common.run_profile(my_name, profile)
 
 # 서비스를 할 준비가 되었음을 AP에게 알림
-common.udp_send(sock, my_name, my_ap_name, common.ES_READY, common.SHORT_SLEEP)
+send_msg = common.str2(my_name, common.ES_READY)
+common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 
 # 서비스를 시작
 while(True): 
@@ -99,7 +100,7 @@ while(True):
 	"""
 	# 직접 연결된 AP로 부터 데이터 수신하기
 	try:
-		recv_msg, _ = udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
+		recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
 		if len(recv_msg) > 0:
 			words = recv_msg.split(common.delim)
 

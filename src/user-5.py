@@ -1,7 +1,7 @@
 #-*- encoding: utf8 -*-
 import socket 
 import time
-import signal, os
+import signal, os, sys
 import datetime
 import common
 
@@ -17,8 +17,8 @@ $ python3 user.py <USER 프로필>
 err_msg = ""
 if len(sys.argv) != 2:
 	# 인자 갯수가 정확하지 않음
-	err_msg = "Need 2 args! " + str(sys.argv)
-elif int(sys.argv[1]) not in common.user_profiles:
+	err_msg = "Need 1 arg(s)! " + str(sys.argv)
+elif int(sys.argv[1]) not in common.profile_ids:
 	# 정의되지 않은 프로필 번호가 주어짐	
 	err_msg = "Incorrect profile id! " + str(sys.argv[1])
 else:
@@ -29,6 +29,7 @@ if len(err_msg) > 0:
 	assert False, "ERR MSG: " + err_msg
 # -------------------------------------------------------------------
 my_name = common.user_name
+profile = int(sys.argv[1])
 # -------------------------------------------------------------------
 # listen 소켓 생성
 local_ip, local_port = common.ip[my_name], common.port[my_name]
@@ -45,11 +46,12 @@ def handler(signum, frame):  # CTRL+C 시그널 핸들러 만들기
 signal.signal(signal.SIGINT, handler)  # 시그널 핸들러 등록
 # -------------------------------------------------------------------
 # 실행 되었다는 것을 Logger에 알리기
-common.send_log(sock, my_name, my_name, common.start_msg)
+common.send_log(sock, my_name, my_name, common.str2(common.start_msg,str(sys.argv)))
 # -------------------------------------------------------------------
 # 처음에는 무조건 AP-1에 연결한다고 가정한다
 curr_ap = common.ap1_name
-common.udp_send(sock, curr_ap, common.USER_HELLO)  # 연결 되었음을 알리기
+common.udp_send(sock, my_name, curr_ap, \
+				common.str2(my_name, common.USER_HELLO), common.SHORT_SLEEP)  # 연결 되었음을 알리기
 # -------------------------------------------------------------------
 def get_ap(curr_ap):
 	# 어떤 AP와 연결할지에 대한 결정을 하는 함수
@@ -60,7 +62,7 @@ def get_ap(curr_ap):
 # -------------------------------------------------------------------
 req_int = common.USER_REQ_INTERVAL
 handover_counter = common.INTMAX  # 핸드오버가 언제 발생하지 제어
-if p > 0:
+if profile > 0:
 	# 프로파일 번호에 따라서 설정값을 불러옴
 	req_int = common.prof.get_req_int(p)
 	handover_counter = common.prof.get_ho_cnt(p)
@@ -72,7 +74,7 @@ counter = 0  # req를 보낼건데, cnt 번호를 붙여서 tracking 가능하�
 # 최초로 실행할때에는 edge server 가 준비될 때 까지 기다림
 assert curr_ap == common.ap1_name
 while(True):
-	recv_msg, _ = common.udp_recv(sock, common.bufsiz, common.SHORT_SLEEP)
+	recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP)
 	if len(recv_msg) > 0:
 		words = recv_msg.split(common.delim)
 		sender = words[0]
@@ -102,22 +104,30 @@ while(True):
 		counter += 1
 
 		# [UR1] 현재 연결된 AP로 부터 서비스 응답 메시지 수신하기
-		recv_msg, addr = common.udp_recv(sock, common.bufsiz, req_int/2.0)
+		recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, req_int/2.0)
 		if len(recv_msg) > 0:  
 			words = recv_msg.split(common.delim)
-			sender = words[0]
+
 			# 현재 연결된 AP로 부터 데이터를 수신한 것이 맞는지 확인
-			# 수신 메시지를 로그로 남겨주기만 하면 됨
-			assert sender == curr_ap
-		else:
-			pass
+			sender = words[0]
+			assert sender == curr_ap  
+
+			cmd = words[1]
+			if cmd == common.SVC_RES:
+				# 서비스에 대한 응답이면 수신 메시지를 로그로 남겨주기만 하면 됨
+				# udp_recv에서 로그 남기니까, 그냥 pass 하면 됨
+				pass
+			else: assert False
+		else: pass
 	else:  # 접속 AP가 변경됨
 		# [US2] new AP로 HELO 먼저 보내고,
 		send_msg = common.str2(my_name, common.USER_HELLO)
+		#print("send : ", send_msg)
 		common.udp_send(sock, my_name, curr_ap, send_msg, common.USER_HANDOVER_DELAY/2.0)
 		
 		# [US3] 다음으로, old AP에 BYEE 보낸다.
 		send_msg = common.str2(my_name, common.USER_BYE)
+		#print("send : ", send_msg)
 		common.udp_send(sock, my_name, old_ap, send_msg, common.USER_HANDOVER_DELAY/2.0)
 		pass
 
