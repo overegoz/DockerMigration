@@ -64,8 +64,8 @@ if( profile == -1 ):  # 도커 없이 실행하는, 테스트용 run
 else:
 	localIP = common.ip_fake[my_name]
 
-print(localIP, ", ", localPort)
 localPort = common.port[my_name]
+print(localIP, ", ", localPort)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 sock.bind((localIP, localPort)) 
 sock.setblocking(0)  # non-blocking socket으로 만들기
