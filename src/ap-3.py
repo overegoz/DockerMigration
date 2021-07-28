@@ -77,7 +77,7 @@ def handler(signum, frame):
 	print(common.sigint_msg)
 	sock.close()
 	if edge_server_ready == True:
-		common.stop_edgeserver(my_edgeserver)
+		common.stop_edgeserver(profile)
 	exit()
 	
 signal.signal(signal.SIGINT, handler)
@@ -99,17 +99,29 @@ while(True):
 			assert sender == common.controller_name
 			# [AS1] migr 기법 결정에 필요한 정보를 컨트롤러에게 전달해줌
 			info = common.return_migr_info_ap1(profile)
-			msg = common.str3(my_name, common.INFO_RES, info)
+			msg = common.str4(my_name, common.INFO_RES, profile, info)
 			common.udp_send(sock, my_name, common.controller_name, msg, common.SHORT_SLEEP)
 		elif cmd == common.MIGR_SRC:  # [AR2] migr 출발지, 시작!
 			# profile : 시나리오 프로파일
 			migr_tech = words[2]  # 마이그레이션 기법
 			print('MIGR_SRC: ', migr_tech)
+			print('미구현!!!')
 			# other_ap : 마이그레이션 목적지
 			pass  # todo 
 		elif cmd == common.MIGR_DST:  # [AR3] migr 도착지, 시작!
 			migr_tech = words[2]
 			print('MIGR_DST: ', migr_tech)
+			print('미구현!!!')
+
+			# 테스트
+			if migr_tech == common.MIGR_NONE:  # 프로필 1번
+			- 구현하기
+
+			# 스레드 만들어서 edge server를 시작해야 할 듯?
+
+			# ES 준비가 완료되면 AP-1에게 알려서 AP-1의 ES를 종료토록 하기
+			- 이 부분에 대한 msg 정의하기
+
 			pass  # todo
 		elif cmd == common.SVC_REQ:  # 서비스 요청 [AR4][AR9]
 			assert sender == common.user_name or sender == other_ap

@@ -1,5 +1,7 @@
 FROM python:3.8-slim
 
+ENV PYTHONUNBUFFERED=1
+
 COPY docker-server-4.py /tmp/server.py
 COPY common.py /tmp/common.py
 COPY Profile.py /tmp/Profile.py

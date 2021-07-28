@@ -74,6 +74,7 @@ MIGR_FC = "FULL-COPY"  # migr 기법 1
 MIGR_DC = "DIFF-COPY"  # migr 기법 2
 MIGR_LR = "LOG-REPLAY"  # migr 기법 3
 MIGR_AUTO = "AUTO"
+MIGR_NONE = "MIGR-NONE"
 INFO_REQ = "INFQ"  # migr 기법 판단에 필요한 정보 요청 (컨트롤러 > old AP)
 INFO_RES = "INFR"  # migr 기법 판단에 필요한 정보 회신 (old AP > 컨트롤러)
 MIGR_SRC = "MIGR-SRC"  # migr 출발지로써, 준비하고 실행하라!
@@ -85,11 +86,12 @@ ES_READY = "ES-READY"  # Edge Server 가 ready 상태가 되고, 서비스 가�
 # 상수 정의
 bufsiz = 1024
 delim = " "
+delimD = "-"
 SHORT_SLEEP = 0.05
 USER_REQ_INTERVAL = 1.0
 USER_HANDOVER_DELAY = 1.0
 INTMAX = sys.maxsize  # 참고: 파이썬2 에서는 sys.maxint
-weight = 10
+weight = 10  # 최적의 migr 기법 선택 시, 가중치
 # -------------------------------------------------------------------
 # 어떤 시나리오로 실험할 것인지를 프로필로 구성하자
 # . 프로필 -1번 : 도커 없이 실행
@@ -186,6 +188,9 @@ def start_edgeserver(es_name, profile):
 
 def stop_edgeserver(profile):
 	# profile에 base image 이름을 포함
+	cont_name = prof.get_cont_name(profile)
+	cmd = 'docker stop {}'.format(cont_name)
+	os.system(cmd)
 	pass
 
 def migrate():
@@ -196,22 +201,25 @@ def return_migr_info_ap1(p):
 	프로파일 번호에 따라서, 어떤 정보를 컨트롤러에 리턴할지 미리 정해놓자
 	리스트 형태로 만들고, 주어진 인덱스에 맞는 값을 리턴하도록 구현하자
 	"""
-	if p == -1 or p == 0:
-		return "1 2 3 4 5 6"  # test
-
+	# .......................................................
+	# 테스트용
+	if p == -1 or p == 0 or p == 1:
+		return "1-2-3-4-5-6"
+	# .......................................................
 	C_sec,l_diff_bits,l_check_bits,l_log_bits,t_replay_sec,th_bps,force \
 	= prof.p1_info()
 
-	return str(C_sec) + delim + \
-			str(l_diff_bits) + delim + \
-			str(l_check_bits) + delim + \
-			str(l_log_bits) + delim + \
-			str(t_replay_sec) + delim + \
+	return str(C_sec) + delimD + \
+			str(l_diff_bits) + delimD + \
+			str(l_check_bits) + delimD + \
+			str(l_log_bits) + delimD + \
+			str(t_replay_sec) + delimD + \
 			str(th_bps)
 
-def get_best_migr(infos, w, force):
+def get_best_migr(infos, force):
+	w = weight
 	if force == MIGR_AUTO:
-		info = infos.split(delim)
+		info = infos.split(delimD)
 		C_s = float(info[0]) * 1.0
 		l_diff_bit = float(info[1]) * 1.0
 		l_check_bit = float(info[2]) * 1.0
@@ -235,5 +243,4 @@ def get_best_migr(infos, w, force):
 			assert False
 			return ""
 	else:
-		assert force == MIGR_FC or force == MIGR_DC or force == MIGR_LR
 		return force

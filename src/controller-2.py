@@ -61,7 +61,7 @@ while(True):
 					user_old_ap = user_curr_ap
 					user_curr_ap = target
 
-					# [CS1] oldAP에게 [migr 판단에 필요한 정보]를 요청
+					# [CS1] oldAP에게 '['migr 판단에 필요한 정보']'를 요청
 					send_msg = common.str2(my_name, common.INFO_REQ)
 					common.udp_send(sock, my_name, user_old_ap, send_msg, common.SHORT_SLEEP)
 					print(user_old_ap, "에게 마이그레이션 정보 요청")
@@ -82,12 +82,17 @@ while(True):
 			assert len(user_curr_ap) > 0 and len(user_old_ap) > 0
 			assert sender == user_old_ap
 			assert words[1] == common.INFO_RES
-
-			infos = words[2]  # AP가 보내온 정보, space 구분된 문자열
+			profile = words[2]
+			infos = words[3]  # AP가 보내온 정보, '-'로 구분된 문자열
 
 			# 받은 정보를 기준으로 어떤 migr 기법이 최선인지 판단하기
 			# 받은 정보 = words[2], AP가 보내온 정보, space 구분된 문자열
-			best_migr = common.get_best_migr(infos, common.weight, common.MIGR_FC)
+			best_migr = ""
+			if common.prof.get_predetermined_migr(profile) == common.MIGR_AUTO:
+				best_migr = common.get_best_migr(infos, common.weight, common.MIGR_FC)
+			else:
+				best_migr = common.prof.get_predetermined_migr(profile)
+
 			print("마이그레이션 기법 결정: ", best_migr)
 			assert len(best_migr) > 0
 

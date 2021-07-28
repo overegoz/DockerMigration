@@ -17,23 +17,23 @@ class Profile:
 	# effective throughput (bits/sec)
 	th_bps = {1:0}
 	# 특정한 migr 기법을 강제하고 싶을때: MIGR_FC,DC,LR,AUTO 
-	force = {1:0}
-	# 도커 이미지 이름 : 최초로 실행하는 이미지 이름
-	img_name_ap1 = {1:0}
-	# 도커 이미지 이름 : migr 목적지에서 실행하는 이미지 이름
-	img_name_ap1 = {1:0}
-	# 컨테이너 이름
-	cont_name = {1:0}
+	predetermined_migr = {1:common.MIGR_NONE}
+	# 도커 이미지 이름 : AP-1에서 최초로 실행하는 이미지 이름
+	img_name_ap1 = {1:'twoon/profile1:es1'}
+	# 도커 이미지 이름 : migr 목적지(AP-2)에서 실행하는 이미지 이름
+	img_name_ap2 = {1:'twoon/profile1:es2'}
+	# 컨테이너 이름 (ES1과 ES2에서 동일한 이름을 사용하게 하자)
+	container_name = {1:'profile1'}
 	# 체크포인트 이름
 	checkpoint_name = {1:0}
 	# user가 몇번의 REQ를 보낸 후 handover 할지
 	ho_cnt = {1:5}
 	# user가 몇초에 한번씩 REQ 보낼 지
 	request_interval_sec = {1:1}
-
+	# -------------------------------------------------------------------
 	def __init__(self):
 		pass
-
+	# -------------------------------------------------------------------
 	def get_C(self, p):
 		return self.C_sec[int(p)]
 
@@ -44,13 +44,16 @@ class Profile:
 		return self.img_name_ap2[int(p)]        
 
 	def get_cont_name(self, p):
-		return self.cont_name[int(p)]
+		return self.container_name[int(p)]
 
 	def get_req_int(self, p):
 		return self.request_interval_sec[int(p)]
 
 	def get_ho_cnt(self, p):
 		return self.ho_cnt[int(p)]
+
+	def get_predetermined_migr(self, p):
+		return self.predetermined_migr[p]
 
 	def id_min(self):
 		"""
