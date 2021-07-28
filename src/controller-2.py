@@ -46,12 +46,12 @@ while(True):
 		# LOGGER로 부터 받은 메시지라면... HELO/BYEE 이벤트에 대한 것이지
 		if sender == common.logger_name:
 			cmd = words[1]
-			target = words[2]
 			if cmd == common.USER_HELLO:  # [CR1]
+				target = words[2]
 				if len(user_curr_ap) == 0:
 					# 처음으로 association 하는거면, migr 필요없음
 					user_curr_ap = target
-				else:
+				else:  # handover 발생해서 다른 AP로 이동했다
 					"""
 					handover로 인해서, user가 new AP에게 HELO를 보냈다
 					user는 BYE보다 HELO를 먼저 보내니까, migr 작업을 여기서 시작하자
@@ -64,10 +64,16 @@ while(True):
 					# [CS1] oldAP에게 [migr 판단에 필요한 정보]를 요청
 					send_msg = common.str2(my_name, common.INFO_REQ)
 					common.udp_send(sock, my_name, user_old_ap, send_msg, common.SHORT_SLEEP)
+					print(user_old_ap, "에게 마이그레이션 정보 요청")
+
+				print('user_old_ap:', user_old_ap)
+				print('user_curr_ap:', user_curr_ap)
 			elif cmd == common.USER_BYE:  # [CR2]
-				# 할 일 없음...
-				assert user_curr_ap == common.ap1_name
+				# 할 일 없음. 
+				# user_curr_ap, user_old_ap 변수 처리는 HELO 메시지 경우에 처리함
 				pass
+			elif cmd == common.USER_EXIT:  # [CR4] 모두 초기화
+				user_curr_ap, user_old_ap = "", ""
 			else:
 				assert False
 		# [CR3] AP로 부터 받은 것이라면, 
@@ -81,7 +87,8 @@ while(True):
 
 			# 받은 정보를 기준으로 어떤 migr 기법이 최선인지 판단하기
 			# 받은 정보 = words[2], AP가 보내온 정보, space 구분된 문자열
-			best_migr = common.get_best_migr(infos)
+			best_migr = common.get_best_migr(infos, common.weight, common.MIGR_FC)
+			print("마이그레이션 기법 결정: ", best_migr)
 			assert len(best_migr) > 0
 
 			# 최선의 migr 기법을 old AP와 new AP 에게 알려주기
@@ -91,7 +98,7 @@ while(True):
 							common.SHORT_SLEEP)
 			# 2. migr 목적지 준비시작! [CS3.2]
 			common.udp_send(sock, my_name, user_curr_ap, 
-							common.str3(my_name, common.MIGR_SRC, best_migr),
+							common.str3(my_name, common.MIGR_DST, best_migr),
 							common.SHORT_SLEEP)
 		else:  # 오류!
 			assert False

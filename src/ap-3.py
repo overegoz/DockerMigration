@@ -17,7 +17,7 @@ $ python3 ap-edge.py <이름> <ES 프로파일>
 err_msg = ""
 if len(sys.argv) != 3:
 	# 인자 갯수가 정확하지 않음
-	err_msg = "Need 2 args! " + str(sys.argv)
+	err_msg = "Need 2 args: <ap name> <profile>, but you entered " + str(sys.argv)
 elif sys.argv[1] != common.ap1_name \
 	 and sys.argv[1] != common.ap2_name:
 	# AP 이름이 정확하지 않음
@@ -104,10 +104,12 @@ while(True):
 		elif cmd == common.MIGR_SRC:  # [AR2] migr 출발지, 시작!
 			# profile : 시나리오 프로파일
 			migr_tech = words[2]  # 마이그레이션 기법
+			print('MIGR_SRC: ', migr_tech)
 			# other_ap : 마이그레이션 목적지
 			pass  # todo 
 		elif cmd == common.MIGR_DST:  # [AR3] migr 도착지, 시작!
 			migr_tech = words[2]
+			print('MIGR_DST: ', migr_tech)
 			pass  # todo
 		elif cmd == common.SVC_REQ:  # 서비스 요청 [AR4][AR9]
 			assert sender == common.user_name or sender == other_ap
@@ -117,6 +119,7 @@ while(True):
 				common.udp_send(sock, my_name, my_edgeserver, send_msg, common.SHORT_SLEEP)
 			else:  # 나의 ES가 down 상태임
 				# [AS4.2][AS9.2] 수신 메시지를 다른 AP에게 전달해줌
+				print('[서비스 요청] 동작하는 ES가 없어서 다른 AP로 전달')
 				common.udp_send(sock, my_name, other_ap, send_msg, common.SHORT_SLEEP)
 		elif cmd == common.USER_HELLO:  # [AR5] 새로운 user가 접속했다
 			assert user_associated == False  # user는 한명 뿐이거든...
@@ -134,7 +137,9 @@ while(True):
 			send_msg = common.str3(my_name, words[1], words[2])
 			if user_associated == True:  # [AS7] 나에게 연결된 user로 보내기
 				common.udp_send(sock, my_name, common.user_name, send_msg, common.SHORT_SLEEP)
+				print('USER에게 전달: ', send_msg)
 			else:  # [AS8] 다른 AP로 relay 해주기
+				print('[서비스 응답] 연결된 사용자가 없어서 다른 AP로 전달')
 				common.udp_send(sock, my_name, other_ap, send_msg, common.SHORT_SLEEP)
 		elif cmd == common.ES_STOP:  # [AR11] edge server 정지하기
 			pass  # todo
@@ -146,6 +151,8 @@ while(True):
 				# [AS13] 이 때만 user에게 알려주기
 				common.udp_send(sock, my_name, common.user_name, 
 								common.str2(my_name, cmd), common.SHORT_SLEEP)
+		elif cmd == common.USER_EXIT:
+			user_associated = False  # [AR14] user가 아예 종료하고 떠나는 것
 		else:
 		    assert False
 	else: 

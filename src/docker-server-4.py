@@ -21,7 +21,7 @@ $ python3 docker-server.py <이름> <프로파일>
 err_msg = ""
 if len(sys.argv) != 3:
 	# 인자 갯수가 정확하지 않음
-	err_msg = "Need 3 args! " + str(sys.argv)
+	err_msg = "Need 3 args: <edge server name> <profile>, but you entered " + str(sys.argv)
 elif sys.argv[1] != common.edge_server1_name \
 	and sys.argv[1] != common.edge_server2_name:
 	# EdgeServer 이름이 정확하지 않음

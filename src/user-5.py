@@ -17,7 +17,7 @@ $ python3 user.py <USER 프로필>
 err_msg = ""
 if len(sys.argv) != 2:
 	# 인자 갯수가 정확하지 않음
-	err_msg = "Need 1 arg(s)! " + str(sys.argv)
+	err_msg = "Need 1 arg(s): <profile>, but you entered " + str(sys.argv)
 elif int(sys.argv[1]) not in common.profile_ids:
 	# 정의되지 않은 프로필 번호가 주어짐	
 	err_msg = "Incorrect profile id! " + str(sys.argv[1])
@@ -38,8 +38,13 @@ sock.bind((local_ip, local_port))
 sock.setblocking(0)  # non-blocking socket으로 만들기
 # -------------------------------------------------------------------
 def handler(signum, frame):  # CTRL+C 시그널 핸들러 만들기
+# 코드마다 마무리 작업이 달라서, common 파일로 옮기지 못함
 	print(common.sigint_msg)
-	# 코드마다 마무리 작업이 달라서, common 파일로 옮기지 못함
+	# ap에게 알려주기
+	common.udp_send(sock, my_name, curr_ap,
+					common.str2(my_name, common.USER_EXIT), 
+					common.SHORT_SLEEP)
+	# 소켓 닫고 나가기	
 	sock.close()  
 	exit()
 
@@ -50,15 +55,9 @@ common.send_log(sock, my_name, my_name, common.str2(common.start_msg,str(sys.arg
 # -------------------------------------------------------------------
 # 처음에는 무조건 AP-1에 연결한다고 가정한다
 curr_ap = common.ap1_name
+# 연결 되었음을 알리기
 common.udp_send(sock, my_name, curr_ap, \
-				common.str2(my_name, common.USER_HELLO), common.SHORT_SLEEP)  # 연결 되었음을 알리기
-# -------------------------------------------------------------------
-def get_ap(curr_ap):
-	# 어떤 AP와 연결할지에 대한 결정을 하는 함수
-	ap_old = curr_ap
-	ap_new = curr_ap  # 일단은 바뀌지 않는 것으로 코딩...
-	return ap_new, ap_old
-
+				common.str2(my_name, common.USER_HELLO), common.SHORT_SLEEP)  
 # -------------------------------------------------------------------
 req_int = common.USER_REQ_INTERVAL
 handover_counter = common.INTMAX  # 핸드오버가 언제 발생하지 제어
@@ -66,8 +65,24 @@ if profile > 0:
 	# 프로파일 번호에 따라서 설정값을 불러옴
 	req_int = common.prof.get_req_int(p)
 	handover_counter = common.prof.get_ho_cnt(p)
+elif profile == -1:  # 테스트용
+	#handover_counter = 3
+	handover_counter = -1
 else:
 	pass  # 테스트용
+# -------------------------------------------------------------------
+def check_ap(current_ap, handover):
+	# 어떤 AP와 연결할지에 대한 결정을 하는 함수
+	if handover == False:
+		ap_old = current_ap
+		ap_new = current_ap  # 일단은 바뀌지 않는 것으로 코딩...
+	else:
+		print('curr: ', current_ap)
+		assert current_ap == common.ap1_name
+		ap_old = current_ap
+		ap_new = common.ap2_name
+
+	return ap_new, ap_old
 # -------------------------------------------------------------------
 counter = 0  # req를 보낼건데, cnt 번호를 붙여서 tracking 가능하도록
 # -------------------------------------------------------------------
@@ -94,7 +109,7 @@ while(True):
 	2. 이벤트에 대해서 Logger에 전송
 	"""
 	# 어떤 AP에 연결할지를 확인
-	curr_ap, old_ap = get_ap(curr_ap)
+	curr_ap, old_ap = check_ap(curr_ap, counter == handover_counter)
 
 	if curr_ap == old_ap:  # AP가 변경되지 않음
 		# 현재 연결된 AP 에게 서비스 요청 메시지 보내기
@@ -106,11 +121,15 @@ while(True):
 		# [UR1] 현재 연결된 AP로 부터 서비스 응답 메시지 수신하기
 		recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, req_int/2.0)
 		if len(recv_msg) > 0:  
+			print('recv msg: ', recv_msg)
 			words = recv_msg.split(common.delim)
 
-			# 현재 연결된 AP로 부터 데이터를 수신한 것이 맞는지 확인
+			"""
+			- 현재 연결된 AP로 부터 데이터를 수신한 것이 맞는지 확인 => 주석처리
+			- user의 NIC 큐에 버퍼링 된 수신 데이터가 있을경우, 오류가 발생하는 버그있음
 			sender = words[0]
-			assert sender == curr_ap  
+			assert sender == curr_ap, 'recv msg: {}'.format(recv_msg)
+			"""
 
 			cmd = words[1]
 			if cmd == common.SVC_RES:
@@ -120,6 +139,7 @@ while(True):
 			else: assert False
 		else: pass
 	else:  # 접속 AP가 변경됨
+		print("핸드오버 발생 : {} => {}".format(old_ap, curr_ap))
 		# [US2] new AP로 HELO 먼저 보내고,
 		send_msg = common.str2(my_name, common.USER_HELLO)
 		#print("send : ", send_msg)
@@ -129,5 +149,11 @@ while(True):
 		send_msg = common.str2(my_name, common.USER_BYE)
 		#print("send : ", send_msg)
 		common.udp_send(sock, my_name, old_ap, send_msg, common.USER_HANDOVER_DELAY/2.0)
-		pass
+		
+		"""
+		handover counter를 초기화
+		: counter를 증가시키지 않고 while 루프를 다시 시작하게 되면
+		  handover 직후, check_ap에서 오류남
+		"""
+		handover_counter = -1
 

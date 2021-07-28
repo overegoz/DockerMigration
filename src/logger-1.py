@@ -52,20 +52,28 @@ while(True):
 
 		# USER가 HELO/BYEE 메시지를 보낸 경우, controller에게 이 사실을 알려줘야 함
 		# AP가 보내온 로그 형식은... (user는 한명 밖에 존재하지 않음)
-		# : <시간> <AP-X> <USER> <메시지: HELO 또는 BYEE>
+		# : <시간> <AP-X> <USER> <메시지: USER HELO 또는 USER BYEE>
 		words = recv_msg.split(common.delim)
 		sender = words[1]
-		event = words[3]
-		if sender == common.ap1_name or sender == common.ap2_name:  # AP로부터 도착한 메시지...
-			if event == common.USER_HELLO or event == common.USER_BYE: # [LR1][LR2] HELO/BYEE 면...
-				ap_name = words[1]
-				msg = common.str3(my_name, event, ap_name)
-				common.udp_send(sock, my_name, common.controller_name, msg, 
-								common.SHORT_SLEEP)  # [LS1][LS2] 컨트롤러에 알리기
-				logger_log(f, common.controller_name, 
-									common.str2(msg, "(sent to controller)"))  # 로그로 기록하기
-			else:
-				pass 
+		if len(words) >= 5: 
+			event = words[4]
+			if sender == common.ap1_name or sender == common.ap2_name:  # AP로부터 도착한 메시지...
+				# 컨트롤러에게 전달해 줘야 하는 이벤트 발생: [LR1][LR2] HELO/BYEE 면...
+				if event == common.USER_HELLO or event == common.USER_BYE: 
+					ap_name = words[1]
+					msg = common.str3(my_name, event, ap_name)
+					common.udp_send(sock, my_name, common.controller_name, msg, 
+									common.SHORT_SLEEP)  # [LS1][LS2] 컨트롤러에 알리기
+					logger_log(f, common.controller_name, 
+										common.str2(msg, "(sent to controller)"))  # 로그로 기록하기
+				elif event == common.USER_EXIT:  # [LR3] EXIT
+					msg = common.str2(my_name, event)
+					common.udp_send(sock, my_name, common.controller_name, msg, 
+									common.SHORT_SLEEP)  # [LS3] 컨트롤러에 알리기
+					logger_log(f, common.controller_name, 
+										common.str2(msg, "(sent to controller)"))  # 로그로 기록하기
+				else:
+					pass 
 	else: # 수신한 메시지가 없으면, 그냥 패스!
 		pass
 

@@ -51,7 +51,7 @@ class Profile:
 		return self.ho_cnt[p]
 
 	def id_min(self):
-		# 프로필 -1번 : 도커 없이 실행
+		# 프로필 -1번 : 도커 없이 하나의 컴퓨터에서 실행
 		# 프로필 0번 : 도커 있지만 migr 없음
 		return -1
 
