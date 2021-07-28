@@ -36,8 +36,8 @@ ip = {controller_name : "192.168.0.2",
 		user_name : "192.168.0.2",
 		ap1_name : "192.168.0.2",
 		ap2_name : "192.168.0.2",
-		edge_server1_name : "192.168.0.113",
-		edge_server2_name : "192.168.0.114"}
+		edge_server1_name : "192.168.0.116",
+		edge_server2_name : "192.168.0.117"}
 
 # 도커가 인식하는 자신의 IP는 0.0.0.0이다        
 ip_fake = {edge_server1_name : "0.0.0.0",

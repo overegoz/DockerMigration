@@ -8,11 +8,11 @@ os.system('ls')
 print('[ls] finished')
 
 print('[file dump] begins')
-os.system('ls > ls_results.txt')
+os.system('ls > /tmp/ls_results.txt')
 print('[file dump] finished')
 
 print('[truncate] begins')
-os.system('truncate --size=10MB just.file')
+os.system('truncate --size=10MB /tmp/just.file')
 print('[truncate] finishes')
 
 print('[file dump] begins')
