@@ -68,6 +68,8 @@ if profile > 0:
 elif profile == -1:  # 테스트용
 	#handover_counter = 3
 	handover_counter = -1
+elif profile == 0:  # test
+	pass
 else:
 	pass  # 테스트용
 # -------------------------------------------------------------------
