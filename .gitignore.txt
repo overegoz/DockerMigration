@@ -1,5 +1,6 @@
 ~$ *
 Win는사무용PC에서만git사용.txt
 __pycache__
+*/__pycache__/*
 .DS_Store
 venv
