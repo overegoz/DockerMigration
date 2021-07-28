@@ -1,7 +1,9 @@
 import common
 
 class Profile:
-	# Dictionary 구조로 하자 "프로필번호 : 값"
+	""" 
+	Dictionary 구조로 하자 "프로필번호 : 값"
+	"""
 	# 공통 소요시간
 	C_sec = {1:0}
 	# diff 파일 전체 크기

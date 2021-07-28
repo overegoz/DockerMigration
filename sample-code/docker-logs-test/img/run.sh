@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker run -d twoon/logtest
+docker run -d --name logt twoon/logtest
