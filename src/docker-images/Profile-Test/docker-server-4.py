@@ -65,6 +65,7 @@ else:
 	localIP = common.ip_fake[my_name]
 
 localPort = common.port[my_name]
+print(localIP, ", ", localPort)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 sock.bind((localIP, localPort)) 
 sock.setblocking(0)  # non-blocking socket으로 만들기

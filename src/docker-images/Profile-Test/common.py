@@ -169,7 +169,7 @@ def start_edgeserver(es_name, profile):
 	- profile : 어떤 프로파일을 적용할지 (base image 이름도 포함)
 	- ap1이면 최초로 실행하는 것이고, ap2이면 migr 으로 실행하는 것임
 	"""
-	if profile == -1:  # 테스트 용
+	if profile <= 0:  # 테스트 용
 		return
 
 	my_port = port[es_name]
