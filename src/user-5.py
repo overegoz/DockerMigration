@@ -69,7 +69,7 @@ elif profile == -1:  # 테스트용
 	#handover_counter = 3
 	handover_counter = -1
 elif profile == 0:  # test
-	pass
+	handover_counter = 5
 else:
 	pass  # 테스트용
 # -------------------------------------------------------------------

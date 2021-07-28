@@ -31,11 +31,11 @@ ip = {controller_name : "127.0.0.1",
 		edge_server1_name : "127.0.0.1",
 		edge_server2_name : "127.0.0.1"}
 """
-ip = {controller_name : "192.168.0.2",
-		logger_name : "192.168.0.2",
-		user_name : "192.168.0.2",
-		ap1_name : "192.168.0.2",
-		ap2_name : "192.168.0.2",
+ip = {controller_name : "127.0.0.1",
+		logger_name : "127.0.0.1",
+		user_name : "127.0.0.1",
+		ap1_name : "127.0.0.1",
+		ap2_name : "127.0.0.1",
 		edge_server1_name : "192.168.0.113",
 		edge_server2_name : "192.168.0.114"}
 
@@ -85,7 +85,7 @@ ES_READY = "ES-READY"  # Edge Server 가 ready 상태가 되고, 서비스 가�
 # 상수 정의
 bufsiz = 1024
 delim = " "
-SHORT_SLEEP = 0.05
+SHORT_SLEEP = 0.1
 USER_REQ_INTERVAL = 1.0
 USER_HANDOVER_DELAY = 1.0
 INTMAX = sys.maxsize  # 참고: 파이썬2 에서는 sys.maxint
@@ -196,7 +196,7 @@ def return_migr_info_ap1(p):
 	프로파일 번호에 따라서, 어떤 정보를 컨트롤러에 리턴할지 미리 정해놓자
 	리스트 형태로 만들고, 주어진 인덱스에 맞는 값을 리턴하도록 구현하자
 	"""
-	if p == -1 or p == 0:
+	if p == -1:
 		return "1 2 3 4 5 6"  # test
 
 	C_sec,l_diff_bits,l_check_bits,l_log_bits,t_replay_sec,th_bps,force \
