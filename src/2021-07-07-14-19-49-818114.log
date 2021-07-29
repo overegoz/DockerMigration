@@ -1,0 +1,6 @@
+2021-07-07-14-19-49-818114 LOGR LOGR start
+2021-07-07-14-19-52-677950 CTRL CTRL start
+2021-07-07-14-19-59-534614 AP-1 AP-1 start ['ap-3.py', 'AP-1', '1']
+2021-07-07-05-20-00-455271 EdgeServer-1 EdgeServer-1 start ['/tmp/server.py', 'EdgeServer-1', '0']
+2021-07-07-05-20-00-511160 EdgeServer-1 AP-1 EdgeServer-1 ES-READY (sent)
+2021-07-07-14-20-54-714174 AP-1 EdgeServer-1 start  (initial launch)
