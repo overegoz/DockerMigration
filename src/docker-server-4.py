@@ -90,6 +90,7 @@ send_msg = common.str2(my_name, common.ES_READY)
 common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 # -------------------------------------------------------------------
 # 서비스를 시작
+no_recv_cnt = 0
 while(True): 
 	"""
 	Edge서버는 두 가지 통신만 한다.
@@ -130,6 +131,7 @@ while(True):
 		common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 		print('sending: ', send_msg)
 	else:
-		print('recv: nothing')
+		no_recv_cnt += 1
+		if no_recv_cnt % 100 == 0:
+			print('recv nothing (cnt : {})'.format(no_recv_cnt))
 
-		
