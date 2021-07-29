@@ -139,7 +139,8 @@ while(True):
 				# udp_recv에서 로그 남기니까, 그냥 pass 하면 됨
 				pass
 			else: assert False
-		else: pass
+		else: 
+			print('recv nothing')
 	else:  # 접속 AP가 변경됨
 		print("핸드오버 발생 : {} => {}".format(old_ap, curr_ap))
 		# [US2] new AP로 HELO 먼저 보내고,

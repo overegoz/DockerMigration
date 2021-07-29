@@ -219,7 +219,7 @@ def start_migr(sock, migr_tech, my_name, other_ap):  # migr src에서 migr 작�
 		assert False
 
 	# 3. migr 관련 파일 전송이 완료되면 ES를 시작하라고 알려주기 [AS12]
-	udp_send(sock, my_name, other_ap, str2(my_name, ES_START))
+	udp_send(sock, my_name, other_ap, str2(my_name, ES_START), SHORT_SLEEP)
 	print('migr 준비 완료!')
 
 def return_migr_info_ap1(p):
