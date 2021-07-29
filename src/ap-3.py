@@ -171,7 +171,7 @@ while(True):
 			print("ES 종료 시작!")
 			edge_server_ready = False  # 이걸 먼저하자. ES STOP에 시간이 좀 걸리더라...
 			# ES 종료는 스레드로 처리하자 // join은 시그널 핸들러에서...
-			thr_stop = Thread(target=common.stop_edgeserver, args=(profile))
+			thr_stop = Thread(target=common.stop_edgeserver, args=(profile,))  # 1 arg 일때는 컴마(,)
 			thr_stop.start()
 		elif cmd == common.ES_START:  # [AR12] edge server 시작하기
 			# AP-1에서 migr에 필요한 데이터를 AP-2로 전송 완료한 후, AP-1이 AP-2에게 보내주는 메시지
