@@ -133,5 +133,5 @@ while(True):
 	except socket.error:
 		# AP로 부터 REQ 받지 않으면 답변할 게 없음
 		# non-blocking recv: 빈손으로 리턴할때 예외가 발생하고, 이를 잡아줘야함
-		pass
+		print('recv: nothing')
 
