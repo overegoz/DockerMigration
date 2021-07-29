@@ -10,3 +10,5 @@ cd ../../
 cd Profile-1/ES-1
 sh build.sh
 cd ../../
+
+docker image prune -f

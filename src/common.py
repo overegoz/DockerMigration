@@ -205,21 +205,21 @@ def start_migr(sock, migr_tech, my_name, other_ap):  # migr src에서 migr 작�
 	2. 파일을 other_ap에게 전송하기 : nothing to do
 	3. 전송이 완료되면 ES를 시작하라고 알려주기 [AS12]
 	"""
-	if migr_tech == common.MIGR_NONE:  # 테스트용, 1번 프로파일
+	if migr_tech == MIGR_NONE:  # 테스트용, 1번 프로파일
 		# 1. nothing to do
 		# 2. nothing to do
 		pass		
-	elif migr_tech == common.MIGR_FC:
+	elif migr_tech == MIGR_FC:
 		pass
-	elif migr_tech == common.MIGR_DC:
+	elif migr_tech == MIGR_DC:
 		pass
-	elif migr_tech == common.MIGR_LR:
+	elif migr_tech == MIGR_LR:
 		pass
 	else:
 		assert False
 
 	# 3. migr 관련 파일 전송이 완료되면 ES를 시작하라고 알려주기 [AS12]
-	common.udp_send(sock, my_name, other_ap, common.str2(my_name, common.ES_START))
+	udp_send(sock, my_name, other_ap, str2(my_name, ES_START))
 	print('migr 준비 완료!')
 
 def return_migr_info_ap1(p):
