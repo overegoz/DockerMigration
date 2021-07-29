@@ -199,7 +199,7 @@ def stop_edgeserver(profile):
 	os.system(cmd)
 	print('EdgeServer가 종료 되었습니다')
 
-def start_migr(migr_tech, my_name, other_ap):  # migr src에서 migr 작업을 수행하기 위한 함수
+def start_migr(sock, migr_tech, my_name, other_ap):  # migr src에서 migr 작업을 수행하기 위한 함수
 	"""
 	1. 전송할 파일 만들기 : nothing to do
 	2. 파일을 other_ap에게 전송하기 : nothing to do

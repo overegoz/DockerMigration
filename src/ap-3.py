@@ -126,8 +126,9 @@ while(True):
 				or migr_tech == common.MIGR_DC or migr_tech == common.MIGR_LR
 
 			print('MIGR 작업을 시작합니다')
-			thr_migr = Thread(target=common.start_migr, args=(migr_tech, my_name, other_ap))
-
+			thr_migr = Thread(target=common.start_migr, \
+								args=(sock, migr_tech, my_name, other_ap))
+			thr_migr.start()
 		elif cmd == common.MIGR_DST:  # [AR3] migr 도착지, 시작! (참고: 마이그레이션 출발지는 other_ap)
 			assert edge_server_ready == False
 			migr_tech = words[2]
@@ -170,12 +171,14 @@ while(True):
 			edge_server_ready = False  # 이걸 먼저하자. ES STOP에 시간이 좀 걸리더라...
 			# ES 종료는 스레드로 처리하자 // join은 시그널 핸들러에서...
 			thr_stop = Thread(target=common.stop_edgeserver, args=(profile))
+			thr_stop.start()
 		elif cmd == common.ES_START:  # [AR12] edge server 시작하기
 			# AP-1에서 migr에 필요한 데이터를 AP-2로 전송 완료한 후, AP-1이 AP-2에게 보내주는 메시지
 			assert sender == other_ap
 			print("ES 를 시작합니다")	
 			thr_start = Thread(target=common.start_edgeserver, args=(my_edgeserver, profile))
-			edge_server_ready = True  # 이걸 마지막에...
+			thr_start.start()
+			# edge_server_ready 는 common.ES_READY 받으면 True로 설정
 		elif cmd == common.ES_READY:  # [AR13] edge svr가 서비스 가능 상태로 변경되었음을 알려줌
 			edge_server_ready = True
 			if (my_name == common.ap1_name) and (user_associated == True):

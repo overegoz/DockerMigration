@@ -1,6 +1,8 @@
 #!/bin/bash
 
+docker stop $(docker ps -a -q)
 docker container prune -f
+
 cd Profile-0/ES-2
 sh build.sh
 cd ../../
