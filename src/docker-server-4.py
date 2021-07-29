@@ -100,38 +100,36 @@ while(True):
 		: EdgeServer<서버번호> SVCR <같은 숫자>
 	"""
 	# 직접 연결된 AP로 부터 데이터 수신하기
-	try:
-		recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
-		if len(recv_msg) > 0:
-			print('recv: ', recv_msg)
-			words = recv_msg.split(common.delim)
+	recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
+	if len(recv_msg) > 0:
+		print('recv: ', recv_msg)
+		words = recv_msg.split(common.delim)
 
-			# sender 정보가 맞는지 확인
-			if words[0] != my_ap_name:
-				common.send_log(sock, my_name, my_name, \
-								common.str2("invalid-sender-name", recv_msg))
-				assert False
+		# sender 정보가 맞는지 확인
+		if words[0] != my_ap_name:
+			common.send_log(sock, my_name, my_name, \
+							common.str2("invalid-sender-name", recv_msg))
+			assert False
 
-			# [ER1][ER2] 서비스 요청 메시지가 맞는지 확인
-			if words[1] != common.SVC_REQ:
-				common.send_log(sock, my_name, my_name, \
-								common.str2("invalid-command-received", recv_msg))
-				assert False
+		# [ER1][ER2] 서비스 요청 메시지가 맞는지 확인
+		if words[1] != common.SVC_REQ:
+			common.send_log(sock, my_name, my_name, \
+							common.str2("invalid-command-received", recv_msg))
+			assert False
 
-			# 수신 메시지가 형식에 맞는지 확인하기
-			if len(words) != 3:
-				common.send_log(sock, my_name, my_name, 
-								common.str2("wrong-msg-format", recv_msg))
-				assert False
+		# 수신 메시지가 형식에 맞는지 확인하기
+		if len(words) != 3:
+			common.send_log(sock, my_name, my_name, 
+							common.str2("wrong-msg-format", recv_msg))
+			assert False
 
-			# 직접 연결된 AP에게 전송할 메시지 준비하기
-			counter = words[2]
-			send_msg = common.str3(my_name, common.SVC_RES, counter)
-			# [ES1][ES2] 직접 연결된 AP에게 메시지 전송
-			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
-			print('sending: ', send_msg)
-	except socket.error:
-		# AP로 부터 REQ 받지 않으면 답변할 게 없음
-		# non-blocking recv: 빈손으로 리턴할때 예외가 발생하고, 이를 잡아줘야함
+		# 직접 연결된 AP에게 전송할 메시지 준비하기
+		counter = words[2]
+		send_msg = common.str3(my_name, common.SVC_RES, counter)
+		# [ES1][ES2] 직접 연결된 AP에게 메시지 전송
+		common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
+		print('sending: ', send_msg)
+	else:
 		print('recv: nothing')
 
+		

@@ -142,6 +142,7 @@ while(True):
 			if edge_server_ready == True:  # 나의 ES가 정상 동작함
 				# [AS4.1][AS9.1] 수신 메시지를 edge server에게 전달해줌
 				common.udp_send(sock, my_name, my_edgeserver, send_msg, common.SHORT_SLEEP)
+				print('[서비스 요청] 나의 ES로 전달')
 			else:  # 나의 ES가 down 상태임
 				# [AS4.2][AS9.2] 수신 메시지를 다른 AP에게 전달해줌
 				print('[서비스 요청] 동작하는 ES가 없어서 다른 AP로 전달')
@@ -162,7 +163,7 @@ while(True):
 			send_msg = common.str3(my_name, words[1], words[2])
 			if user_associated == True:  # [AS7] 나에게 연결된 user로 보내기
 				common.udp_send(sock, my_name, common.user_name, send_msg, common.SHORT_SLEEP)
-				print('USER에게 전달: ', send_msg)
+				print('[서비스 응답] 직접 연결된 USER에게 전달: ', send_msg)
 			else:  # [AS8] 다른 AP로 relay 해주기
 				print('[서비스 응답] 연결된 사용자가 없어서 다른 AP로 전달')
 				common.udp_send(sock, my_name, other_ap, send_msg, common.SHORT_SLEEP)
