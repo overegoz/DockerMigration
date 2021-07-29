@@ -103,8 +103,9 @@ while(True):
 	recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
 	# -------------------------------------------------------------------
 	if len(recv_msg) > 0:  # 수신한 데이터가 있으면...
+		print('recv: ', recv_msg)
 		words = recv_msg.split(common.delim)
-		#print(words)
+		
 		sender = words[0]
 		cmd = words[1]
 
@@ -190,7 +191,7 @@ while(True):
 			if my_name == common.ap2_name:
 				# [AS11] AP-1의 ES를 종료하라고 알려줘야지?
 				common.udp_send(sock, my_name, other_ap,
-								common.str2(my_name, common.ES_STOP))
+								common.str2(my_name, common.ES_STOP), common.SHORT_SLEEP)
 		elif cmd == common.USER_EXIT:
 			user_associated = False  # [AR14] user가 아예 종료하고 떠나는 것
 		else:
