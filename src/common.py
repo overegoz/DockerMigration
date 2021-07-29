@@ -34,8 +34,8 @@ ip = {controller_name : "127.0.0.1",
 ip = {controller_name : "192.168.0.2",
 		logger_name : "192.168.0.2",
 		user_name : "192.168.0.2",
-		ap1_name : "192.168.0.2",
-		ap2_name : "192.168.0.2",
+		ap1_name : "192.168.0.116",
+		ap2_name : "192.168.0.116",
 		edge_server1_name : "192.168.0.116",
 		edge_server2_name : "192.168.0.117"}
 
