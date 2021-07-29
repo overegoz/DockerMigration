@@ -142,7 +142,8 @@ while(True):
 			if edge_server_ready == True:  # 나의 ES가 정상 동작함
 				# [AS4.1][AS9.1] 수신 메시지를 edge server에게 전달해줌
 				common.udp_send(sock, my_name, my_edgeserver, send_msg, common.SHORT_SLEEP)
-				print('[서비스 요청] 나의 ES로 전달')
+				print('[서비스 요청] 나의 ES로 전달 {}/{}'.format(common.ip[my_edgeserver], 
+																common.port[my_edgeserver]))
 			else:  # 나의 ES가 down 상태임
 				# [AS4.2][AS9.2] 수신 메시지를 다른 AP에게 전달해줌
 				print('[서비스 요청] 동작하는 ES가 없어서 다른 AP로 전달')

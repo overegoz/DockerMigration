@@ -36,21 +36,21 @@ ip = {controller_name : "192.168.0.2",
 		user_name : "192.168.0.2",
 		ap1_name : "192.168.0.116",
 		ap2_name : "192.168.0.117",
-		edge_server1_name : "127.0.0.1",
-		edge_server2_name : "127.0.0.1"}
+		edge_server1_name : "192.168.0.116",
+		edge_server2_name : "192.168.0.117"}
 
 # 도커가 인식하는 자신의 IP는 0.0.0.0이다        
 ip_fake = {edge_server1_name : "0.0.0.0",
 		edge_server2_name : "0.0.0.0"}
 # -------------------------------------------------------------------
 # port number
-port = {controller_name : 20000,
-		logger_name : 20001,
-		user_name : 20002,
-		ap1_name : 20003,
-		ap2_name : 20004,
-		edge_server1_name : 20005,
-		edge_server2_name : 20006}
+port = {controller_name : 21000,
+		logger_name : 21001,
+		user_name : 21002,
+		ap1_name : 21003,
+		ap2_name : 21004,
+		edge_server1_name : 21005,
+		edge_server2_name : 21006}
 # -------------------------------------------------------------------
 # directory
 account = "daniel"
