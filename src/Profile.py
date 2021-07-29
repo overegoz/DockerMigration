@@ -24,7 +24,7 @@ class Profile:
 	th_bps = {1:1}
 	# -------------------------------------------------------------------
 	# 특정한 migr 기법을 강제하고 싶을때: MIGR_FC,DC,LR,AUTO 
-	predetermined_migr = {1:common.MIGR_NONE}
+	predetermined_migr = {1:"MIGR-NONE"}
 	# -------------------------------------------------------------------
 	# 도커 이미지 이름 : AP-1에서 최초로 실행하는 이미지 이름
 	img_name_ap1 = {1:'twoon/profile1:es1'}
