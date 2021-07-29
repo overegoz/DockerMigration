@@ -122,8 +122,8 @@ while(True):
 			migr_tech = words[2]  # 마이그레이션 기법
 			print('MIGR_SRC: ', migr_tech, ' (구현 미완료)')
 
-			assert migr_tech == MIGR_NONE or migr_tech == MIGR_FC \
-				or migr_tech == MIGR_DC or migr_tech == MIGR_LR
+			assert migr_tech == common.MIGR_NONE or migr_tech == common.MIGR_FC \
+				or migr_tech == common.MIGR_DC or migr_tech == common.MIGR_LR
 
 			print('MIGR 작업을 시작합니다')
 			thr_migr = Thread(target=common.start_migr, args=(migr_tech, my_name, other_ap))

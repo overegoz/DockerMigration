@@ -84,7 +84,7 @@ while(True):
 
 			# <AP-X> <INF_RES> <프로파일 번호> <migr 판단에 필요한 정보, '-'로 구분>
 			assert words[1] == common.INFO_RES
-			profile = words[2]
+			profile = int(words[2])
 			infos = words[3]  # AP가 보내온 정보, '-'로 구분된 문자열
 
 			# 받은 정보를 기준으로 어떤 migr 기법이 최선인지 판단하기
