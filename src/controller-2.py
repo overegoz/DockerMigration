@@ -51,7 +51,7 @@ while(True):
 				if len(user_curr_ap) == 0:
 					# 처음으로 association 하는거면, migr 필요없음
 					user_curr_ap = target
-				else:  # handover 발생해서 다른 AP로 이동했다
+				else:  # handover 발생해서 다른 AP로 이동했다 : migr 준비하자
 					"""
 					handover로 인해서, user가 new AP에게 HELO를 보냈다
 					user는 BYE보다 HELO를 먼저 보내니까, migr 작업을 여기서 시작하자
@@ -81,16 +81,19 @@ while(True):
 		elif sender == common.ap1_name or sender == common.ap2_name:
 			assert len(user_curr_ap) > 0 and len(user_old_ap) > 0
 			assert sender == user_old_ap
+
+			# <AP-X> <INF_RES> <프로파일 번호> <migr 판단에 필요한 정보, '-'로 구분>
 			assert words[1] == common.INFO_RES
 			profile = words[2]
 			infos = words[3]  # AP가 보내온 정보, '-'로 구분된 문자열
 
 			# 받은 정보를 기준으로 어떤 migr 기법이 최선인지 판단하기
-			# 받은 정보 = words[2], AP가 보내온 정보, space 구분된 문자열
 			best_migr = ""
 			if common.prof.get_predetermined_migr(profile) == common.MIGR_AUTO:
+				# 최적의 migr 기법을 자동(AUTO)으로 선택하기
 				best_migr = common.get_best_migr(infos, common.weight, common.MIGR_FC)
 			else:
+				# 사전에 설정된 migr 기법이 있으면, 그것을 선택하기
 				best_migr = common.prof.get_predetermined_migr(profile)
 
 			print("마이그레이션 기법 결정: ", best_migr)

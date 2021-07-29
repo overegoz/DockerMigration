@@ -1,8 +1,9 @@
+from threading import Thread
 import socket 
-import time
+import time, datetime
 import signal, os, sys
-import datetime
 import common
+
 
 """
 실행 방법
@@ -58,26 +59,38 @@ common.send_log(sock, my_name, my_name, common.str2(common.start_msg,str(sys.arg
 # 상태 정보를 기록할 변수들
 profile = int(sys.argv[2])
 user_associated = False
-edge_server_ready = False
 # -------------------------------------------------------------------
-# Edge Server (Docker) 시작하기
+# Edge Server (Docker) 시작하기 // AP-1만 ES를 이때에 시작한다
+edge_server_ready = None
 if my_name == common.ap1_name:
 	# AP-1은 시작과 동시에 ES 를 시작
+	# 여기서는 thread 쓰지말자
 	common.start_edgeserver(es_name=my_edgeserver, profile=profile)
+	edge_server_ready = True
 	common.send_log(sock, my_name, common.edge_server1_name, 
 					common.str2(common.start_msg, " (initial launch)"))
 elif my_name == common.ap2_name:
 	# AP2는 시작과 동시에 프로필을 시작할 필요 없음. 컨트롤러가 시키면 그 때 시작
 	edge_server_ready = False
-else:
+else: 
 	assert False
+# -------------------------------------------------------------------
+# 스레드 변수 
+thr_start, thr_stop = None, None  # ES 시작용 스레드, ES 종료용 스레드
+thr_migr = None  # MIGR-SRC에서 실행하는 작업을 위한 스레드
 # -------------------------------------------------------------------
 # 핸들러 등록
 def handler(signum, frame):
 	print(common.sigint_msg)
 	sock.close()
 	if edge_server_ready == True:
-		common.stop_edgeserver(profile)
+		common.stop_edgeserver(profile)  # 여기서는 thread 쓰지말자
+	if thr_start is not None:
+		thr_start.join()
+	if thr_stop is not None:
+		thr_stop.join()
+	if thr_migr is not None:
+		thr_migr.join()
 	exit()
 	
 signal.signal(signal.SIGINT, handler)
@@ -99,30 +112,28 @@ while(True):
 			assert sender == common.controller_name
 			# [AS1] migr 기법 결정에 필요한 정보를 컨트롤러에게 전달해줌
 			info = common.return_migr_info_ap1(profile)
+			# <AP-X> <INFR> <프로파일 번호> <migr 판단에 필요한 정보, '-'로 구분>
 			msg = common.str4(my_name, common.INFO_RES, profile, info)
 			common.udp_send(sock, my_name, common.controller_name, msg, common.SHORT_SLEEP)
-		elif cmd == common.MIGR_SRC:  # [AR2] migr 출발지, 시작!
+		elif cmd == common.MIGR_SRC:  # [AR2] migr 출발지, 시작! (참고: 마이그레이션 목적지는 other_ap)
+			assert edge_server_ready == True
+
 			# profile : 시나리오 프로파일
 			migr_tech = words[2]  # 마이그레이션 기법
-			print('MIGR_SRC: ', migr_tech)
-			print('미구현!!!')
-			# other_ap : 마이그레이션 목적지
-			pass  # todo 
-		elif cmd == common.MIGR_DST:  # [AR3] migr 도착지, 시작!
+			print('MIGR_SRC: ', migr_tech, ' (구현 미완료)')
+
+			assert migr_tech == MIGR_NONE or migr_tech == MIGR_FC \
+				or migr_tech == MIGR_DC or migr_tech == MIGR_LR
+
+			print('MIGR 작업을 시작합니다')
+			thr_migr = Thread(target=common.start_migr, args=(migr_tech, my_name, other_ap))
+
+		elif cmd == common.MIGR_DST:  # [AR3] migr 도착지, 시작! (참고: 마이그레이션 출발지는 other_ap)
+			assert edge_server_ready == False
 			migr_tech = words[2]
-			print('MIGR_DST: ', migr_tech)
-			print('미구현!!!')
-
-			# 테스트
-			if migr_tech == common.MIGR_NONE:  # 프로필 1번
-			- 구현하기
-
-			# 스레드 만들어서 edge server를 시작해야 할 듯?
-
-			# ES 준비가 완료되면 AP-1에게 알려서 AP-1의 ES를 종료토록 하기
-			- 이 부분에 대한 msg 정의하기
-
-			pass  # todo
+			print('MIGR_DST: ', migr_tech, ' (구현 미완료)')
+			# 여기선 딱히 해줄 게 없어 
+			# base image를 pull 하도록 하자 => 프로파일용 img는 local img라서 pull 불가
 		elif cmd == common.SVC_REQ:  # 서비스 요청 [AR4][AR9]
 			assert sender == common.user_name or sender == other_ap
 			send_msg = common.str3(my_name, words[1], words[2])
@@ -136,10 +147,10 @@ while(True):
 		elif cmd == common.USER_HELLO:  # [AR5] 새로운 user가 접속했다
 			assert user_associated == False  # user는 한명 뿐이거든...
 			user_associated = True
-			if edge_server_ready == True:
-				cmd = common.ES_READY
+			if (my_name == common.ap1_name) and (edge_server_ready == True):
+				# [AS13] 이 때만 user에게 알려주기 (user가 while-loop을 탈출할 수 있도록!)
 				common.udp_send(sock, my_name, common.user_name, 
-								common.str2(my_name, cmd), common.SHORT_SLEEP)
+								common.str2(my_name, common.ES_READY), common.SHORT_SLEEP)
 		elif cmd == common.USER_BYE:  # [AR6] 기존 user가 접속을 해제했다
 			assert user_associated == True
 			user_associated = False
@@ -154,15 +165,29 @@ while(True):
 				print('[서비스 응답] 연결된 사용자가 없어서 다른 AP로 전달')
 				common.udp_send(sock, my_name, other_ap, send_msg, common.SHORT_SLEEP)
 		elif cmd == common.ES_STOP:  # [AR11] edge server 정지하기
-			pass  # todo
+			# AP-2에서 ES가 준비 완료되면, AP-1에게 이 메시지를 전해줄거야...
+			print("ES 종료 시작!")
+			edge_server_ready = False  # 이걸 먼저하자. ES STOP에 시간이 좀 걸리더라...
+			# ES 종료는 스레드로 처리하자 // join은 시그널 핸들러에서...
+			thr_stop = Thread(target=common.stop_edgeserver, args=(profile))
 		elif cmd == common.ES_START:  # [AR12] edge server 시작하기
-			pass  # todo
-		elif cmd == common.ES_READY:  # [AR13] edge server가 서비스 가능한 상태로 변경되었음
+			# AP-1에서 migr에 필요한 데이터를 AP-2로 전송 완료한 후, AP-1이 AP-2에게 보내주는 메시지
+			assert sender == other_ap
+			print("ES 를 시작합니다")	
+			thr_start = Thread(target=common.start_edgeserver, args=(my_edgeserver, profile))
+			edge_server_ready = True  # 이걸 마지막에...
+		elif cmd == common.ES_READY:  # [AR13] edge svr가 서비스 가능 상태로 변경되었음을 알려줌
 			edge_server_ready = True
 			if (my_name == common.ap1_name) and (user_associated == True):
-				# [AS13] 이 때만 user에게 알려주기
+				# 프로그램을 처음 시작할때, AP-1에게 접속한 user에게 보내주는 메시지
+				# [AS13] 이 때만 user에게 알려주기 (user가 while-loop을 탈출할 수 있도록!)
+				# 이후로는 user에게 알려줄 필요 없다
 				common.udp_send(sock, my_name, common.user_name, 
 								common.str2(my_name, cmd), common.SHORT_SLEEP)
+			if my_name == common.ap2_name:
+				# [AS11] AP-1의 ES를 종료하라고 알려줘야지?
+				common.udp_send(sock, my_name, other_ap,
+								common.str2(my_name, common.ES_STOP))
 		elif cmd == common.USER_EXIT:
 			user_associated = False  # [AR14] user가 아예 종료하고 떠나는 것
 		else:

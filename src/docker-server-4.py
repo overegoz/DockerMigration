@@ -39,7 +39,6 @@ if len(err_msg) > 0:
 	common.send_log(sock, "EdgeServer-X", "EdgeServer-X", err_msg)
 	sock.close()
 	exit()  # 즉시 종료
-
 # -------------------------------------------------------------------
 my_name = sys.argv[1]
 my_ap_name = ""
@@ -49,7 +48,6 @@ elif my_name == common.edge_server2_name:
 	my_ap_name = common.ap2_name
 else:
 	assert False
-
 # -------------------------------------------------------------------
 profile = int(sys.argv[2])
 # -------------------------------------------------------------------
@@ -69,26 +67,28 @@ print(localIP, ", ", localPort)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 sock.bind((localIP, localPort)) 
 sock.setblocking(0)  # non-blocking socket으로 만들기
-
+# -------------------------------------------------------------------
+# SIGINT 시그널 핸들러 등록
 def handler(signum, frame):
 	print(common.sigint_msg)
 	sock.close()
 	exit()
 
 signal.signal(signal.SIGINT, handler)
-
+# -------------------------------------------------------------------
 # 실행 되었다는 것을 Logger에 알리기
 common.send_log(sock, my_name, my_name, 
 				common.str2(common.start_msg, str(sys.argv)))
-
+# -------------------------------------------------------------------
 # 프로파일에 따라서 사전 작업을 수행함
 profile = int(sys.argv[2])
 common.run_profile(my_name, profile)
-
+# -------------------------------------------------------------------
 # 서비스를 할 준비가 되었음을 AP에게 알림
+# 프로파일에 따른 사전작업이 모두 완료되면, ES_READY 메시지를 보내라.
 send_msg = common.str2(my_name, common.ES_READY)
 common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
-
+# -------------------------------------------------------------------
 # 서비스를 시작
 while(True): 
 	"""

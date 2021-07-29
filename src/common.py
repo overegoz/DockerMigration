@@ -125,7 +125,6 @@ def send_log(sock, me, you, msg):
 	# udp_send(sock, me, logger_name, log, SHORT_SLEEP)  # 이렇게 하면 무한 루프
 	sock.sendto(log.encode(), (ip[logger_name], port[logger_name]))
 
-
 def udp_send(sock, me, you, msg, t):
 	time.sleep(t)
 	# 메시지 보내기
@@ -155,17 +154,20 @@ def udp_recv(sock, me, bufsize, t):
 
 	return msg, addr
 
-
-def run_profile(my_name, p):
+def run_profile(es_name, profile):
 	"""
 	프로파일 번호에 따라서 사전에 정의된 동작을 수행함
-	- my_name = EdgeServer1이면 최초에 실행한것이고, 
+	- es_name = EdgeServer1이면 최초에 실행한것이고, 
 				EdgeServer2이면 migr 으로 실행된 것이다.
-	- p : 프로파일 번호            
+	- profile : 프로파일 번호            
 	"""	    
-	if p <= 0:
-		 return  # 테스트
-
+	if profile <= 0:
+		pass  # 테스트
+	elif profile == 1:
+		pass  # 할 일 없음 없음
+	else:
+		pass
+	
 def start_edgeserver(es_name, profile):
 	"""
 	- profile : 어떤 프로파일을 적용할지 (base image 이름도 포함)
@@ -185,16 +187,39 @@ def start_edgeserver(es_name, profile):
 
 	cmd = 'docker run -p {}:{} --name {} {}'.format(my_port,my_port,cont_name,img_name)
 	os.system(cmd)
+	print("EdgeServer가 시작 되었습니다")
 
 def stop_edgeserver(profile):
-	# profile에 base image 이름을 포함
+	if profile <= 0:  # 테스트용
+		return
+
 	cont_name = prof.get_cont_name(profile)
 	cmd = 'docker stop {}'.format(cont_name)
 	os.system(cmd)
-	pass
+	print('EdgeServer가 종료 되었습니다')
 
-def migrate():
-	pass
+def start_migr(migr_tech, my_name, other_ap):  # migr src에서 migr 작업을 수행하기 위한 함수
+	"""
+	1. 전송할 파일 만들기 : nothing to do
+	2. 파일을 other_ap에게 전송하기 : nothing to do
+	3. 전송이 완료되면 ES를 시작하라고 알려주기 [AS12]
+	"""
+	if migr_tech == common.MIGR_NONE:  # 테스트용, 1번 프로파일
+		# 1. nothing to do
+		# 2. nothing to do
+		pass		
+	elif migr_tech == common.MIGR_FC:
+		pass
+	elif migr_tech == common.MIGR_DC:
+		pass
+	elif migr_tech == common.MIGR_LR:
+		pass
+	else:
+		assert False
+
+	# 3. migr 관련 파일 전송이 완료되면 ES를 시작하라고 알려주기 [AS12]
+	common.udp_send(sock, my_name, other_ap, common.str2(my_name, common.ES_START))
+	print('migr 준비 완료!')
 
 def return_migr_info_ap1(p):
 	"""

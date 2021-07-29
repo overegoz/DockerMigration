@@ -55,7 +55,7 @@ common.send_log(sock, my_name, my_name, common.str2(common.start_msg,str(sys.arg
 # -------------------------------------------------------------------
 # 처음에는 무조건 AP-1에 연결한다고 가정한다
 curr_ap = common.ap1_name
-# 연결 되었음을 알리기
+# user가 AP에 연결 되었음을 알리기 (HELLO)
 common.udp_send(sock, my_name, curr_ap, \
 				common.str2(my_name, common.USER_HELLO), common.SHORT_SLEEP)  
 # -------------------------------------------------------------------
@@ -86,9 +86,8 @@ def check_ap(current_ap, handover):
 
 	return ap_new, ap_old
 # -------------------------------------------------------------------
-counter = 0  # req를 보낼건데, cnt 번호를 붙여서 tracking 가능하도록
-# -------------------------------------------------------------------
 # 최초로 실행할때에는 edge server 가 준비될 때 까지 기다림
+# AP에게 HELLO 메시지는 이미 보냈음
 assert curr_ap == common.ap1_name
 while(True):
 	recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP)
@@ -104,6 +103,7 @@ while(True):
 		pass
 # -------------------------------------------------------------------
 # 본격적으로 REQ-RES 시작!
+counter = 0  # req를 보낼건데, cnt 번호를 붙여서 tracking 가능하도록
 while(True):
 	"""
 	USER는 두 가지 통신만 한다.
