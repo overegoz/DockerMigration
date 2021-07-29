@@ -47,6 +47,9 @@ else:
 
 assert len(my_edgeserver) > 0 and len(other_ap) > 0
 # -------------------------------------------------------------------
+# migr에 필요한 디렉토리 생성
+common.check_dirs(common.dir_list)
+# -------------------------------------------------------------------
 # listen 소켓 생성
 local_ip,local_port = common.ip[my_name], common.port[my_name]
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # 주소와 IP로 Bind 
@@ -121,15 +124,17 @@ while(True):
 
 			# profile : 시나리오 프로파일
 			migr_tech = words[2]  # 마이그레이션 기법
-			print('MIGR_SRC: ', migr_tech, ' (구현 미완료)')
 
 			assert migr_tech == common.MIGR_NONE or migr_tech == common.MIGR_FC \
 				or migr_tech == common.MIGR_DC or migr_tech == common.MIGR_LR
-
-			print('MIGR 작업을 시작합니다')
+			
+			print('MIGR 작업을 시작합니다 : {}'.format(migr_tech))
+			
 			thr_migr = Thread(target=common.start_migr, \
 								args=(sock, migr_tech, my_name, other_ap))
 			thr_migr.start()
+			# migr 시간 측정 : 로그에서, 여기서 부터 시간을 측정하면 됨.
+			common.send_log(sock, my_name, my_name, common.str2("migr begins : ", migr_tech))
 		elif cmd == common.MIGR_DST:  # [AR3] migr 도착지, 시작! (참고: 마이그레이션 출발지는 other_ap)
 			assert edge_server_ready == False
 			migr_tech = words[2]
@@ -190,7 +195,10 @@ while(True):
 				# 이후로는 user에게 알려줄 필요 없다
 				common.udp_send(sock, my_name, common.user_name, 
 								common.str2(my_name, cmd), common.SHORT_SLEEP)
-			if my_name == common.ap2_name:
+			if my_name == common.ap2_name:  # migr 완료
+				# migr 완료 로그 남기기
+				# migr 시간 측정 : 로그에서, 여기까지 소요된 시간을 측정하면 됨.
+				common.send_log(sock, my_name, my_name, "migr finished")
 				# [AS11] AP-1의 ES를 종료하라고 알려줘야지?
 				common.udp_send(sock, my_name, other_ap,
 								common.str2(my_name, common.ES_STOP), common.SHORT_SLEEP)

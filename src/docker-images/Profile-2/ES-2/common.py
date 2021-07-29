@@ -31,44 +31,34 @@ ip = {controller_name : "127.0.0.1",
 		edge_server1_name : "127.0.0.1",
 		edge_server2_name : "127.0.0.1"}
 """
-ip = {controller_name : "192.168.0.2",
-		logger_name : "192.168.0.2",
-		user_name : "192.168.0.2",
-		ap1_name : "192.168.0.116",
-		ap2_name : "192.168.0.117",
-		edge_server1_name : "192.168.0.116",
-		edge_server2_name : "192.168.0.117"}
+ip = {controller_name : "127.0.0.1",
+		logger_name : "127.0.0.1",
+		user_name : "127.0.0.1",
+		ap1_name : "127.0.0.1",
+		ap2_name : "127.0.0.1",
+		edge_server1_name : "192.168.0.113",
+		edge_server2_name : "192.168.0.114"}
 
 # 도커가 인식하는 자신의 IP는 0.0.0.0이다        
 ip_fake = {edge_server1_name : "0.0.0.0",
-			edge_server2_name : "0.0.0.0"}
+		edge_server2_name : "0.0.0.0"}
 # -------------------------------------------------------------------
 # port number
-port = {controller_name : 11000,
-		logger_name : 11001,
-		user_name : 11002,
-		ap1_name : 11003,
-		ap2_name : 11004,
-		edge_server1_name : 11005,
-		edge_server2_name : 11006}
+port = {controller_name : 20000,
+		logger_name : 20001,
+		user_name : 20002,
+		ap1_name : 20003,
+		ap2_name : 20004,
+		edge_server1_name : 20005,
+		edge_server2_name : 20006}
 # -------------------------------------------------------------------
 # directory
 account = "daniel"
 base_dir = "/home/" + account + "/migration/"
-# checkpoint 이외에 복사해야 하는 파일을 저장하기 위한 폴더
-fc_file_dir = base_dir + "FullCopyImages/"
-dc_file_dir = base_dir + "DiffCopyFiles/"
-lr_file_dir = base_dir + "LogReplayRecords/"
-# checkpoint 를 저장하기 위한 폴더
-fc_cp_dir = base_dir + "FC-CheckPoints/"
-dc_cp_dir = base_dir + "DC-CheckPoints/"
-lr_cp_dir = None  # LR는 checkpoint가 필요 없음
-# 디렉토리 생성 코드는 AP에서 수행
-dir_list = [fc_file_dir,dc_file_dir,lr_file_dir,fc_cp_dir,dc_cp_dir,lr_cp_dir]
-def check_dirs(dlist):
-	for this_dir in dlist:
-		if os.path.isdir(this_dir) == False:  # 존재하지 않으면
-			os.makedirs(this_dir)  # 폴더 및 그 경로에 존재하는 폴더까지 생성
+checkpoint_dir = base_dir + "CheckPoints/"
+fullcopy_dir = base_dir + "FullCopyImages/"
+diffcopy_dir = base_dir + "DiffCopyFiles/"
+logreplay_dir = base_dir + "LogReplayRecords/"
 # -------------------------------------------------------------------
 # 메시지 정의
 sigint_msg = "SIGINT handler called! Terminating...\n"
@@ -84,7 +74,6 @@ MIGR_FC = "FULL-COPY"  # migr 기법 1
 MIGR_DC = "DIFF-COPY"  # migr 기법 2
 MIGR_LR = "LOG-REPLAY"  # migr 기법 3
 MIGR_AUTO = "AUTO"
-MIGR_NONE = "MIGR-NONE"
 INFO_REQ = "INFQ"  # migr 기법 판단에 필요한 정보 요청 (컨트롤러 > old AP)
 INFO_RES = "INFR"  # migr 기법 판단에 필요한 정보 회신 (old AP > 컨트롤러)
 MIGR_SRC = "MIGR-SRC"  # migr 출발지로써, 준비하고 실행하라!
@@ -96,12 +85,11 @@ ES_READY = "ES-READY"  # Edge Server 가 ready 상태가 되고, 서비스 가�
 # 상수 정의
 bufsiz = 1024
 delim = " "
-delimD = "-"
-SHORT_SLEEP = 0.05
+SHORT_SLEEP = 0.1
 USER_REQ_INTERVAL = 1.0
 USER_HANDOVER_DELAY = 1.0
 INTMAX = sys.maxsize  # 참고: 파이썬2 에서는 sys.maxint
-weight = 10  # 최적의 migr 기법 선택 시, 가중치
+weight = 10
 # -------------------------------------------------------------------
 # 어떤 시나리오로 실험할 것인지를 프로필로 구성하자
 # . 프로필 -1번 : 도커 없이 실행
@@ -135,6 +123,7 @@ def send_log(sock, me, you, msg):
 	# udp_send(sock, me, logger_name, log, SHORT_SLEEP)  # 이렇게 하면 무한 루프
 	sock.sendto(log.encode(), (ip[logger_name], port[logger_name]))
 
+
 def udp_send(sock, me, you, msg, t):
 	time.sleep(t)
 	# 메시지 보내기
@@ -164,20 +153,17 @@ def udp_recv(sock, me, bufsize, t):
 
 	return msg, addr
 
-def run_profile(es_name, profile):
+
+def run_profile(my_name, p):
 	"""
 	프로파일 번호에 따라서 사전에 정의된 동작을 수행함
-	- es_name = EdgeServer1이면 최초에 실행한것이고, 
+	- my_name = EdgeServer1이면 최초에 실행한것이고, 
 				EdgeServer2이면 migr 으로 실행된 것이다.
-	- profile : 프로파일 번호            
+	- p : 프로파일 번호            
 	"""	    
-	if profile <= 0:
-		pass  # 테스트
-	elif profile == 1:
-		pass  # 할 일 없음 없음
-	else:
-		pass
-	
+	if p <= 0:
+		 return  # 테스트
+
 def start_edgeserver(es_name, profile):
 	"""
 	- profile : 어떤 프로파일을 적용할지 (base image 이름도 포함)
@@ -195,91 +181,37 @@ def start_edgeserver(es_name, profile):
 	else:
 		assert False
 
-	# 도커 실행할 때, remove 옵션을 넣을까...?
-	# udp 없으면 안되 ㅠㅠ
-	cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
+	cmd = 'docker run -p {}:{} --name {} {}'.format(my_port,my_port,cont_name,img_name)
 	os.system(cmd)
-	print("EdgeServer가 시작 되었습니다")
 
 def stop_edgeserver(profile):
-	if profile <= 0:  # 테스트용
-		return
+	# profile에 base image 이름을 포함
+	pass
 
-	cont_name = prof.get_cont_name(profile)
-	cmd = 'docker stop {}'.format(cont_name)
-	os.system(cmd)
-	print('EdgeServer가 종료 되었습니다')
-
-def start_migr(sock, migr_tech, my_name, other_ap):  # migr src에서 migr 작업을 수행하기 위한 함수
-	"""
-	1. 전송할 파일 만들기 : nothing to do
-	2. 파일을 other_ap에게 전송하기 : nothing to do
-	3. 전송이 완료되면 ES를 시작하라고 알려주기 [AS12]
-	"""
-	if migr_tech == MIGR_NONE:  # 테스트용, 1번 프로파일
-		# nothing to do
-		pass		
-	elif migr_tech == MIGR_FC:
-		# 1.1 전송할 파일 만들기 : 이미지 전체를 파일로 export
-
-		# 1.2 이미지 전체를 파일 전송
-
-		# 2.1 체크포인트 생성
-
-		# 2.2 체크포인트 전송
-
-		# 3. 전송 완료 알리기 : 함수 마지막에서 수행
-		pass
-	elif migr_tech == MIGR_DC:
-		# 1.1 전송할 파일 만들기 : diff 파일
-
-		# 1.2 diff 파일 전송
-
-		# 2.1 체크포인트 생성
-
-		# 2.2 체크포인트 전송
-
-		# 3. 전송 완료 알리기 : 함수 마지막에서 수행
-		pass
-	elif migr_tech == MIGR_LR:
-		# 1.1 전송할 파일 만들기 : replay할 log
-
-		# 1.2 파일 전송 : replay-log 파일 전송
-
-		# 2. 체크포인트 : 필요 없음
-		# 3. 전송 완료 알리기 : 함수 마지막에서 수행
-		pass
-	else:
-		assert False
-
-	# 3. migr 관련 파일 전송이 완료되면 ES를 시작하라고 알려주기 [AS12]
-	udp_send(sock, my_name, other_ap, str2(my_name, ES_START), SHORT_SLEEP)
-	print('migr 준비 완료!')
+def migrate():
+	pass
 
 def return_migr_info_ap1(p):
 	"""
 	프로파일 번호에 따라서, 어떤 정보를 컨트롤러에 리턴할지 미리 정해놓자
 	리스트 형태로 만들고, 주어진 인덱스에 맞는 값을 리턴하도록 구현하자
 	"""
-	# .......................................................
-	# 테스트용
-	if p == -1 or p == 0 or p == 1:
-		return "1-2-3-4-5-6"
-	# .......................................................
+	if p == -1:
+		return "1 2 3 4 5 6"  # test
+
 	C_sec,l_diff_bits,l_check_bits,l_log_bits,t_replay_sec,th_bps,force \
 	= prof.p1_info()
 
-	return str(C_sec) + delimD + \
-			str(l_diff_bits) + delimD + \
-			str(l_check_bits) + delimD + \
-			str(l_log_bits) + delimD + \
-			str(t_replay_sec) + delimD + \
+	return str(C_sec) + delim + \
+			str(l_diff_bits) + delim + \
+			str(l_check_bits) + delim + \
+			str(l_log_bits) + delim + \
+			str(t_replay_sec) + delim + \
 			str(th_bps)
 
-def get_best_migr(infos, force):
-	w = weight
+def get_best_migr(infos, w, force):
 	if force == MIGR_AUTO:
-		info = infos.split(delimD)
+		info = infos.split(delim)
 		C_s = float(info[0]) * 1.0
 		l_diff_bit = float(info[1]) * 1.0
 		l_check_bit = float(info[2]) * 1.0
@@ -303,4 +235,5 @@ def get_best_migr(infos, force):
 			assert False
 			return ""
 	else:
+		assert force == MIGR_FC or force == MIGR_DC or force == MIGR_LR
 		return force

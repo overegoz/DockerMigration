@@ -39,6 +39,7 @@ if len(err_msg) > 0:
 	common.send_log(sock, "EdgeServer-X", "EdgeServer-X", err_msg)
 	sock.close()
 	exit()  # 즉시 종료
+
 # -------------------------------------------------------------------
 my_name = sys.argv[1]
 my_ap_name = ""
@@ -49,7 +50,6 @@ elif my_name == common.edge_server2_name:
 else:
 	assert False
 
-print('{} started at {}!'.format(my_name, my_ap_name))
 # -------------------------------------------------------------------
 profile = int(sys.argv[2])
 # -------------------------------------------------------------------
@@ -65,39 +65,31 @@ else:
 	localIP = common.ip_fake[my_name]
 
 localPort = common.port[my_name]
-#print("EdgeServer: ", localIP, ", ", localPort)
+print(localIP, ", ", localPort)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 sock.bind((localIP, localPort)) 
 sock.setblocking(0)  # non-blocking socket으로 만들기
 
-print('socket setup complete!')
-# -------------------------------------------------------------------
-# SIGINT 시그널 핸들러 등록
 def handler(signum, frame):
 	print(common.sigint_msg)
 	sock.close()
 	exit()
 
 signal.signal(signal.SIGINT, handler)
-# -------------------------------------------------------------------
+
 # 실행 되었다는 것을 Logger에 알리기
 common.send_log(sock, my_name, my_name, 
 				common.str2(common.start_msg, str(sys.argv)))
-# -------------------------------------------------------------------
+
 # 프로파일에 따라서 사전 작업을 수행함
 profile = int(sys.argv[2])
 common.run_profile(my_name, profile)
-print('pre-work done!')
-# -------------------------------------------------------------------
+
 # 서비스를 할 준비가 되었음을 AP에게 알림
-# 프로파일에 따른 사전작업이 모두 완료되면, ES_READY 메시지를 보내라.
 send_msg = common.str2(my_name, common.ES_READY)
 common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
-print('{} is ready to serve!'.format(my_name))
-# -------------------------------------------------------------------
+
 # 서비스를 시작
-no_recv_cnt = 0  # recv 못한 경우 카운트
-yes_recv_cnt = 0  # recv 성공적으로 받은 경우 카운트
 while(True): 
 	"""
 	Edge서버는 두 가지 통신만 한다.
@@ -108,37 +100,36 @@ while(True):
 		: EdgeServer<서버번호> SVCR <같은 숫자>
 	"""
 	# 직접 연결된 AP로 부터 데이터 수신하기
-	recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
-	if len(recv_msg) > 0:
-		yes_recv_cnt += 1
-		#print('recv: ', recv_msg)
-		words = recv_msg.split(common.delim)
+	try:
+		recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
+		if len(recv_msg) > 0:
+			words = recv_msg.split(common.delim)
 
-		# sender 정보가 맞는지 확인
-		if words[0] != my_ap_name:
-			common.send_log(sock, my_name, my_name, \
-							common.str2("invalid-sender-name", recv_msg))
-			assert False
+			# sender 정보가 맞는지 확인
+			if words[0] != my_ap_name:
+				common.send_log(sock, my_name, my_name, \
+								common.str2("invalid-sender-name", recv_msg))
+				assert False
 
-		# [ER1][ER2] 서비스 요청 메시지가 맞는지 확인
-		if words[1] != common.SVC_REQ:
-			common.send_log(sock, my_name, my_name, \
-							common.str2("invalid-command-received", recv_msg))
-			assert False
+			# [ER1][ER2] 서비스 요청 메시지가 맞는지 확인
+			if words[1] != common.SVC_REQ:
+				common.send_log(sock, my_name, my_name, \
+								common.str2("invalid-command-received", recv_msg))
+				assert False
 
-		# 수신 메시지가 형식에 맞는지 확인하기
-		if len(words) != 3:
-			common.send_log(sock, my_name, my_name, 
-							common.str2("wrong-msg-format", recv_msg))
-			assert False
+			# 수신 메시지가 형식에 맞는지 확인하기
+			if len(words) != 3:
+				common.send_log(sock, my_name, my_name, 
+								common.str2("wrong-msg-format", recv_msg))
+				assert False
 
-		# 직접 연결된 AP에게 전송할 메시지 준비하기
-		counter = words[2]
-		send_msg = common.str3(my_name, common.SVC_RES, counter)
-		# [ES1][ES2] 직접 연결된 AP에게 메시지 전송
-		common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
-		#print('sending: ', send_msg)
-	else:
-		no_recv_cnt += 1
-		#if no_recv_cnt % 100 == 0: print('recv nothing (cnt : {})'.format(no_recv_cnt))
+			# 직접 연결된 AP에게 전송할 메시지 준비하기
+			counter = words[2]
+			send_msg = common.str3(my_name, common.SVC_RES, counter)
+			# [ES1][ES2] 직접 연결된 AP에게 메시지 전송
+			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
+	except socket.error:
+		# AP로 부터 REQ 받지 않으면 답변할 게 없음
+		# non-blocking recv: 빈손으로 리턴할때 예외가 발생하고, 이를 잡아줘야함
+		pass
 
