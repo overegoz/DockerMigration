@@ -185,7 +185,8 @@ def start_edgeserver(es_name, profile):
 	else:
 		assert False
 
-	cmd = 'docker run -p {}:{} --name {} {}'.format(my_port,my_port,cont_name,img_name)
+	# 도커 실행할 때, remove 옵션을 넣을까...?
+	cmd = 'docker run -p {}:{} -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
 	os.system(cmd)
 	print("EdgeServer가 시작 되었습니다")
 

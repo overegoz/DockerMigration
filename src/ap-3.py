@@ -113,7 +113,7 @@ while(True):
 			# [AS1] migr 기법 결정에 필요한 정보를 컨트롤러에게 전달해줌
 			info = common.return_migr_info_ap1(profile)
 			# <AP-X> <INFR> <프로파일 번호> <migr 판단에 필요한 정보, '-'로 구분>
-			msg = common.str4(my_name, common.INFO_RES, profile, info)
+			msg = common.str4(my_name, common.INFO_RES, str(profile), info)
 			common.udp_send(sock, my_name, common.controller_name, msg, common.SHORT_SLEEP)
 		elif cmd == common.MIGR_SRC:  # [AR2] migr 출발지, 시작! (참고: 마이그레이션 목적지는 other_ap)
 			assert edge_server_ready == True

@@ -63,8 +63,8 @@ req_int = common.USER_REQ_INTERVAL
 handover_counter = common.INTMAX  # 핸드오버가 언제 발생하지 제어
 if profile > 0:
 	# 프로파일 번호에 따라서 설정값을 불러옴
-	req_int = common.prof.get_req_int(p)
-	handover_counter = common.prof.get_ho_cnt(p)
+	req_int = common.prof.get_req_int(profile)
+	handover_counter = common.prof.get_ho_cnt(profile)
 elif profile == -1:  # 테스트용
 	#handover_counter = 3
 	handover_counter = -1
