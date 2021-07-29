@@ -41,16 +41,16 @@ ip = {controller_name : "192.168.0.2",
 
 # 도커가 인식하는 자신의 IP는 0.0.0.0이다        
 ip_fake = {edge_server1_name : "0.0.0.0",
-		edge_server2_name : "0.0.0.0"}
+			edge_server2_name : "0.0.0.0"}
 # -------------------------------------------------------------------
 # port number
-port = {controller_name : 21000,
-		logger_name : 21001,
-		user_name : 21002,
-		ap1_name : 21003,
-		ap2_name : 21004,
-		edge_server1_name : 21005,
-		edge_server2_name : 21006}
+port = {controller_name : 11000,
+		logger_name : 11001,
+		user_name : 11002,
+		ap1_name : 11003,
+		ap2_name : 11004,
+		edge_server1_name : 11005,
+		edge_server2_name : 11006}
 # -------------------------------------------------------------------
 # directory
 account = "daniel"
