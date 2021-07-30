@@ -97,6 +97,8 @@ send_msg = common.str2(my_name, common.ES_READY)
 common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 print('{} is ready to serve!'.format(my_name))
 # -------------------------------------------------------------------
+print('host name : ', socket.gethostname())
+# -------------------------------------------------------------------
 # 서비스를 시작
 no_recv_cnt = 0  # recv 못한 경우 카운트
 yes_recv_cnt = 0  # recv 성공적으로 받은 경우 카운트
