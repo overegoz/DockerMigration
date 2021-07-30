@@ -98,7 +98,7 @@ send_msg = common.str2(my_name, common.ES_READY)
 print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
 common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 # -------------------------------------------------------------------
-print('host name : ', socket.gethostname())
+#print('host name : ', socket.gethostname())
 # -------------------------------------------------------------------
 # 서비스를 시작
 no_recv_cnt = 0  # recv 못한 경우 카운트
@@ -114,9 +114,10 @@ while(True):
 	"""
 	# 직접 연결된 AP로 부터 데이터 수신하기
 	recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
+	
 	if len(recv_msg) > 0:
 		yes_recv_cnt += 1
-		#print('recv: ', recv_msg)
+		print('recv: ', recv_msg)
 		words = recv_msg.split(common.delim)
 
 		# sender 정보가 맞는지 확인
@@ -145,7 +146,6 @@ while(True):
 		send_msg = common.str3(my_name, common.SVC_RES, counter)
 		# [ES1][ES2] 직접 연결된 AP에게 메시지 전송
 		common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
-		#common.udp_send(sock, my_name, common.localhost_name, send_msg, common.SHORT_SLEEP)
 	else:
 		no_recv_cnt += 1
 		#if no_recv_cnt % 100 == 0: print('recv nothing (cnt : {})'.format(no_recv_cnt))
