@@ -95,8 +95,8 @@ print('pre-work done!')
 # 프로파일에 따른 사전작업이 모두 완료되면, ES_READY 메시지를 보내라.
 print('{} is ready to serve!'.format(my_name))
 send_msg = common.str2(my_name, common.ES_READY)
-common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
+common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 # -------------------------------------------------------------------
 print('host name : ', socket.gethostname())
 # -------------------------------------------------------------------
