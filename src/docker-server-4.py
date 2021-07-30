@@ -148,8 +148,9 @@ while(True):
 		common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 	else:
 		no_recv_cnt += 1
-		print('recv: nothing')
+		#print('recv: nothing')
 		#if no_recv_cnt % 100 == 0: print('recv nothing (cnt : {})'.format(no_recv_cnt))
+
 
 	if 	no_recv_cnt + yes_recv_cnt % 100 == 0: 
 		print('recv : {}, no recv : {}'.format(yes_recv_cnt, no_recv_cnt))
