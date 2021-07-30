@@ -114,7 +114,7 @@ while(True):
 	"""
 	# 직접 연결된 AP로 부터 데이터 수신하기
 	recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
-	
+
 	if len(recv_msg) > 0:
 		yes_recv_cnt += 1
 		print('recv: ', recv_msg)
@@ -148,6 +148,7 @@ while(True):
 		common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 	else:
 		no_recv_cnt += 1
+		print('recv: nothing')
 		#if no_recv_cnt % 100 == 0: print('recv nothing (cnt : {})'.format(no_recv_cnt))
 
 	if 	no_recv_cnt + yes_recv_cnt % 100 == 0: 
