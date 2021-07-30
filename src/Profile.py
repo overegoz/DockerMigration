@@ -90,10 +90,14 @@ class Profile:
 		return self.ho_cnt[int(p)]
 
 	def get_predetermined_migr(self, p):
-		return self.predetermined_migr[p]
+		return self.predetermined_migr[int(p)]
 
 	def get_checkpoint_name(self, p):
-		return self.checkpoint_name[p]
+		return self.checkpoint_name[int(p)]
+
+	def get_summary(self, p):
+		return self.C_sec[int(p)], self.l_diff_bit[int(p)], self.l_check_bit[int(p)], \
+				self.l_log_bit[int(p)], self.t_replay_sec[int(p)], self.th_bps[int(p)]
 
 	def id_min(self):
 		"""

@@ -15,5 +15,7 @@ cd ../../../
 # cd docker-images/Profile-2/ES-2
 # sh build.sh
 # cd ../../../
+# 대신, migr 으로 생성된게 있으면 지우자
+docker rmi twoon/profile2:es2
 
 docker image prune -f
