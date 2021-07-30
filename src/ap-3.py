@@ -69,7 +69,7 @@ edge_server_ready = None
 if my_name == common.ap1_name:
 	# AP-1은 시작과 동시에 ES 를 시작
 	# 여기서는 thread 쓰지말자
-	common.start_edgeserver(es_name=my_edgeserver, "no need", profile=profile)
+	common.start_edgeserver(es_name=my_edgeserver, migr_type="no need", profile=profile)
 	edge_server_ready = True
 	common.send_log(sock, my_name, common.edge_server1_name, 
 					common.str2(common.start_msg, " (initial launch)"))
