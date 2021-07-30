@@ -49,7 +49,8 @@ elif my_name == common.edge_server2_name:
 else:
 	assert False
 # -------------------------------------------------------------------
-my_ap_name = common.localhost_name  # migr 이후에도 동작하기 위해서...
+#my_ap_name = common.localhost_name  # migr 이후에도 동작하기 위해서...
+my_ap_name = socket.gethostname()
 # -------------------------------------------------------------------
 print('{} started at {}!'.format(my_name, my_ap_name))
 # -------------------------------------------------------------------

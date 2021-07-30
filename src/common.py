@@ -18,6 +18,8 @@ logger_name = "LOGR"
 user_name = "USER"
 ap1_name = "AP-1"
 ap2_name = "AP-2"
+ap1_hostname = "docker-1"
+ap2_hostanem = "docker-2"
 edge_server1_name = "EdgeServer-1"
 edge_server2_name = "EdgeServer-2"
 localhost_name = "LocalPC-Docker"
@@ -36,7 +38,9 @@ ip = {controller_name : "192.168.0.2",
 		logger_name : "192.168.0.2",
 		user_name : "192.168.0.2",
 		ap1_name : "192.168.0.116",
+		ap1_hostname : "192.168.0.116",
 		ap2_name : "192.168.0.117",
+		ap2_hostname : "192.168.0.117",
 		#edge_server1_name : "192.168.0.116",
 		edge_server1_name : "127.0.0.1",
 		edge_server2_name : "192.168.0.117",
