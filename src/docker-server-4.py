@@ -121,7 +121,7 @@ while(True):
 		# ap2_hostname은 migr 후 ES2번을 실행할 때만 정의된다
 		_ = socket.gethostbyname(common.ap2_hostname)
 		# 오류가 없다면, 여기는 AP-2
-		my_ap_name == common.ap2_name
+		my_ap_name = common.ap2_name
 		# 최초로 한번은 READY 메시지를 보내주자
 		assert notified == 10 or notified == 110
 		if notified == 10:
@@ -129,9 +129,10 @@ while(True):
 			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
 			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 			notified += 100
+			print('notified: ', notified)	
 	except:
 		# 오류가 있다면, 여기는 AP-1
-		my_ap_name == common.ap1_name
+		my_ap_name = common.ap1_name
 		# 최초로 한번은 READY 메시지를 보내주자
 		assert notified == 0 or notified == 10
 		if notified == 0:
@@ -139,6 +140,7 @@ while(True):
 			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
 			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 			notified += 10
+			print('notified: ', notified)	
 
 	# 직접 연결된 AP로 부터 데이터 수신하기
 	recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 

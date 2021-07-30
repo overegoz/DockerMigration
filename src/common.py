@@ -211,7 +211,7 @@ def start_edgeserver(es_name, migr_type, profile):
 
 		#cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
 		# 여기서는 ap1_hostname만 정의되어 있고, ap2_hostname은 없음
-		cmd = 'docker run --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ap1_hostname, ip[ap1_hostname], my_port,my_port,cont_name,img_name)
+		cmd = 'docker run --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
 		#cmd = 'docker run --network="host" -d --name {} {}'.format(cont_name,img_name)
 		print(cmd)
 		os.system(cmd)
@@ -234,7 +234,7 @@ def start_edgeserver(es_name, migr_type, profile):
 			print('FC (2/3)-컨테이너 생성')
 			#cmd = 'docker create -p {}:{}/udp --name {} {}'.format(my_port,my_port,cont_name,img_name)
 			# 여기서는 ap2_hostname이 정의되어 있다
-			cmd = 'docker create --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname, ip[ap2_hostname], my_port,my_port,cont_name,img_name)
+			cmd = 'docker create --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
 			#cmd = 'docker create --network="host" --name {} {}'.format(cont_name,img_name)
 			print(cmd)
 			os.system(cmd)
