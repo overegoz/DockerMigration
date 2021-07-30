@@ -11,8 +11,9 @@ cd docker-images/Profile-1/ES-2
 sh build.sh
 cd ../../../
 
-cd docker-images/Profile-2/ES-2
-sh build.sh
-cd ../../../
+# FC를 할거니까, Profile-2에서는 ES2의 img 만들지 말기
+# cd docker-images/Profile-2/ES-2
+# sh build.sh
+# cd ../../../
 
 docker image prune -f

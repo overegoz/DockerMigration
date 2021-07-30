@@ -62,13 +62,14 @@ common.send_log(sock, my_name, my_name, common.str2(common.start_msg,str(sys.arg
 # 상태 정보를 기록할 변수들
 profile = int(sys.argv[2])
 user_associated = False
+migr_type = ""
 # -------------------------------------------------------------------
 # Edge Server (Docker) 시작하기 // AP-1만 ES를 이때에 시작한다
 edge_server_ready = None
 if my_name == common.ap1_name:
 	# AP-1은 시작과 동시에 ES 를 시작
 	# 여기서는 thread 쓰지말자
-	common.start_edgeserver(es_name=my_edgeserver, profile=profile)
+	common.start_edgeserver(es_name=my_edgeserver, "no need", profile=profile)
 	edge_server_ready = True
 	common.send_log(sock, my_name, common.edge_server1_name, 
 					common.str2(common.start_msg, " (initial launch)"))
@@ -121,25 +122,28 @@ while(True):
 			common.udp_send(sock, my_name, common.controller_name, msg, common.SHORT_SLEEP)
 		elif cmd == common.MIGR_SRC:  # [AR2] migr 출발지, 시작! (참고: 마이그레이션 목적지는 other_ap)
 			assert edge_server_ready == True
+			assert len(migr_type) == 0
 
 			# profile : 시나리오 프로파일
-			migr_tech = words[2]  # 마이그레이션 기법
+			migr_type = words[2]  # 마이그레이션 기법
 
-			assert migr_tech == common.MIGR_NONE or migr_tech == common.MIGR_FC \
-				or migr_tech == common.MIGR_DC or migr_tech == common.MIGR_LR
+			assert migr_type == common.MIGR_NONE or migr_type == common.MIGR_FC \
+				or migr_type == common.MIGR_DC or migr_type == common.MIGR_LR
 			
-			print('MIGR 작업을 시작합니다 : {}'.format(migr_tech))
+			print('MIGR 작업을 시작합니다 : {}'.format(migr_type))
 			
 			thr_migr = Thread(target=common.start_migr, \
-								args=(sock, migr_tech, my_name, other_ap))
+								args=(sock, migr_type, my_name, other_ap, common.prof))
 			thr_migr.start()
 			# migr 시간 측정 : 로그에서, 여기서 부터 시간을 측정하면 됨.
-			common.send_log(sock, my_name, my_name, common.str2("migr begins : ", migr_tech))
+			common.send_log(sock, my_name, my_name, common.str2("migr begins : ", migr_type))
 		elif cmd == common.MIGR_DST:  # [AR3] migr 도착지, 시작! (참고: 마이그레이션 출발지는 other_ap)
 			assert edge_server_ready == False
-			migr_tech = words[2]
-			print('MIGR_DST: ', migr_tech, ' (구현 미완료)')
-			# 여기선 딱히 해줄 게 없어 
+			assert len(migr_type) == 0
+
+			migr_type = words[2]
+			print('MIGR_DST: ', migr_type, ' (구현 미완료)')
+			# 여기선, 이 타이밍에서는 딱히 해줄 게 없어 
 			# base image를 pull 하도록 하자 => 프로파일용 img는 local img라서 pull 불가
 		elif cmd == common.SVC_REQ:  # 서비스 요청 [AR4][AR9]
 			assert sender == common.user_name or sender == other_ap
@@ -184,7 +188,7 @@ while(True):
 			# AP-1에서 migr에 필요한 데이터를 AP-2로 전송 완료한 후, AP-1이 AP-2에게 보내주는 메시지
 			assert sender == other_ap
 			print("ES 를 시작합니다")	
-			thr_start = Thread(target=common.start_edgeserver, args=(my_edgeserver, profile))
+			thr_start = Thread(target=common.start_edgeserver, args=(my_edgeserver, migr_type, profile))
 			thr_start.start()
 			# edge_server_ready 는 common.ES_READY 받으면 True로 설정
 		elif cmd == common.ES_READY:  # [AR13] edge svr가 서비스 가능 상태로 변경되었음을 알려줌

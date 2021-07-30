@@ -92,6 +92,9 @@ class Profile:
 	def get_predetermined_migr(self, p):
 		return self.predetermined_migr[p]
 
+	def get_checkpoint_name(self, p):
+		return self.checkpoint_name[p]
+
 	def id_min(self):
 		"""
 		<프로필 -1번>

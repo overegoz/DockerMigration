@@ -178,10 +178,12 @@ def run_profile(es_name, profile):
 	else:
 		pass
 	
-def start_edgeserver(es_name, profile):
+def start_edgeserver(es_name, migr_type, profile):
 	"""
 	- profile : 어떤 프로파일을 적용할지 (base image 이름도 포함)
 	- ap1이면 최초로 실행하는 것이고, ap2이면 migr 으로 실행하는 것임
+	- 도커 실행할 때, remove 옵션 넣지말자
+	- 도커 실행할 때, udp 없으면 안되 ㅠㅠ
 	"""
 	if profile <= 0:  # 테스트 용
 		return
@@ -190,15 +192,33 @@ def start_edgeserver(es_name, profile):
 	cont_name = prof.get_cont_name(profile)
 	if es_name == edge_server1_name:  # 최초로 실행하는 것
 		img_name = prof.get_img_name_ap1(profile)
+
+		cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
+		os.system(cmd)
 	elif es_name == edge_server2_name:  # migr 으로 실행하는 것
 		img_name = prof.get_img_name_ap2(profile)
+
+		if migr_type == MIGR_NONE:
+			cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
+			os.system(cmd)
+		elif migr_type == MIGR_FC:
+			# tar 파일로부터 이미지 불러오기
+			cmd = 'docker load -i {}.tar'.format(fc_file_dir + cont_name)
+			os.system(cmd)
+
+			# 컨테이너 생성 (실행 안함)
+			cmd = 'docker create -p {}:{}/udp --name {} {}'.format(my_port,my_port,cont_name,img_name)
+			os.system(cmd)
+
+			# 체크포인트로 컨테이너 실행
+			cp_name = prof.get_checkpoint_name(profile)
+			cmd = 'docker start --checkpoint-dir={} --checkpoint={} {}'.format(fc_cp_dir, cp_name, cont_name)
+			os.system(cmd)
+	else:
+		assert False, "미구현"	
 	else:
 		assert False
 
-	# 도커 실행할 때, remove 옵션을 넣을까...?
-	# udp 없으면 안되 ㅠㅠ
-	cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
-	os.system(cmd)
 	print("EdgeServer가 시작 되었습니다")
 
 def stop_edgeserver(profile):
@@ -210,7 +230,9 @@ def stop_edgeserver(profile):
 	os.system(cmd)
 	print('EdgeServer가 종료 되었습니다')
 
-def start_migr(sock, migr_tech, my_name, other_ap):  # migr src에서 migr 작업을 수행하기 위한 함수
+# migr src에서 migr 작업을 수행하기 위한 함수
+def start_migr(sock, migr_tech, my_name, other_ap, profile):  
+	assert my_name == ap1_name and other_ap == ap2_name
 	"""
 	1. 전송할 파일 만들기 : nothing to do
 	2. 파일을 other_ap에게 전송하기 : nothing to do
@@ -220,16 +242,33 @@ def start_migr(sock, migr_tech, my_name, other_ap):  # migr src에서 migr 작�
 		# nothing to do
 		pass		
 	elif migr_tech == MIGR_FC:
-		# 1.1 전송할 파일 만들기 : 이미지 전체를 파일로 export
-
-		# 1.2 이미지 전체를 파일 전송
-
-		# 2.1 체크포인트 생성
-
-		# 2.2 체크포인트 전송
-
-		# 3. 전송 완료 알리기 : 함수 마지막에서 수행
-		pass
+		"""
+		1.1 전송할 파일 만들기 : 
+		- 이미지 전체를 파일로 export
+		- 컨테이너를 정지하지 않는 방식으로 진행하자 (계속 서비스 제공 가능하도록...)
+		"""
+		cont_name = prof.get_cont_name(profile)
+		ap2_img_name = prof.get_img_name_ap2(profile)
+		cmd = 'docker commit --pause=false {} {}'.format(cont_name, ap2_img_name)
+		os.system(cmd)
+		cmd = 'docker save -o {}.tar {}'.format(fc_file_dir+cont_name, ap2_img_name)
+		os.system(cmd)
+		"""
+		1.2 이미지 전체를 파일 전송
+		"""
+		cmd = 'scp {}.tar {}@{}:{}'.format(fc_file_dir+cont_name, account, ip[other_ap], fc_file_dir)
+		os.system(cmd)
+		"""
+		2.1 체크포인트 생성
+		"""
+		cp_name = prof.get_checkpoint_name(profile)
+		cmd = 'docker checkpoint create --leave-running=true --checkpoint-dir={} {} {}'.format(fc_cp_dir, cont_name, cp_name)
+		os.system(cmd)
+		"""
+		2.2 체크포인트 전송 (디렉토리 전체를 복사)
+		"""
+		cmd = 'scp -r {} {}@{}:{}'.format(fc_cp_dir + cp_name, account, ip[other_ap], fc_cp_dir)
+		# 3. 전송 완료 알리기 : 여기서 말고, 함수 마지막에서 수행
 	elif migr_tech == MIGR_DC:
 		# 1.1 전송할 파일 만들기 : diff 파일
 
@@ -239,7 +278,7 @@ def start_migr(sock, migr_tech, my_name, other_ap):  # migr src에서 migr 작�
 
 		# 2.2 체크포인트 전송
 
-		# 3. 전송 완료 알리기 : 함수 마지막에서 수행
+		# 3. 전송 완료 알리기 : 여기서 말고, 함수 마지막에서 수행
 		pass
 	elif migr_tech == MIGR_LR:
 		# 1.1 전송할 파일 만들기 : replay할 log
@@ -247,7 +286,7 @@ def start_migr(sock, migr_tech, my_name, other_ap):  # migr src에서 migr 작�
 		# 1.2 파일 전송 : replay-log 파일 전송
 
 		# 2. 체크포인트 : 필요 없음
-		# 3. 전송 완료 알리기 : 함수 마지막에서 수행
+		# 3. 전송 완료 알리기 : 여기서 말고, 함수 마지막에서 수행
 		pass
 	else:
 		assert False
