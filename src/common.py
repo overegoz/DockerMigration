@@ -20,7 +20,7 @@ ap1_name = "AP-1"
 ap2_name = "AP-2"
 edge_server1_name = "EdgeServer-1"
 edge_server2_name = "EdgeServer-2"
-localhost_name = "LocalPC"
+localhost_name = "LocalPC-Docker"
 # -------------------------------------------------------------------
 # ip table
 """

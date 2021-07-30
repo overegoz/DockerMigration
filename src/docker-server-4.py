@@ -49,6 +49,8 @@ elif my_name == common.edge_server2_name:
 else:
 	assert False
 
+my_ap_name = common.localhost_name
+
 print('{} started at {}!'.format(my_name, my_ap_name))
 # -------------------------------------------------------------------
 profile = int(sys.argv[2])
@@ -139,9 +141,11 @@ while(True):
 		counter = words[2]
 		send_msg = common.str3(my_name, common.SVC_RES, counter)
 		# [ES1][ES2] 직접 연결된 AP에게 메시지 전송
-		#common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
-		common.udp_send(sock, my_name, common.localhost_name, send_msg, common.SHORT_SLEEP)
+		common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
+		#common.udp_send(sock, my_name, common.localhost_name, send_msg, common.SHORT_SLEEP)
 	else:
 		no_recv_cnt += 1
 		#if no_recv_cnt % 100 == 0: print('recv nothing (cnt : {})'.format(no_recv_cnt))
 
+	if 	no_recv_cnt + yes_recv_cnt % 100 == 0: 
+		print('recv : {}, no recv : {}'.format(yes_recv_cnt, no_recv_cnt))
