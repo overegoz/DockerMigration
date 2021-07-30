@@ -106,10 +106,10 @@ yes_recv_cnt = 0  # recv 성공적으로 받은 경우 카운트
 while(True): 
 	"""
 	Edge서버는 두 가지 통신만 한다.
-	1. AP를 통해서 받은 USER의 REQ 
+	1. [recv] AP를 통해서 받은 USER의 REQ 
 		: AP는 USER가 보낸 메시지를 그대로 전달해 줌
 		: USER SVCQ <숫자>
-	2. USER의 REQ에 대한 응답을 AP로 보내는 것
+	2. [send] USER의 REQ에 대한 응답을 AP로 보내는 것
 		: EdgeServer<서버번호> SVCR <같은 숫자>
 	"""
 	# 직접 연결된 AP로 부터 데이터 수신하기

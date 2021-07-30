@@ -37,7 +37,8 @@ ip = {controller_name : "192.168.0.2",
 		user_name : "192.168.0.2",
 		ap1_name : "192.168.0.116",
 		ap2_name : "192.168.0.117",
-		edge_server1_name : "192.168.0.116",
+		#edge_server1_name : "192.168.0.116",
+		edge_server1_name : "127.0.0.1",
 		edge_server2_name : "192.168.0.117",
 		localhost_name : "172.17.0.1"}  # 도커에서 바라보는 물리 호스트 IP
 
@@ -199,7 +200,8 @@ def start_edgeserver(es_name, migr_type, profile):
 	if es_name == edge_server1_name:  # 최초로 실행하는 것
 		img_name = prof.get_img_name_ap1(profile)
 
-		cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
+		#cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
+		cmd = 'docker run --network="host" -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
 		print(cmd)
 		os.system(cmd)
 	elif es_name == edge_server2_name:  # migr 으로 실행하는 것
