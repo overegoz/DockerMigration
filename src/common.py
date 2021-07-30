@@ -64,7 +64,7 @@ fc_cp_dir = base_dir + "FC-CheckPoints/"
 dc_cp_dir = base_dir + "DC-CheckPoints/"
 lr_cp_dir = None  # LR는 checkpoint가 필요 없음
 # 디렉토리 생성 코드는 AP에서 수행
-dir_list = [fc_file_dir,dc_file_dir,lr_file_dir,fc_cp_dir,dc_cp_dir,lr_cp_dir]
+dir_list = [fc_file_dir,dc_file_dir,lr_file_dir,fc_cp_dir,dc_cp_dir]
 def check_dirs(dlist):
 	for this_dir in dlist:
 		if os.path.isdir(this_dir) == False:  # 존재하지 않으면
