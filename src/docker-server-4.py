@@ -115,10 +115,13 @@ while(True):
 		words = recv_msg.split(common.delim)
 
 		# sender 정보가 맞는지 확인
+		"""
+		# migr 이후에는 맞지 않는 정보
 		if words[0] != my_ap_name:
 			common.send_log(sock, my_name, my_name, \
 							common.str2("invalid-sender-name", recv_msg))
 			assert False
+		"""
 
 		# [ER1][ER2] 서비스 요청 메시지가 맞는지 확인
 		if words[1] != common.SVC_REQ:
@@ -136,8 +139,8 @@ while(True):
 		counter = words[2]
 		send_msg = common.str3(my_name, common.SVC_RES, counter)
 		# [ES1][ES2] 직접 연결된 AP에게 메시지 전송
-		common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
-		#print('sending: ', send_msg)
+		#common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
+		common.udp_send(sock, my_name, common.localhost_name, send_msg, common.SHORT_SLEEP)
 	else:
 		no_recv_cnt += 1
 		#if no_recv_cnt % 100 == 0: print('recv nothing (cnt : {})'.format(no_recv_cnt))

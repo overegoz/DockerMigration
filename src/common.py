@@ -20,6 +20,7 @@ ap1_name = "AP-1"
 ap2_name = "AP-2"
 edge_server1_name = "EdgeServer-1"
 edge_server2_name = "EdgeServer-2"
+localhost_name = "LocalPC"
 # -------------------------------------------------------------------
 # ip table
 """
@@ -37,7 +38,8 @@ ip = {controller_name : "192.168.0.2",
 		ap1_name : "192.168.0.116",
 		ap2_name : "192.168.0.117",
 		edge_server1_name : "192.168.0.116",
-		edge_server2_name : "192.168.0.117"}
+		edge_server2_name : "192.168.0.117",
+		localhost_name : "127.0.0.1"}
 
 # 도커가 인식하는 자신의 IP는 0.0.0.0이다        
 ip_fake = {edge_server1_name : "0.0.0.0",
@@ -48,9 +50,10 @@ port = {controller_name : 11000,
 		logger_name : 11001,
 		user_name : 11002,
 		ap1_name : 11003,
-		ap2_name : 11004,
+		ap2_name : 11003,
 		edge_server1_name : 11005,
-		edge_server2_name : 11006}
+		edge_server2_name : 11005,
+		localhost_name : 10003}
 # -------------------------------------------------------------------
 # directory
 account = "daniel"
