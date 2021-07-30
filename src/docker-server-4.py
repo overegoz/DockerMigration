@@ -49,7 +49,8 @@ elif my_name == common.edge_server2_name:
 else:
 	assert False
 # -------------------------------------------------------------------
-my_ap_name = socket.gethostname()
+# --network="host" 일때만 의미있음
+#my_ap_name = socket.gethostname()
 # -------------------------------------------------------------------
 print('{} started at {}!'.format(my_name, my_ap_name))
 # -------------------------------------------------------------------
@@ -93,10 +94,13 @@ print('pre-work done!')
 # -------------------------------------------------------------------
 # 서비스를 할 준비가 되었음을 AP에게 알림
 # 프로파일에 따른 사전작업이 모두 완료되면, ES_READY 메시지를 보내라.
+# 이를 위한 카운터 변수를 만들자
+# 0 : 한번도 알리지 않음
+# 10 : ES1이 AP1에게 알림
+# 100 : ES2가 AP2에게 알림
+# 110 : (ES1 -> ) AP1, (ES2 -> )AP2에게 알림
+notified = 0
 print('{} is ready to serve!'.format(my_name))
-send_msg = common.str2(my_name, common.ES_READY)
-print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
-common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 # -------------------------------------------------------------------
 #print('host name : ', socket.gethostname())
 # -------------------------------------------------------------------
@@ -112,6 +116,28 @@ while(True):
 	2. [send] USER의 REQ에 대한 응답을 AP로 보내는 것
 		: EdgeServer<서버번호> SVCR <같은 숫자>
 	"""
+	# 지금 어떤 AP에있는 ES인지를 매번 확인
+	try:
+		# ap2_hostname은 migr 후 ES2번을 실행할 때만 정의된다
+		_ = socket.gethostbyname(common.ap2_hostname)
+		# 오류가 없다면, 여기는 AP-2
+		my_ap_name == common.ap2_name
+		# 최초로 한번은 READY 메시지를 보내주자
+		assert notified == 10 or notified == 110
+		if notified == 100:
+			send_msg = common.str2(my_name, common.ES_READY)
+			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
+			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
+	except:
+		# 오류가 있다면, 여기는 AP-1
+		my_ap_name == common.ap1_name
+		# 최초로 한번은 READY 메시지를 보내주자
+		assert notified == 0 or notified == 10
+		if notified == 0:
+			send_msg = common.str2(my_name, common.ES_READY)
+			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
+			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
+
 	# 직접 연결된 AP로 부터 데이터 수신하기
 	recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
 
@@ -150,4 +176,4 @@ while(True):
 		no_recv_cnt += 1
 
 	if 	((no_recv_cnt + yes_recv_cnt) % 100) == 0: 
-		print('recv : {}, no recv : {}'.format(yes_recv_cnt, no_recv_cnt))
+		print('recv : {}, no recv : {} on {} machine'.format(yes_recv_cnt, no_recv_cnt, my_ap_name))

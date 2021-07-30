@@ -199,7 +199,9 @@ while(True):
 				# 이후로는 user에게 알려줄 필요 없다
 				common.udp_send(sock, my_name, common.user_name, 
 								common.str2(my_name, cmd), common.SHORT_SLEEP)
+
 			if my_name == common.ap2_name:  # migr 완료
+				# user 에게는 알려줄 필요 없음
 				# migr 완료 로그 남기기
 				# migr 시간 측정 : 로그에서, 여기까지 소요된 시간을 측정하면 됨.
 				common.send_log(sock, my_name, my_name, "migr finished")
