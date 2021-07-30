@@ -231,7 +231,8 @@ def start_edgeserver(es_name, migr_type, profile):
 			# 컨테이너 생성 (실행 안함)
 			print('FC (2/3)-컨테이너 생성')
 			#cmd = 'docker create -p {}:{}/udp --name {} {}'.format(my_port,my_port,cont_name,img_name)
-			cmd = 'docker create --network="host" --name {} {}'.format(cont_name,img_name)
+			#cmd = 'docker create --network="host" --name {} {}'.format(cont_name,img_name)
+			cmd = 'docker create --name {} {}'.format(cont_name,img_name)
 			print(cmd)
 			os.system(cmd)
 
