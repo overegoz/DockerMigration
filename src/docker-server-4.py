@@ -49,7 +49,7 @@ elif my_name == common.edge_server2_name:
 else:
 	assert False
 
-my_ap_name = common.localhost_name
+#my_ap_name = common.localhost_name
 
 print('{} started at {}!'.format(my_name, my_ap_name))
 # -------------------------------------------------------------------
