@@ -22,7 +22,6 @@ ap1_hostname = "docker-1"
 ap2_hostname = "docker-2"
 edge_server1_name = "EdgeServer-1"
 edge_server2_name = "EdgeServer-2"
-localhost_name = "LocalPC-Docker"
 # -------------------------------------------------------------------
 # ip table
 """
@@ -34,20 +33,21 @@ ip = {controller_name : "127.0.0.1",
 		edge_server1_name : "127.0.0.1",
 		edge_server2_name : "127.0.0.1"}
 """
-ip = {controller_name : "192.168.0.2",
-		logger_name : "192.168.0.2",
-		user_name : "192.168.0.2",
-		ap1_name : "192.168.0.116",
-		ap1_hostname : "192.168.0.116",
-		ap2_name : "192.168.0.117",
-		ap2_hostname : "192.168.0.117",
-		#edge_server1_name : "192.168.0.116",
-		edge_server1_name : "127.0.0.1",
-		edge_server2_name : "192.168.0.117",
-		localhost_name : "127.0.0.1"}  # 도커에서 바라보는 물리 호스트 IP
+LOCAL_PC_IP = "192.168.0.2"
+VM1_IP = "192.168.0.116"
+VM2_IP = "192.168.0.117"
+ip = {controller_name : LOCAL_PC_IP,
+		logger_name : LOCAL_PC_IP,
+		user_name : LOCAL_PC_IP,
+		ap1_name : VM1_IP,
+		ap1_hostname : VM1_IP,
+		ap2_name : VM2_IP,
+		ap2_hostname : VM2_IP,
+		edge_server1_name : "127.0.0.1",  # ES1은 AP1 와 공존함
+		edge_server2_name : "127.0.0.1"}   # ES2는 AP2와 공존함
 
 # 도커가 인식하는 자신의 IP는 0.0.0.0이다        
-# --network="host" 옵션을 줘도 0.0.0.0을 사용해야 한다
+# --network="host" 옵션을 사용해도 0.0.0.0을 사용해야 한다
 ip_fake = {edge_server1_name : "0.0.0.0",
 			edge_server2_name : "0.0.0.0"}
 
@@ -63,8 +63,7 @@ port = {controller_name : 11000,
 		ap2_name : AP_PORT,
 		ap2_hostname : AP_PORT,
 		edge_server1_name : ES_PORT,
-		edge_server2_name : ES_PORT,
-		localhost_name : AP_PORT}
+		edge_server2_name : ES_PORT}
 # -------------------------------------------------------------------
 # directory
 account = "daniel"
@@ -218,7 +217,8 @@ def start_edgeserver(es_name, migr_type, profile):
 		img_name = prof.get_img_name_ap2(profile)
 
 		if migr_type == MIGR_NONE:
-			cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
+			#cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
+			cmd = 'docker run --network="host" -d --name {} {}'.format(cont_name,img_name)
 			print(cmd)
 			os.system(cmd)
 		elif migr_type == MIGR_FC:
@@ -230,7 +230,8 @@ def start_edgeserver(es_name, migr_type, profile):
 
 			# 컨테이너 생성 (실행 안함)
 			print('FC (2/3)-컨테이너 생성')
-			cmd = 'docker create -p {}:{}/udp --name {} {}'.format(my_port,my_port,cont_name,img_name)
+			#cmd = 'docker create -p {}:{}/udp --name {} {}'.format(my_port,my_port,cont_name,img_name)
+			cmd = 'docker create --network="host" --name {} {}'.format(cont_name,img_name)
 			print(cmd)
 			os.system(cmd)
 

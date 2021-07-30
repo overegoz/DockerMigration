@@ -49,7 +49,6 @@ elif my_name == common.edge_server2_name:
 else:
 	assert False
 # -------------------------------------------------------------------
-#my_ap_name = common.localhost_name  # migr 이후에도 동작하기 위해서...
 my_ap_name = socket.gethostname()
 # -------------------------------------------------------------------
 print('{} started at {}!'.format(my_name, my_ap_name))
@@ -149,9 +148,6 @@ while(True):
 		common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 	else:
 		no_recv_cnt += 1
-		#print('recv: nothing')
-		#if no_recv_cnt % 100 == 0: print('recv nothing (cnt : {})'.format(no_recv_cnt))
 
-
-	if 	no_recv_cnt + yes_recv_cnt % 100 == 0: 
+	if 	((no_recv_cnt + yes_recv_cnt) % 100) == 0: 
 		print('recv : {}, no recv : {}'.format(yes_recv_cnt, no_recv_cnt))
