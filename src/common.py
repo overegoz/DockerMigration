@@ -203,14 +203,17 @@ def start_edgeserver(es_name, migr_type, profile):
 			os.system(cmd)
 		elif migr_type == MIGR_FC:
 			# tar 파일로부터 이미지 불러오기
+			print('FC (1/3)-이미지 불러오기')
 			cmd = 'docker load -i {}.tar'.format(fc_file_dir + cont_name)
 			os.system(cmd)
 
 			# 컨테이너 생성 (실행 안함)
+			print('FC (2/3)-컨테이너 생성')
 			cmd = 'docker create -p {}:{}/udp --name {} {}'.format(my_port,my_port,cont_name,img_name)
 			os.system(cmd)
 
 			# 체크포인트로 컨테이너 실행
+			print('FC (3/3)-컨테이너 실행 + 체크포인트')
 			cp_name = prof.get_checkpoint_name(profile)
 			cmd = 'docker start --checkpoint-dir={} --checkpoint={} {}'.format(fc_cp_dir, cp_name, cont_name)
 			os.system(cmd)
@@ -228,7 +231,7 @@ def stop_edgeserver(profile):
 	os.system(cmd)
 	print('EdgeServer가 종료 되었습니다')
 
-# migr src에서 migr 작업을 수행하기 위한 함수
+# migr SRC 에서 migr 작업을 수행하기 위한 함수
 def start_migr(sock, migr_tech, my_name, other_ap, profile):  
 	assert my_name == ap1_name and other_ap == ap2_name
 	"""
@@ -245,6 +248,7 @@ def start_migr(sock, migr_tech, my_name, other_ap, profile):
 		- 이미지 전체를 파일로 export
 		- 컨테이너를 정지하지 않는 방식으로 진행하자 (계속 서비스 제공 가능하도록...)
 		"""
+		print('FC (1/4)-이미지 파일 만들기')
 		cont_name = prof.get_cont_name(profile)
 		ap2_img_name = prof.get_img_name_ap2(profile)
 		cmd = 'docker commit --pause=false {} {}'.format(cont_name, ap2_img_name)
@@ -254,17 +258,20 @@ def start_migr(sock, migr_tech, my_name, other_ap, profile):
 		"""
 		1.2 이미지 전체를 파일 전송
 		"""
+		print('FC (2/4)-이미지 파일 전송')
 		cmd = 'scp {}.tar {}@{}:{}'.format(fc_file_dir+cont_name, account, ip[other_ap], fc_file_dir)
 		os.system(cmd)
 		"""
 		2.1 체크포인트 생성
 		"""
+		print('FC (3/4)-체크포인트 만들기')
 		cp_name = prof.get_checkpoint_name(profile)
 		cmd = 'docker checkpoint create --leave-running=true --checkpoint-dir={} {} {}'.format(fc_cp_dir, cont_name, cp_name)
 		os.system(cmd)
 		"""
 		2.2 체크포인트 전송 (디렉토리 전체를 복사)
 		"""
+		print('FC (4/4)-체크포인트 전송')
 		cmd = 'scp -r {} {}@{}:{}'.format(fc_cp_dir + cp_name, account, ip[other_ap], fc_cp_dir)
 		# 3. 전송 완료 알리기 : 여기서 말고, 함수 마지막에서 수행
 	elif migr_tech == MIGR_DC:

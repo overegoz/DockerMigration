@@ -133,7 +133,7 @@ while(True):
 			print('MIGR 작업을 시작합니다 : {}'.format(migr_type))
 			
 			thr_migr = Thread(target=common.start_migr, \
-								args=(sock, migr_type, my_name, other_ap, common.prof))
+								args=(sock, migr_type, my_name, other_ap, profile))
 			thr_migr.start()
 			# migr 시간 측정 : 로그에서, 여기서 부터 시간을 측정하면 됨.
 			common.send_log(sock, my_name, my_name, common.str2("migr begins : ", migr_type))
