@@ -145,6 +145,8 @@ def udp_send(sock, me, you, msg, t):
 	#print("you : ", you)
 	#print(msg, ip[you], port[you])
 	sock.sendto(msg.encode(), (ip[you], port[you]))
+	if me == edge_server1_name:
+		print('comm: {} -> {}, {}, {}, {}}'.format(me, you, msg, ip[you], port[you]))
 
 	# 로그에 기록하기
 	send_log(sock, me, you, msg + delim + "(sent)")
