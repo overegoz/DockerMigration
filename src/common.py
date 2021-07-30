@@ -49,14 +49,16 @@ ip_fake = {edge_server1_name : "0.0.0.0",
 
 # -------------------------------------------------------------------
 # port number
+AP_PORT = 11003
+ES_PORT = 11005
 port = {controller_name : 11000,
 		logger_name : 11001,
 		user_name : 11002,
-		ap1_name : 11003,
-		ap2_name : 11003,
-		edge_server1_name : 11005,
-		edge_server2_name : 11005,
-		localhost_name : 11003}
+		ap1_name : AP_PORT,
+		ap2_name : AP_PORT,
+		edge_server1_name : ES_PORT,
+		edge_server2_name : ES_PORT,
+		localhost_name : AP_PORT}
 # -------------------------------------------------------------------
 # directory
 account = "daniel"
@@ -148,8 +150,8 @@ def udp_send(sock, me, you, msg, t):
 	#print("you : ", you)
 	#print(msg, ip[you], port[you])
 	sock.sendto(msg.encode(), (ip[you], port[you]))
-	if me == edge_server1_name:
-		print('comm: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))
+	if me == edge_server1_name or me == edge_server2_name:
+		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))
 
 	# 로그에 기록하기
 	send_log(sock, me, you, msg + delim + "(sent)")
