@@ -121,7 +121,8 @@ while(True):
 		# ap2_hostname은 migr 후 ES2번을 실행할 때만 정의된다
 		_ = socket.gethostbyname(common.ap2_hostname)
 		# 오류가 없다면, 여기는 AP-2
-		my_ap_name = common.ap2_name
+		my_ap_name = common.ap2_name  # AP 이름 바꿔주고,
+		my_name = common.edge_server2_name  # 내 이름 (ES)도 바꿔주자
 		# 최초로 한번은 READY 메시지를 보내주자
 		assert notified == 10 or notified == 110
 		if notified == 10:
