@@ -40,11 +40,13 @@ ip = {controller_name : "192.168.0.2",
 		#edge_server1_name : "192.168.0.116",
 		edge_server1_name : "127.0.0.1",
 		edge_server2_name : "192.168.0.117",
-		localhost_name : "172.17.0.1"}  # 도커에서 바라보는 물리 호스트 IP
+		localhost_name : "127.0.0.1"}  # 도커에서 바라보는 물리 호스트 IP
 
 # 도커가 인식하는 자신의 IP는 0.0.0.0이다        
-ip_fake = {edge_server1_name : "0.0.0.0",
-			edge_server2_name : "0.0.0.0"}
+#ip_fake = {edge_server1_name : "0.0.0.0",
+#			edge_server2_name : "0.0.0.0"}
+ip_fake = {edge_server1_name : "127.0.0.1",
+			edge_server2_name : "127.0.0.1"}
 # -------------------------------------------------------------------
 # port number
 port = {controller_name : 11000,
