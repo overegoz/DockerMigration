@@ -273,6 +273,7 @@ def start_migr(sock, migr_tech, my_name, other_ap, profile):
 		"""
 		print('FC (4/4)-체크포인트 전송')
 		cmd = 'scp -r {} {}@{}:{}'.format(fc_cp_dir + cp_name, account, ip[other_ap], fc_cp_dir)
+		os.system(cmd)
 		# 3. 전송 완료 알리기 : 여기서 말고, 함수 마지막에서 수행
 	elif migr_tech == MIGR_DC:
 		# 1.1 전송할 파일 만들기 : diff 파일
