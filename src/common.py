@@ -216,8 +216,6 @@ def start_edgeserver(es_name, migr_type, profile):
 			os.system(cmd)
 	else:
 		assert False, "미구현"	
-	else:
-		assert False
 
 	print("EdgeServer가 시작 되었습니다")
 
