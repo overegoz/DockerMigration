@@ -72,32 +72,32 @@ class Profile:
 		pass
 	# -------------------------------------------------------------------
 	def get_C(self, p):
-		return self.C_sec[int(p)]
+		return self.C_sec[p]
 
 	def get_img_name_ap1(self, p):
-		return self.img_name_ap1[int(p)]
+		return self.img_name_ap1[p]
 
 	def get_img_name_ap2(self, p):
-		return self.img_name_ap2[int(p)]        
+		return self.img_name_ap2[p]        
 
 	def get_cont_name(self, p):
-		return self.container_name[int(p)]
+		return self.container_name[p]
 
 	def get_req_int(self, p):
-		return self.request_interval_sec[int(p)]
+		return self.request_interval_sec[p]
 
 	def get_ho_cnt(self, p):
-		return self.ho_cnt[int(p)]
+		return self.ho_cnt[p]
 
 	def get_predetermined_migr(self, p):
-		return self.predetermined_migr[int(p)]
+		return self.predetermined_migr[p]
 
 	def get_checkpoint_name(self, p):
-		return self.checkpoint_name[int(p)]
+		return self.checkpoint_name[p]
 
 	def get_summary(self, p):
-		return self.C_sec[int(p)], self.l_diff_bit[int(p)], self.l_check_bit[int(p)], \
-				self.l_log_bit[int(p)], self.t_replay_sec[int(p)], self.th_bps[int(p)]
+		return self.C_sec[p], self.l_diff_bit[p], self.l_check_bit[p], \
+				self.l_log_bit[p], self.t_replay_sec[p], self.th_bps[p]
 
 	def id_min(self):
 		"""
