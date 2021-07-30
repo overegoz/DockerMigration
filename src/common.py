@@ -201,7 +201,7 @@ def start_edgeserver(es_name, migr_type, profile):
 		img_name = prof.get_img_name_ap1(profile)
 
 		#cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
-		cmd = 'docker run --network="host" -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
+		cmd = 'docker run --network="host" -d --name {} {}'.format(cont_name,img_name)
 		print(cmd)
 		os.system(cmd)
 	elif es_name == edge_server2_name:  # migr 으로 실행하는 것
