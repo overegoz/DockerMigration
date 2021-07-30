@@ -43,10 +43,10 @@ ip = {controller_name : "192.168.0.2",
 		localhost_name : "127.0.0.1"}  # 도커에서 바라보는 물리 호스트 IP
 
 # 도커가 인식하는 자신의 IP는 0.0.0.0이다        
-#ip_fake = {edge_server1_name : "0.0.0.0",
-#			edge_server2_name : "0.0.0.0"}
-ip_fake = {edge_server1_name : "127.0.0.1",
-			edge_server2_name : "127.0.0.1"}
+# --network="host" 옵션을 줘도 0.0.0.0을 사용해야 한다
+ip_fake = {edge_server1_name : "0.0.0.0",
+			edge_server2_name : "0.0.0.0"}
+
 # -------------------------------------------------------------------
 # port number
 port = {controller_name : 11000,
@@ -235,7 +235,7 @@ def start_edgeserver(es_name, migr_type, profile):
 	else:
 		assert False, "미구현"	
 
-	print("EdgeServer를 시작 사켰습니다")
+	print("EdgeServer를 시작 시켰습니다")
 
 def stop_edgeserver(profile):
 	if profile <= 0:  # 테스트용
