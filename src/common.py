@@ -492,7 +492,7 @@ def return_migr_info_ap1(profile):
 	"""
 	# .......................................................
 	# 테스트용 또는 migr type을 강제하는 경우
-	if p <= 4:
+	if profile <= 4:
 		return "1-2-3-4-5-6"
 	# .......................................................
 	C_sec,l_diff_bit,l_check_bit,l_log_bit,t_replay_sec,th_bps,force \
