@@ -19,3 +19,10 @@ Code is partially from
   - CRIU 버전 확인 명령어는... 모르겠고, github에서 다운 받은 파일 중 Makefile.versions 파일에 기록된 버전 정보로 확인함
 - Ubuntu 18.04 커널 버전 : 5.4.0-80-generic ($ uname -r 명령으로 확인)\
 
+# 실행 방법
+1. ㅁㅁ
+  - ㅁㅁ
+2. ㅁㅁ
+  2.1. ㅁㅁ
+  2.2. ㅁㅁ
+3. ㅁㅁ
