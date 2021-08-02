@@ -218,7 +218,7 @@ def action_profile(es_name, profile):
 				os.system(cmd)
 				time.sleep(3.0)
 			
-			print('action_profile took {} seconds'.foramt(time.time()-start_time))
+			print('action_profile took {} seconds'.format(time.time()-start_time))
 	else:
 		pass
 	
