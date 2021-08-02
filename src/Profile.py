@@ -112,6 +112,9 @@ class Profile:
 		return self.C_sec[p], self.l_diff_bit[p], self.l_check_bit[p], \
 				self.l_log_bit[p], self.t_replay_sec[p], self.th_bps[p]
 
+	def get_final_dir_name(self, p):
+		return final_dir_name[p]
+
 	def id_min(self):
 		"""
 		<프로필 -1번>
