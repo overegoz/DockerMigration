@@ -81,7 +81,7 @@ class Profile:
 	final_dir_name = {1:'none',
 						2:'profile2',
 						3:'profile3',
-						4:'profile3'}
+						4:'profile4'}
 	# -------------------------------------------------------------------
 	# user가 몇번의 REQ를 보낸 후 handover 할지 / integer
 	ho_cnt = {1:5,
