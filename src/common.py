@@ -183,7 +183,7 @@ def udp_recv(sock, me, bufsize, t):
 
 	return msg, addr
 
-def action_profile(es_name, profile):
+def action_profile(sock, es_name, profile):
 	print('Profile action begins!')
 	"""
 	프로파일 번호에 따라서 사전에 정의된 동작을 수행함
@@ -224,7 +224,11 @@ def action_profile(es_name, profile):
 			time.sleep(3.0)
 		
 		""" predefined action finishes """
-		print('action_profile took {} seconds'.format(time.time()-start_time))
+		time_taken_sec = time.time()-start_time
+		print('action_profile took {} seconds'.format(time_taken_sec))
+
+		# 소요 시간을 Logger에게 알릴까?
+		send_log(sock, es_name, es_name, str2("ReplayTime", str(time_taken_sec)))
 	else:
 		assert False
 	

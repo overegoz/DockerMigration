@@ -16,7 +16,7 @@ sock.bind((local_ip, local_port))
 sock.setblocking(0)  # non-blocking socket으로 만들기
 # -------------------------------------------------------------------
 # 로그 파일 만들기
-f = open(common.get_now() + ".log", 'w')
+f = open('./logs/' + common.get_now() + '.log', 'w')
 # -------------------------------------------------------------------
 def file_write(f, msg):
 	# 파일에 기록할 때, 개행문자를 추가하자

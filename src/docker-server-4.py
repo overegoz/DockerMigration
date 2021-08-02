@@ -139,7 +139,7 @@ while(True):
 			print('notified: ', notified)
 
 			# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
-			common.action_profile(my_name, profile)
+			common.action_profile(sock, my_name, profile)
 
 			# 'Log-Replay 작업이 완료되면' READY 메시지를 AP2에게 보내주기
 			send_msg = common.str2(my_name, common.ES_READY)
@@ -160,7 +160,7 @@ while(True):
 			print('notified: ', notified)
 
 			# Log-Replay 경우 : AP1은 '스레드'를 사용해서 지정된 작업 수행
-			thr_action = Thread(target=common.action_profile, args=(my_name, profile))
+			thr_action = Thread(target=common.action_profile, args=(sock, my_name, profile))
 			thr_action.start()
 
 			# (action_profile 리턴을 기다리지 않고) AP에게 READY 메시지 보내기

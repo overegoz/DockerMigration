@@ -1,11 +1,5 @@
 # DockerMigration
-
 To implement THREE different docker migration methods.
-
-Code is partially from my collaborators (School of SW, Hallym Univ., South Korea)
-- https://github.com/GEONheong/migrate_docker_conatiner_diff.git
-- https://github.com/GEONheong/migrate_docker_container_fullCopy.git
-- https://github.com/KimJaeHwan/docker_live_migration.git
 
 # Important
 - Ubuntu 18.04, Docker 17 버전(저장된 폴더: `./DockerCheckpoint`) 조합으로 checkpoint 기능을 사용함
@@ -60,3 +54,9 @@ Code is partially from my collaborators (School of SW, Hallym Univ., South Korea
 		- "Config > Env" : 환경변수
 		- "Config > Image" : 실행한 도커 이미지
 	- `$ docker diff <컨테이너 이름>` : (writable layer) 파일/폴더 변경 내역
+	
+# Notes
+Code is partially from my collaborators (School of SW, Hallym Univ., South Korea)
+- https://github.com/GEONheong/migrate_docker_conatiner_diff.git
+- https://github.com/GEONheong/migrate_docker_container_fullCopy.git
+- https://github.com/KimJaeHwan/docker_live_migration.git	
