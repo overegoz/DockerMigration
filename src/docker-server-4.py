@@ -119,12 +119,13 @@ while(True):
 	# 지금 어떤 AP에있는 ES인지를 매번 확인
 	# - 지금은 --add-host 명령으로 /etc/hosts 파일의 내용을 기반으로 판단
 	# - 근데, 환경변수를 사용해서 판단하는게 더 좋은듯?
-	if True:
+	if False:
+		# 환경 변수명이 ES2에서 기존의 ES1 이름으로 남아 있어서 안됨
 		print('notified: ', notified)
 		try:
 			get_es_name = os.environ[common.ENV_ES_NAME]
 			print('get_es_name: ', get_es_name)
-			
+
 			if get_es_name == common.edge_server1_name:  # 여기는 AP-1
 				my_ap_name = common.ap1_name  # AP 이름 바꿔주고,
 				my_name = common.edge_server1_name

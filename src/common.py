@@ -212,7 +212,8 @@ def start_edgeserver(es_name, migr_type, profile):
 
 		#cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
 		# 여기서는 ap1_hostname만 정의되어 있고, ap2_hostname은 없음
-		if True:
+		if False:
+			# 환경 변수명이 ES2에서 기존의 ES1 이름으로 남아 있어서 안됨
 			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp -d --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
 		else:
 			cmd = 'docker run -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
@@ -240,7 +241,8 @@ def start_edgeserver(es_name, migr_type, profile):
 			print('FC (2/3)-컨테이너 생성(실행 안함)')
 			#cmd = 'docker create -p {}:{}/udp --name {} {}'.format(my_port,my_port,cont_name,img_name)
 			# 여기서는 ap2_hostname이 정의되어 있다
-			if True:
+			if False:
+				# 환경 변수명이 ES2에서 기존의 ES1 이름으로 남아 있어서 안됨
 				cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
 			else:
 				cmd = 'docker create -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
@@ -258,7 +260,8 @@ def start_edgeserver(es_name, migr_type, profile):
 		elif migr_type == MIGR_DC:
 			# 1. 컨테니어 생성 (실행 안함)
 			print('DC (1/3)-컨테이너 생성(실행 안함)')
-			if True:
+			if False:
+				# 환경 변수명이 ES2에서 기존의 ES1 이름으로 남아 있어서 안됨
 				cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
 			else:
 				cmd = 'docker create -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
