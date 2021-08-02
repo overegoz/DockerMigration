@@ -231,7 +231,7 @@ def start_edgeserver(es_name, migr_type, profile):
 			os.system(cmd)
 
 			# 2. 컨테이너 생성 (실행 안함)
-			print('FC (2/3)-컨테이너 생성')
+			print('FC (2/3)-컨테이너 생성(실행 안함)')
 			#cmd = 'docker create -p {}:{}/udp --name {} {}'.format(my_port,my_port,cont_name,img_name)
 			# 여기서는 ap2_hostname이 정의되어 있다
 			cmd = 'docker create -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
@@ -247,17 +247,39 @@ def start_edgeserver(es_name, migr_type, profile):
 			os.system(cmd)
 		elif migr_type == MIGR_DC:
 			# 1. 컨테니어 생성 (실행 안함)
+			print('DC (1/3)-컨테이너 생성(실행 안함)')
+			cmd = 'docker create -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
+			print(cmd)
+			os.system(cmd)
 
 			# 2. diff 파일을 컨테이너에 복사해 넣기
-			수신받은 diff 파일을 UpperDir=diff 폴더에 그대로 복사해 넣자 ; 루트 권한 필요?
+			print('DC (2/3)-수신한 diff 파일을 복사해넣기')
+			# 2.1 diff 절대경로 얻기
+			output_filename = 'diff-dst-dir-{}.txt'.format(cont_name)
+			cmd = 'docker inspect --format="{}" {} > {}'.format('{{.GraphDriver.Data.UpperDir}}', cont_name, output_filename)
+			os.system(cmd)  # diff 절대경로를 파일에 기록
+			fp = open(output_filename, 'r')
+			diff_dst_dir = fp.readline()  # 파일에서 diff 절대경로명 획득
+			diff_dst_dir = diff_dst_dir.rstrip()  # 마지막에 '\n'이 붙는데, 이거 제거하기
+			fp.close()
+
+			# 2.2 전송받은 폴더내의 파일을 diff 절대경로에 복사해넣기
+			diff_src_dir = dc_file_dir + prof.get_final_dir_name(profile)
+
+			# 수신받은 diff 파일을 UpperDir(=diff) 폴더에 그대로 복사해 넣자; 루트 권한 필요
+			cmd = 'cp -r {}/* {}/'.format(diff_src_dir, diff_dst_dir)
+			os.system(cmd)			
 
 			# 3. 체크 포인트로 컨테이너 실행
-
+			print('DC (3/3)-컨테이너 실행 + 체크포인트')
+			cp_name = prof.get_checkpoint_name(profile)
+			cmd = 'docker start --checkpoint-dir={} --checkpoint={} {}'.format(fc_cp_dir, cp_name, cont_name)
+			print(cmd)
+			os.system(cmd)
 			pass
 		elif migr_type == MIGR_LR:  # 사전에 준비된 새로운 img를 실행하는 것
-			로그 파일 수신 완료되면, 사전에 준비된 이미지를 실행하자
-			베이스 이미지에서 log를 모두 replay 하는 시나리오니까, docker img build 를 여기서 할 필요 없음
-			
+			#로그 파일 수신 완료되면, 사전에 준비된 이미지를 실행하자
+			#베이스 이미지에서 log를 모두 replay 하는 시나리오니까, docker img build 를 여기서 할 필요 없음
 			pass
 		else:
 			assert False, "잘못된 MIGR 기법 : {}".format(migr_type)
@@ -324,33 +346,46 @@ def start_migr(sock, migr_tech, my_name, other_ap, profile):
 
 		# 3. AP2에게 ES 시작하라고 알리기 : 여기서 말고, 함수 마지막에서 수행
 	elif migr_tech == MIGR_DC:
-		# 1.1 전송할 파일 만들기 : diff 파일
+		# 1 전송할 파일 만들기 : diff 파일
+		print('DC (1/4)-전송할 diff 파일을 지정된 경로로 복사')
+		"""
 		docker inspect 로 보면 UpperDir이 diff 폴더인데, 그걸 통째로 보내주면 안되나?
 		docker diff 해서, 어떤 파일이 변경 되었는지... 이런거 분석 할 필요도 없어지는데?
 		아, 근데 삭제된 파일을 알아내려면, diff 명령을 확인하긴 해야겠네... 이것도 어쩌면 필요 없을듯?
 		그냥 diff 폴더 전체를 DST로 보내는  걸로 구현하자
+		"""
 
 		아래 코드는 실행 전에, 직접 터미널에서 run 해봐
+		# 1.1 diff 디렉토리 절대경로 알아내서 경로를 파일에 쓰기
 		cont_name = prof.get_cont_name(profile)
-		output_filename = "diff-src-dir.txt"
+		output_filename = 'diff-src-dir-{}.txt'.format(cont_name)
 		cmd = 'docker inspect --format="{}" {} > {}'.format('{{.GraphDriver.Data.UpperDir}}', cont_name, output_filename)
 		os.system(cmd)
 
+		# 1.2 파일을 읽어서 diff 절대경로 획득하기
 		fp = open(output_filename, 'r')
 		diff_src_dir = fp.readline()
+		diff_src_dir = diff_src_dir.rstrip()  # 마지막에 '\n'이 붙는데, 이거 제거하기
+		fp.close()
+
+		# 1.3 diff 폴더 전체를 복사해오기 : 루트 권한 필요
 		diff_dst_dir = dc_file_dir + prof.get_final_dir_name(profile)
 		cmd = 'cp -r {} {}'.format(diff_src_dir, diff_dst_dir)
+		os.system(cmd)
 
-		# 1.2 diff 파일 전송 : 폴더 통째로 전송
+		# 1.4 diff 파일 전송 : 폴더 통째로 AP-2에게 전송하기
+		print('DC (2/4)-diff 파일 전송하기')
 		cmd = 'scp -r {} {}@{}:{}'.format(diff_dst_dir, account, ip[other_ap], dc_file_dir)
 		os.system(cmd)
 
 		# 2.1 체크포인트 생성
+		print('DC (3/4)-체크포인트 생성하기')
 		cp_name = prof.get_checkpoint_name(profile)
 		cmd = 'docker checkpoint create --leave-running=true --checkpoint-dir={} {} {}'.format(dc_cp_dir, cont_name, cp_name)
 		os.system(cmd)
 
 		# 2.2 체크포인트 전송
+		print('DC (4/4)-체크포인트 전송하기')
 		cmd = 'scp -r {} {}@{}:{}'.format(dc_cp_dir + cp_name, account, ip[other_ap], dc_cp_dir)
 		os.system(cmd)
 
@@ -358,12 +393,12 @@ def start_migr(sock, migr_tech, my_name, other_ap, profile):
 		pass
 	elif migr_tech == MIGR_LR:
 		# 1.1 전송할 파일 만들기 : replay할 log
-		JSON 형식의 로그 파일을 읽어서 parsing 하기 : 일단은 수행하기
+		#JSON 형식의 로그 파일을 읽어서 parsing 하기 : 일단은 수행하기
 
 		# 1.2 파일 전송 : replay-log 파일 전송
-		parsing된 로그파일 전송하기 : 일단은 수행하기
+		#parsing된 로그파일 전송하기 : 일단은 수행하기
 
-		DST에서는 로그파일 수신 받으면, 로그가 박혀있는(함수로 구현하기) 도커를 실행할 것임
+		#DST에서는 로그파일 수신 받으면, 로그가 박혀있는(함수로 구현하기) 도커를 실행할 것임
 
 		# 2. 체크포인트 : 필요 없음
 		# 3. AP2에게 ES 시작하라고 알리기 : 여기서 말고, 함수 마지막에서 수행

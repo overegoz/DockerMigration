@@ -169,7 +169,7 @@ while(True):
 			user_associated = False
 		elif cmd == common.SVC_RES:  # [AR7][AR8][AR10] 사용자 요청에 대한 응답을 받았다
 			assert sender == my_edgeserver or sender == other_ap
-			# 응답 메시지 구성하기
+			# 응답 메시지 만들고 전송하기
 			send_msg = common.str3(my_name, words[1], words[2])
 			if user_associated == True:  # [AS7] 나에게 연결된 user로 보내기
 				common.udp_send(sock, my_name, common.user_name, send_msg, common.SHORT_SLEEP)
