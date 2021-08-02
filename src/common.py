@@ -207,7 +207,9 @@ def action_profile(es_name, profile):
 	elif profile == 3:
 		pass  # DC 테스트, 할 일 없음
 	elif profile == 4:  # LR 테스트
-		assert migr_type == MIGR_LR
+		if es_name == edge_server2_name:
+			assert migr_type == MIGR_LR
+
 		if es_name == edge_server1_name or es_name == edge_server2_name:
 			for i in range(2):
 				cmd = 'truncate -s 10M /tmp/file-{}.file'.format(i)
