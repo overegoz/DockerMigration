@@ -224,7 +224,8 @@ def start_edgeserver(es_name, migr_type, profile):
 		img_name = prof.get_img_name_ap2(profile)
 
 		if migr_type == MIGR_NONE:
-			cmd = 'docker run -e "TZ=Asia/Seoul" -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
+			#cmd = 'docker run -e "TZ=Asia/Seoul" -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
+			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp -d --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
 			#cmd = 'docker run --network="host" -d --name {} {}'.format(cont_name,img_name)
 			print(cmd)
 			os.system(cmd)

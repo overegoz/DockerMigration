@@ -120,6 +120,7 @@ while(True):
 	# - 지금은 --add-host 명령으로 /etc/hosts 파일의 내용을 기반으로 판단
 	# - 근데, 환경변수를 사용해서 판단하는게 더 좋은듯?
 	if True:
+		print('notified: ', notified)
 		try:
 			get_es_name = os.environ[common.ENV_ES_NAME]
 			if get_es_name == common.edge_server1_name:  # 여기는 AP-1
