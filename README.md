@@ -50,4 +50,6 @@ Code is partially from my collaborators (School of SW, Hallym Univ., South Korea
 10. (`$GIT_HOME/src`로 이동 후) AP-2 실행하기:
 	- `$ sudo sh sudo-run-ap-2.sh <숫자>`를 실행해서, Profile-<숫자>에 해당하는 프로파일 실행하기('<'와 '>'는 입력하지 않음)
 	- AP-2는 ES-2를 자동으로 실행하지 않음. 마이그레이션이 되면, 그 때 실행함
+X. 참고
+	- ㅌㄴ
 	
