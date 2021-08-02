@@ -10,4 +10,4 @@ Code is partially from
 
 # Important
 - Ubuntu 20.04, Docker 최신버전은 checkpoint 기능이 동작안함
-- Ubuntu 18.04, (Docker 17 버전)은 checkpoint 기능이 동작함 : ./DockerCheckpoint/docker-ce_17.03.2~ce-0~ubuntu-xenial_amd64.deb
+- Ubuntu 18.04, Docker 17 버전(저장된 폴더: [./DockerCheckpoint])은 checkpoint 기능이 동작함
