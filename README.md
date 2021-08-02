@@ -18,7 +18,7 @@ Code is partially from my collaborators (School of SW, Hallym Univ., South Korea
 	- CRIU 버전 확인 명령어는 ~~모르겠고~~, CRIU 공식 github에서 다운 받은 파일 중 `/Makefile.versions` 파일에 기록된 버전 정보로 확인함
 - Ubuntu 18.04 커널 버전 : 5.4.0-80-generic ($ uname -r 명령으로 확인)
 
-# 실행 방법 (1~6: 사전 준비, 7~: 실행)
+# 실행 방법 (1-6: 사전 준비, 7-: 실행)
 1. `Profile.py`
 	- 기존에 생성된 프로파일(=시나리오) 정보를 확인, 또는
 	- 새로 생성한 프로파일에 대한 정보를 기록하기 (dictionary 자료구조, <프로파일 번호>:<값> 형태로 프로파일별로 값/정보를 입력)
