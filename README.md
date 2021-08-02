@@ -31,10 +31,10 @@ Code is partially from my collaborators (School of SW, Hallym Univ., South Korea
 	3. `./build-img-edgeServer1.sh` (ES-1에서 생성할 도커 이미지), `./build-img-edgeServer2.sh` (ES-2에서 생성할 도커 이미지) 파일에서, 신규 프로파일에 대한 스크립트 추가하기
 4. `common.py` : 'ip' 라는 이름의 딕셔너리에서, 각각의 ENTITY의 IP 주소를 설정하기
 	- 현재 환경 구성:
-	- 총 5개의 ENTITY가 존재: Logger, Controller, User, AP-1(ES-1과 공존), AP-2(ES-2와 공존)
-	- 총 2대의 물리 PC를 사용: PC-1, PC-2
-	- Logger, Controller, User를 PC-1에서 실행 : LOCAL_PC_IP
-	- PC-2에서 2개의 가상머신(VM1, VM2)을 실행하고, (VirtualBox, 어댑터에 브릿지 모드로 설정)
-		- VM1에서 AP-1, ES-1을 실행
-		- VM2에서 AP-2, ES-2를 실행
+		- 총 5개의 ENTITY가 존재: Logger, Controller, User, AP-1(ES-1과 공존), AP-2(ES-2와 공존)
+		- 총 2대의 물리 PC를 사용: PC-1, PC-2
+		- Logger, Controller, User를 PC-1에서 실행 : LOCAL_PC_IP
+		- PC-2에서 2개의 가상머신(VM1, VM2)을 실행하고, (VirtualBox, 어댑터에 브릿지 모드로 설정)
+			- VM1에서 AP-1, ES-1을 실행
+			- VM2에서 AP-2, ES-2를 실행
 5. (git 등을 사용해서) 모든 호스트에 코드 동기화		
