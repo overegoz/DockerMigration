@@ -212,12 +212,16 @@ def action_profile(es_name, profile):
 
 		if es_name == edge_server1_name or es_name == edge_server2_name:
 			start_time = time.time()
+			
+			""" predefined action starts """
 			for i in range(2):
 				cmd = 'truncate -s 10M /tmp/file-{}.file'.format(i)
 				print('action : ', cmd)
 				os.system(cmd)
 				time.sleep(3.0)
 			
+			""" predefined action finishes """
+
 			print('action_profile took {} seconds'.format(time.time()-start_time))
 	else:
 		pass
