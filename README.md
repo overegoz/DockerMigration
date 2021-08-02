@@ -18,9 +18,9 @@ Code is partially from my collaborators (School of SW, Hallym Univ., South Korea
 	- CRIU 버전 확인 명령어는 ~~모르겠고~~, CRIU 공식 github에서 다운 받은 파일 중 `/Makefile.versions` 파일에 기록된 버전 정보로 확인함
 - Ubuntu 18.04 커널 버전 : 5.4.0-80-generic ($ uname -r 명령으로 확인)
 
-# 실행 방법
+# 실행 방법 (1~6: 사전 준비, 7~: 실행)
 1. `Profile.py`
-	- 기존에 생성된 프로파일 정보를 확인, 또는
+	- 기존에 생성된 프로파일(=시나리오) 정보를 확인, 또는
 	- 새로 생성한 프로파일에 대한 정보를 기록하기 (dictionary 자료구조, <프로파일 번호>:<값> 형태로 프로파일별로 값/정보를 입력)
 2. `common.py` : 사전에 정의된 행동(predefined action)을 `action_profile` 함수 안에 코딩
 	- AP-1에서 동작하는 ES-1(= EdgeServer-1)는 '행동'을 스레드로 1회 실행함
@@ -42,4 +42,12 @@ Code is partially from my collaborators (School of SW, Hallym Univ., South Korea
 	- `GIT_HOME/src`폴더로 이동
 	- `$ sudo sh sudo-clear-files.sh`를 실행해서, 불필요한 파일 모두 삭제
 	- `$ sh build-img-edgeServer1.sh`를 실행해서, 프로파일별로 필요한 도커 이미지 생성
-	- `$ sudo sh sudo-run-ap-1.sh <숫자>`를 실행해서, Profile-<숫자> 실행하기('<'와 '>'는 입력하지 않음)
+7. (`$GIT_HOME/src`로 이동 후) Logger 실행하기: `$ python3 ./logger-1.py`
+8. (`$GIT_HOME/src`로 이동 후) Controller 실행하기: `$ python3 ./controller-2.py`
+9. (`$GIT_HOME/src`로 이동 후) AP-1 실행하기:
+	- `$ sudo sh sudo-run-ap-1.sh <숫자>`를 실행해서, Profile-<숫자>에 해당하는 프로파일 실행하기('<'와 '>'는 입력하지 않음)
+	- AP-1은 ES-1을 자동으로 실행함
+10. (`$GIT_HOME/src`로 이동 후) AP-2 실행하기:
+	- `$ sudo sh sudo-run-ap-2.sh <숫자>`를 실행해서, Profile-<숫자>에 해당하는 프로파일 실행하기('<'와 '>'는 입력하지 않음)
+	- AP-2는 ES-2를 자동으로 실행하지 않음. 마이그레이션이 되면, 그 때 실행함
+	
