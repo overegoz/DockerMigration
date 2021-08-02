@@ -246,7 +246,7 @@ def start_edgeserver(es_name, migr_type, profile):
 		img_name = prof.get_img_name_ap2(profile)
 
 		if migr_type == MIGR_NONE:
-			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ENV_MIG_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
+			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ENV_MIGR_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
 			#cmd = 'docker run --network="host" -d --name {} {}'.format(cont_name,img_name)
 			print(cmd)
 			os.system(cmd)
@@ -261,7 +261,7 @@ def start_edgeserver(es_name, migr_type, profile):
 			print('FC (2/3)-컨테이너 생성(실행 안함)')
 			#cmd = 'docker create -p {}:{}/udp --name {} {}'.format(my_port,my_port,cont_name,img_name)
 			# 여기서는 ap2_hostname이 정의되어 있다
-			cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ENV_MIG_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
+			cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ENV_MIGR_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
 			#cmd = 'docker create --network="host" --name {} {}'.format(cont_name,img_name)
 			print(cmd)
 			os.system(cmd)
@@ -275,7 +275,7 @@ def start_edgeserver(es_name, migr_type, profile):
 		elif migr_type == MIGR_DC:
 			# 1. 컨테니어 생성 (실행 안함)
 			print('DC (1/3)-컨테이너 생성(실행 안함)')
-			cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ENV_MIG_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
+			cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ENV_MIGR_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
 			print(cmd)
 			os.system(cmd)
 
@@ -319,7 +319,7 @@ def start_edgeserver(es_name, migr_type, profile):
 			f_log.close()
 
 			print('LR (2/2)-컨테이너 실행')
-			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ENV_MIG_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
+			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ENV_MIGR_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
 			print(cmd)
 			os.system(cmd)			
 			pass

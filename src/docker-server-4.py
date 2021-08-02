@@ -138,7 +138,7 @@ while(True):
 			# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
 			common.action_profile(my_name, profile)
 
-			# Log-Replay 작업이 완료되면 READY 메시지를 AP2에게 보내주기
+			# 'Log-Replay 작업이 완료되면' READY 메시지를 AP2에게 보내주기
 			send_msg = common.str2(my_name, common.ES_READY)
 			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
 			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
@@ -158,7 +158,7 @@ while(True):
 			thr_action = Thread(target=common.action_profile, args=(my_name, profile))
 			thr_action.start()
 
-			# AP에게 READY 메시지 보내기
+			# (action_profile 리턴을 기다리지 않고) AP에게 READY 메시지 보내기
 			send_msg = common.str2(my_name, common.ES_READY)
 			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
 			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
