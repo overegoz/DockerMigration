@@ -29,9 +29,10 @@ Code is partially from my collaborators (School of SW, Hallym Univ., South Korea
 	1. `\src\docker-images`에서 Profile-X 폴더를 만들고, 그 안에 ES-1, ES-2 폴더를 만들기
 	2. ES-1, ES-2 폴더 내의 `build.sh`파일과 `Dockerfile` 파일에서 프로파일 번호 관련 부분을 수정하기 (나머지 *.py 파일은 자동으로 생성되는 파일이니까, 무시하기)
 	3. `./build-img-edgeServer1.sh` (ES-1에서 생성할 도커 이미지), `./build-img-edgeServer2.sh` (ES-2에서 생성할 도커 이미지) 파일에서, 신규 프로파일에 대한 스크립트 추가하기
-4. `common.py` : 'ip' 라는 이름의 딕셔너리에서, 각각의 호스트의 IP 주소를 설정하기: 현재 설정값은...
-	- 총 2대의 물리 PC를 사용
-	- Logger, Controller, User를 물리 PC 1에서 실행 : LOCAL_PC_IP
-	- 물리 PC 2에서 2개의 가상머신(VM1, VM2)을 실행하고,
+4. `common.py` : 'ip' 라는 이름의 딕셔너리에서, 각각의 호스트의 IP 주소를 설정하기
+	- <현재 설정값>
+	- 총 2대의 물리 PC를 사용: PC-1, PC-2
+	- Logger, Controller, User를 PC-1에서 실행 : LOCAL_PC_IP
+	- PC-2에서 2개의 가상머신(VM1, VM2)을 실행하고, (VirtualBox, 어댑터에 브릿지 모드로 설정)
 		- VM1에서 AP-1, ES-1을 실행
 		- VM2에서 AP-2, ES-2를 실행
