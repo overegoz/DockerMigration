@@ -213,9 +213,9 @@ def start_edgeserver(es_name, migr_type, profile):
 		#cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
 		# 여기서는 ap1_hostname만 정의되어 있고, ap2_hostname은 없음
 		if True:
-			cmd = 'docker run -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
-		else:
 			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp -d --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
+		else:
+			cmd = 'docker run -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
 
 		#cmd = 'docker run --network="host" -d --name {} {}'.format(cont_name,img_name)
 		print(cmd)
