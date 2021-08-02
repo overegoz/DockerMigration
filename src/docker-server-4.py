@@ -146,7 +146,7 @@ while(True):
 			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
 			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 			
-	except:
+	except socket.gaierror:  # socket.gethostbyname 함수가 던지는 예외(getaddrinfo failed)
 		# ------------------------------------------------------
 		# 오류가 있다면, 여기는 AP-1
 		# ------------------------------------------------------

@@ -193,10 +193,8 @@ def action_profile(es_name, profile):
 	- migr_type : 어떤 migr 기법을 사용했는지...
 	"""	    
 	migr_type = ""
-	try:
-		migr_type = os.environ[ENV_MIGR_TYPE]
-	except:
-		pass
+	migr_type = os.environ[ENV_MIGR_TYPE]  # 환경변수가 없으면 예외 발생하고 종료함
+	
 
 	if profile <= 0:
 		pass  # 테스트
@@ -207,24 +205,28 @@ def action_profile(es_name, profile):
 	elif profile == 3:
 		pass  # DC 테스트, 할 일 없음
 	elif profile == 4:  # LR 테스트
+		assert es_name == edge_server1_name or es_name == edge_server2_name
+		"""
+		ES1은 여기 정의된 행동을 무조건 수행한다. 스레드를 사용하여 병렬처리
+		ES2는 migr_type == MIGR_LR 인 경우에만 여기의 코드를 수행한다
+		(그 외의 migr_type인 경우, ES2는 여기 코드를 수행할 필요 없음)
+		"""
 		if es_name == edge_server2_name:
-			assert migr_type == MIGR_LR
+			if migr_type != MIGR_LR:
+				return
 
-		if es_name == edge_server1_name or es_name == edge_server2_name:
-			start_time = time.time()
-			
-			""" predefined action starts """
-			for i in range(2):
-				cmd = 'truncate -s 10M /tmp/file-{}.file'.format(i)
-				print('action : ', cmd)
-				os.system(cmd)
-				time.sleep(3.0)
-			
-			""" predefined action finishes """
-
-			print('action_profile took {} seconds'.format(time.time()-start_time))
+		start_time = time.time()
+		""" predefined action starts """
+		for i in range(2):
+			cmd = 'truncate -s 10M /tmp/file-{}.file'.format(i)
+			print('action : ', cmd)
+			os.system(cmd)
+			time.sleep(3.0)
+		
+		""" predefined action finishes """
+		print('action_profile took {} seconds'.format(time.time()-start_time))
 	else:
-		pass
+		assert False
 	
 	print('Profile action finished!')
 	
