@@ -123,6 +123,8 @@ while(True):
 		print('notified: ', notified)
 		try:
 			get_es_name = os.environ[common.ENV_ES_NAME]
+			print('get_es_name: ', get_es_name)
+			
 			if get_es_name == common.edge_server1_name:  # 여기는 AP-1
 				my_ap_name = common.ap1_name  # AP 이름 바꿔주고,
 				my_name = common.edge_server1_name
