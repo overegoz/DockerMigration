@@ -142,7 +142,7 @@ while(True):
 			assert len(migr_type) == 0
 
 			migr_type = words[2]
-			print('MIGR_DST: ', migr_type, ' (구현 미완료)')
+			print('MIGR_DST: ', migr_type)
 			# 여기선, 이 타이밍에서는 딱히 해줄 게 없어 
 			# base image를 pull 하도록 하자 => 프로파일용 img는 local img라서 pull 불가
 		elif cmd == common.SVC_REQ:  # 서비스 요청 [AR4][AR9]

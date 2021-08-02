@@ -24,5 +24,9 @@ cd docker-images/Profile-3/ES-1
 sh build.sh
 cd ../../../
 # -----------------------------
+cd docker-images/Profile-4/ES-1
+sh build.sh
+cd ../../../
+# -----------------------------
 docker image prune -f
 # -----------------------------

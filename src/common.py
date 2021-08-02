@@ -4,6 +4,7 @@
 """
 import time, datetime, socket, sys, os
 from Profile import Profile
+import json
 
 # -------------------------------------------------------------------
 # 총 4대의 VM을 사용하자
@@ -115,7 +116,8 @@ USER_REQ_INTERVAL = 1.0
 USER_HANDOVER_DELAY = 1.0
 INTMAX = sys.maxsize  # 참고: 파이썬2 에서는 sys.maxint
 weight = 10  # 최적의 migr 기법 선택 시, 가중치
-ENV_ES_NAME="EDGE_SERVER_NAME"  # 환경변수로 사용할 변수명
+#ENV_ES_NAME="EDGE_SERVER_NAME"  # 환경변수로 사용할 변수명
+ENV_MIGR_TYPE="MIGR_TYPE"  # 환경변수
 # -------------------------------------------------------------------
 # 어떤 시나리오로 실험할 것인지를 프로필로 구성하자
 # . 프로필 -1번 : 도커 없이 실행
@@ -181,19 +183,42 @@ def udp_recv(sock, me, bufsize, t):
 
 	return msg, addr
 
-def run_profile(es_name, profile):
+def action_profile(es_name, profile):
+	print('Profile action begins!')
 	"""
 	프로파일 번호에 따라서 사전에 정의된 동작을 수행함
 	- es_name = EdgeServer1이면 최초에 실행한것이고, 
 				EdgeServer2이면 migr 으로 실행된 것이다.
-	- profile : 프로파일 번호            
+	- profile : 프로파일 번호
+	- migr_type : 어떤 migr 기법을 사용했는지...
 	"""	    
+	migr_type = ""
+	try:
+		migr_type = os.environ[ENV_MIGR_TYPE]
+	except:
+		pass
+
+	try: os.environ
 	if profile <= 0:
 		pass  # 테스트
 	elif profile == 1:
-		pass  # 할 일 없음 없음
+		pass  # 테스트, 할 일 없음
+	elif profile == 2:
+		pass  # FC 테스트, 할 일 없음
+	elif profile == 3:
+		pass  # DC 테스트, 할 일 없음
+	elif profile == 4:  # LR 테스트
+		assert migr_type == MIGR_LR
+		if es_name == edge_server1_name or es_name == edge_server2_name:
+			for i in range(2):
+				cmd = 'truncate -s 10M /tmp/file-{}.file'.format(i)
+				print('action : ', cmd)
+				os.system(cmd)
+				time.sleep(3.0)
 	else:
 		pass
+	
+	print('Profile action finished!')
 	
 def start_edgeserver(es_name, migr_type, profile):
 	"""
@@ -207,26 +232,20 @@ def start_edgeserver(es_name, migr_type, profile):
 
 	my_port = port[es_name]
 	cont_name = prof.get_cont_name(profile)
-	if es_name == edge_server1_name:  # 최초로 실행하는 것
+	if es_name == edge_server1_name:  # AP1에서 최초로 실행하는 것
 		img_name = prof.get_img_name_ap1(profile)
 
-		#cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
 		# 여기서는 ap1_hostname만 정의되어 있고, ap2_hostname은 없음
-		if False:
-			# 환경 변수명이 ES2에서 기존의 ES1 이름으로 남아 있어서 안됨
-			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp -d --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
-		else:
-			cmd = 'docker run -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
-
+		# AP1에서 실행하는 것이므로, ENV_MIGR_TYPE 환경변수를 설정할 수 없음
+		cmd = 'docker run -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
 		#cmd = 'docker run --network="host" -d --name {} {}'.format(cont_name,img_name)
 		print(cmd)
 		os.system(cmd)
-	elif es_name == edge_server2_name:  # migr 으로 실행하는 것
+	elif es_name == edge_server2_name:  # AP2에서 migr 으로 실행하는 것
 		img_name = prof.get_img_name_ap2(profile)
 
 		if migr_type == MIGR_NONE:
-			#cmd = 'docker run -e "TZ=Asia/Seoul" -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
-			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp -d --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
+			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ENV_MIG_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
 			#cmd = 'docker run --network="host" -d --name {} {}'.format(cont_name,img_name)
 			print(cmd)
 			os.system(cmd)
@@ -241,12 +260,7 @@ def start_edgeserver(es_name, migr_type, profile):
 			print('FC (2/3)-컨테이너 생성(실행 안함)')
 			#cmd = 'docker create -p {}:{}/udp --name {} {}'.format(my_port,my_port,cont_name,img_name)
 			# 여기서는 ap2_hostname이 정의되어 있다
-			if False:
-				# 환경 변수명이 ES2에서 기존의 ES1 이름으로 남아 있어서 안됨
-				cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
-			else:
-				cmd = 'docker create -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
-
+			cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ENV_MIG_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
 			#cmd = 'docker create --network="host" --name {} {}'.format(cont_name,img_name)
 			print(cmd)
 			os.system(cmd)
@@ -260,12 +274,7 @@ def start_edgeserver(es_name, migr_type, profile):
 		elif migr_type == MIGR_DC:
 			# 1. 컨테니어 생성 (실행 안함)
 			print('DC (1/3)-컨테이너 생성(실행 안함)')
-			if False:
-				# 환경 변수명이 ES2에서 기존의 ES1 이름으로 남아 있어서 안됨
-				cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
-			else:
-				cmd = 'docker create -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
-
+			cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ENV_MIG_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
 			print(cmd)
 			os.system(cmd)
 
@@ -295,8 +304,23 @@ def start_edgeserver(es_name, migr_type, profile):
 			os.system(cmd)
 			pass
 		elif migr_type == MIGR_LR:  # 사전에 준비된 새로운 img를 실행하는 것
-			#로그 파일 수신 완료되면, 사전에 준비된 이미지를 실행하자
-			#베이스 이미지에서 log를 모두 replay 하는 시나리오니까, docker img build 를 여기서 할 필요 없음
+			# 로그 파일 수신 완료되면, 사전에 준비된 이미지를 실행하자
+			# 베이스 이미지에서 log를 모두 replay 하는 스크립트를 실행하거나, 또는
+			# 도커 실행 후, log를 replay 하는 시나리오니까, 따로 해 줄 일이 없음
+			print('LR (1/2)-수신 Log 확인')
+			log_dst_dir = lr_file_dir + prof.get_final_dir_name(profile)
+			log_extract_filename = 'log-extract-{}.txt'.format(cont_name)
+			log_extract_file_path = log_dst_dir + '/' + log_extract_filename
+			f_log = open(log_extract_file_path, 'r')
+			for line in f_log:
+				l = line.rstrip()  # processing...
+				pass
+			f_log.close()
+
+			print('LR (2/2)-컨테이너 실행')
+			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ENV_MIG_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
+			print(cmd)
+			os.system(cmd)			
 			pass
 		else:
 			assert False, "잘못된 MIGR 기법 : {}".format(migr_type)
@@ -409,12 +433,48 @@ def start_migr(sock, migr_tech, my_name, other_ap, profile):
 		pass
 	elif migr_tech == MIGR_LR:
 		# 1.1 전송할 파일 만들기 : replay할 log
-		#JSON 형식의 로그 파일을 읽어서 parsing 하기 : 일단은 수행하기
+		# JSON 형식의 로그 파일을 읽어서 parsing 하기 : 일단은 수행하기
+		output_filename = 'log-file-path-{}.txt'.format(cont_name)  # 원본 로그 파일 경로명을 저장할 파일
+		cmd = 'docker inspect --format="{}" {} > {}'.format('{{.LogPath}}', cont_name, output_filename)
+		os.system(cmd)  # diff 절대경로를 파일에 기록
+		fp = open(output_filename, 'r')
+		log_file_src_path = fp.readline()  # 파일에서 diff 절대경로명 획득
+		log_file_src_path = log_file_src_path.rstrip()  # 마지막에 '\n'이 붙는데, 이거 제거하기
+		fp.close()
+
+		# full log를 저장할 폴더 생성
+		log_dst_dir = lr_file_dir + prof.get_final_dir_name(profile)
+		if os.path.isdir(log_dst_dir) == False:  # 존재하지 않으면
+			os.makedirs(log_dst_dir)
+
+		FULL_LOG_NAME = 'full-log-json.txt'
+		full_log_file_path = lr_file_dir + prof.get_final_dir_name(profile) + '/' + FULL_LOG_NAME
+
+		# full log를 복사
+		cmd = 'cp {} {}'.format(log_file_src_path, full_log_file_path)
+		os.system(cmd)
+
+		# 로그파일을 읽어서, 데이터를 추출해서, <시간> <command>로 출력하기
+		log_extract_filename = 'log-extract-{}.txt'.format(cont_name)
+		log_extract_file_path = log_dst_dir + '/' + log_extract_filename
+
+		f_dst = open(log_extract_file_path, 'w')
+		f_src = open(full_log_file_path, 'r')
+
+		line_cnt = 1
+		for line in f_src:
+			json_obj = json.loads(line.rstrip())
+			f_dst.write('{} {} {}\n'.format(line_cnt, json_obj.get("time").rstrip(), json_obj.get("log").rstrip()))
+			line_cnt += 1
+
+		f_dst.close()
+		f_src.close()
 
 		# 1.2 파일 전송 : replay-log 파일 전송
-		#parsing된 로그파일 전송하기 : 일단은 수행하기
-
-		#DST에서는 로그파일 수신 받으면, 로그가 박혀있는(함수로 구현하기) 도커를 실행할 것임
+		# parsing된 로그파일 전송하기 : 일단은 수행하기
+		# DST에서는 로그파일 수신 받으면, 로그가 박혀있는(함수로 구현하기) 도커를 실행할 것임
+		cmd = 'scp -r {} {}@{}:{}'.format(log_dst_dir, account, ip[other_ap], lr_file_dir)
+		os.system(cmd)
 
 		# 2. 체크포인트 : 필요 없음
 		# 3. AP2에게 ES 시작하라고 알리기 : 여기서 말고, 함수 마지막에서 수행
