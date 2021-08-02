@@ -50,6 +50,13 @@ Code is partially from my collaborators (School of SW, Hallym Univ., South Korea
 10. (`$GIT_HOME/src`로 이동 후) AP-2 실행하기:
 	- `$ sudo sh sudo-run-ap-2.sh <숫자>`를 실행해서, Profile-<숫자>에 해당하는 프로파일 실행하기('<'와 '>'는 입력하지 않음)
 	- AP-2는 ES-2를 자동으로 실행하지 않음. 마이그레이션이 되면, 그 때 실행함
-X. 참고
-	- ㅌㄴ
-	
+99. 참고
+	- `$ docker logs <컨테이너 이름>` 입력하면, ES가 STDOUT에 출력하는 메시지를 볼 수 있음
+	- `$ docker inspect <컨테이너 이름>` 입력하면, 컨테이너 관련 정보를 확인할 수 있음
+		- "LogPath" : 로그가 저장된 JSON 파일 경로
+		- "HostConfig > PortBingdings" : 포트 포워딩 상태
+		- "HostConfig > ExtraHosts" : 도커 실행할 때, `--add-host`로 추가해 준 호스트 정보
+		- "GraphDriver > UpperDir" : `diff` 폴더가 저장된 경로
+		- "Config > Env" : 환경변수
+		- "Config > Image" : 실행한 도커 이미지
+	- `$ docker diff <컨테이너 이름>` : (writable layer) 파일/폴더 변경 내역
