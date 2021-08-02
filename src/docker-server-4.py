@@ -1,11 +1,11 @@
 """
 EdgeServer 즉 도커 컨테이너에서 실행할 코드이다.
 """
-import socket 
-import time
-import signal, os, sys
-import datetime
+from threading import Thread
+import socket, signal, os, sys
+import datetime, time
 import common
+
 
 """
 실행 방법
