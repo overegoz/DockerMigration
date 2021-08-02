@@ -113,7 +113,7 @@ class Profile:
 				self.l_log_bit[p], self.t_replay_sec[p], self.th_bps[p]
 
 	def get_final_dir_name(self, p):
-		return final_dir_name[p]
+		return self.final_dir_name[p]
 
 	def id_min(self):
 		"""
