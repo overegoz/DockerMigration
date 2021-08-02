@@ -433,6 +433,7 @@ def start_migr(sock, migr_tech, my_name, other_ap, profile):
 	elif migr_tech == MIGR_LR:
 		# 1.1 전송할 파일 만들기 : replay할 log
 		# JSON 형식의 로그 파일을 읽어서 parsing 하기 : 일단은 수행하기
+		cont_name = prof.get_cont_name(profile)
 		output_filename = 'log-file-path-{}.txt'.format(cont_name)  # 원본 로그 파일 경로명을 저장할 파일
 		cmd = 'docker inspect --format="{}" {} > {}'.format('{{.LogPath}}', cont_name, output_filename)
 		os.system(cmd)  # diff 절대경로를 파일에 기록
