@@ -19,7 +19,7 @@ Code is partially from my collaborators (School of SW, Hallym Univ., South Korea
 - Ubuntu 18.04 커널 버전 : 5.4.0-80-generic ($ uname -r 명령으로 확인)
 
 # 실행 방법
-1. `Profile.py'
+1. `Profile.py`
 	- 기존에 생성된 프로파일 정보를 확인, 또는
 	- 새로 생성한 프로파일에 대한 정보를 기록하기 (dictionary 자료구조, <프로파일 번호>:<값> 형태로 프로파일별로 값/정보를 입력)
 2. `common.py` : 사전에 정의된 행동(predefined action)을 `action_profile` 함수 안에 코딩
@@ -37,4 +37,9 @@ Code is partially from my collaborators (School of SW, Hallym Univ., South Korea
 		- PC-2에서 2개의 가상머신(VM1, VM2)을 실행하고, (VirtualBox, 어댑터에 브릿지 모드로 설정)
 			- VM1에서 AP-1, ES-1을 실행
 			- VM2에서 AP-2, ES-2를 실행
-5. (git 등을 사용해서) 모든 호스트에 코드 동기화		
+5. (git 등을 사용해서) 모든 호스트에 코드 동기화	
+6. AP-1(ES-1)역할을 하는 VM1에서:
+	- `GIT_HOME/src`폴더로 이동
+	- `$ sudo sh sudo-clear-files.sh`를 실행해서, 불필요한 파일 모두 삭제
+	- `$ sh build-img-edgeServer1.sh`를 실행해서, 프로파일별로 필요한 도커 이미지 생성
+	- `$ sudo sh sudo-run-ap-1.sh <숫자>`를 실행해서, Profile-<숫자> 실행하기('<'와 '>'는 입력하지 않음)
