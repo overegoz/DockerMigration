@@ -198,7 +198,6 @@ def action_profile(es_name, profile):
 	except:
 		pass
 
-	try: os.environ
 	if profile <= 0:
 		pass  # 테스트
 	elif profile == 1:
