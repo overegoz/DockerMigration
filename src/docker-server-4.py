@@ -130,6 +130,7 @@ while(True):
 		# ------------------------------------------------------
 		# 오류가 없다면, 여기는 AP-2
 		# ------------------------------------------------------
+		print('gethostbyname : success')
 		my_ap_name = common.ap2_name  # AP 이름 바꿔주고,
 		my_name = common.edge_server2_name  # 내 이름 (ES)도 바꿔주자
 		# 최초로 한번은 READY 메시지를 보내주자
@@ -150,6 +151,7 @@ while(True):
 		# ------------------------------------------------------
 		# 오류가 있다면, 여기는 AP-1
 		# ------------------------------------------------------
+		print('gethostbyname : failed')
 		my_ap_name = common.ap1_name
 		my_name = common.edge_server1_name
 		# 최초로 한번은 READY 메시지를 보내주자
@@ -157,7 +159,7 @@ while(True):
 		if notified == 0:
 			notified += 10
 			print('notified: ', notified)
-			
+
 			# Log-Replay 경우 : AP1은 '스레드'를 사용해서 지정된 작업 수행
 			thr_action = Thread(target=common.action_profile, args=(my_name, profile))
 			thr_action.start()
