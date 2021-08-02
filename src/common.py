@@ -503,19 +503,23 @@ def return_migr_info_ap1(profile):
 	리스트 형태로 만들고, 주어진 인덱스에 맞는 값을 리턴하도록 구현하자
 	"""
 	# .......................................................
-	# 테스트용 또는 migr type을 강제하는 경우
-	if profile <= 4:
+	# 수치에 기반에서 최적의 마이그레이션 기법을 찾는 경우
+	if prof.get_predetermined_migr(profile) == MIGR_AUTO:
+		C_sec,l_diff_bit,l_check_bit,l_log_bit,t_replay_sec,th_bps,force \
+		= prof.get_summary(profile)
+
+		return str(C_sec) + delimD + \
+				str(l_diff_bit) + delimD + \
+				str(l_check_bit) + delimD + \
+				str(l_log_bit) + delimD + \
+				str(t_replay_sec) + delimD + \
+				str(th_bps)
+	else:
+		# 테스트용, 또는 migr type을 강제하는 경우,
+		# 리턴값이 아무 의미가 없음
 		return "1-2-3-4-5-6"
 	# .......................................................
-	C_sec,l_diff_bit,l_check_bit,l_log_bit,t_replay_sec,th_bps,force \
-	= prof.get_summary(profile)
-
-	return str(C_sec) + delimD + \
-			str(l_diff_bit) + delimD + \
-			str(l_check_bit) + delimD + \
-			str(l_log_bit) + delimD + \
-			str(t_replay_sec) + delimD + \
-			str(th_bps)
+	
 
 def get_best_migr(infos, force):
 	w = weight

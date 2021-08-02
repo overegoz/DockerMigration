@@ -1,5 +1,7 @@
 #!/bin/bash
 # -----------------------------
+# Edge Server 2에서 생성할 도커 이미지를 생성하는 부분
+# -----------------------------
 docker stop $(docker ps -a -q)
 docker container prune -f
 # -----------------------------
