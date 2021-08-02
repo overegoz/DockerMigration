@@ -355,7 +355,6 @@ def start_migr(sock, migr_tech, my_name, other_ap, profile):
 		그냥 diff 폴더 전체를 DST로 보내는  걸로 구현하자
 		"""
 
-		아래 코드는 실행 전에, 직접 터미널에서 run 해봐
 		# 1.1 diff 디렉토리 절대경로 알아내서 경로를 파일에 쓰기
 		cont_name = prof.get_cont_name(profile)
 		output_filename = 'diff-src-dir-{}.txt'.format(cont_name)
