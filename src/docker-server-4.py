@@ -135,6 +135,9 @@ while(True):
 		# 최초로 한번은 READY 메시지를 보내주자
 		assert notified == 10 or notified == 110
 		if notified == 10:
+			notified += 100
+			print('notified: ', notified)
+
 			# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
 			common.action_profile(my_name, profile)
 
@@ -143,8 +146,6 @@ while(True):
 			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
 			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 			
-			notified += 100
-			print('notified: ', notified)	
 	except:
 		# ------------------------------------------------------
 		# 오류가 있다면, 여기는 AP-1
@@ -154,6 +155,9 @@ while(True):
 		# 최초로 한번은 READY 메시지를 보내주자
 		assert notified == 0 or notified == 10
 		if notified == 0:
+			notified += 10
+			print('notified: ', notified)
+			
 			# Log-Replay 경우 : AP1은 '스레드'를 사용해서 지정된 작업 수행
 			thr_action = Thread(target=common.action_profile, args=(my_name, profile))
 			thr_action.start()
@@ -162,9 +166,6 @@ while(True):
 			send_msg = common.str2(my_name, common.ES_READY)
 			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
 			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
-			
-			notified += 10
-			print('notified: ', notified)
 
 	# 직접 연결된 AP로 부터 데이터 수신하기
 	recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
