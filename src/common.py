@@ -485,18 +485,18 @@ def start_migr(sock, migr_tech, my_name, other_ap, profile):
 	udp_send(sock, my_name, other_ap, str2(my_name, ES_START), SHORT_SLEEP)
 	print('migr 준비 완료!')
 
-def return_migr_info_ap1(p):
+def return_migr_info_ap1(profile):
 	"""
 	프로파일 번호에 따라서, 어떤 정보를 컨트롤러에 리턴할지 미리 정해놓자
 	리스트 형태로 만들고, 주어진 인덱스에 맞는 값을 리턴하도록 구현하자
 	"""
 	# .......................................................
 	# 테스트용 또는 migr type을 강제하는 경우
-	if p <= 3:
+	if p <= 4:
 		return "1-2-3-4-5-6"
 	# .......................................................
 	C_sec,l_diff_bit,l_check_bit,l_log_bit,t_replay_sec,th_bps,force \
-	= prof.p1_info()
+	= prof.get_summary(profile)
 
 	return str(C_sec) + delimD + \
 			str(l_diff_bit) + delimD + \
