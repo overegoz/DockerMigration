@@ -273,7 +273,7 @@ def start_edgeserver(es_name, migr_type, profile):
 			# 3. 체크 포인트로 컨테이너 실행
 			print('DC (3/3)-컨테이너 실행 + 체크포인트')
 			cp_name = prof.get_checkpoint_name(profile)
-			cmd = 'docker start --checkpoint-dir={} --checkpoint={} {}'.format(fc_cp_dir, cp_name, cont_name)
+			cmd = 'docker start --checkpoint-dir={} --checkpoint={} {}'.format(dc_cp_dir, cp_name, cont_name)
 			print(cmd)
 			os.system(cmd)
 			pass
