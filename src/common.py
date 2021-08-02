@@ -115,6 +115,7 @@ USER_REQ_INTERVAL = 1.0
 USER_HANDOVER_DELAY = 1.0
 INTMAX = sys.maxsize  # 참고: 파이썬2 에서는 sys.maxint
 weight = 10  # 최적의 migr 기법 선택 시, 가중치
+ENV_ES_NAME="EDGE_SERVER_NAME"  # 환경변수로 사용할 변수명
 # -------------------------------------------------------------------
 # 어떤 시나리오로 실험할 것인지를 프로필로 구성하자
 # . 프로필 -1번 : 도커 없이 실행
@@ -211,7 +212,11 @@ def start_edgeserver(es_name, migr_type, profile):
 
 		#cmd = 'docker run -p {}:{}/udp -d --name {} {}'.format(my_port,my_port,cont_name,img_name)
 		# 여기서는 ap1_hostname만 정의되어 있고, ap2_hostname은 없음
-		cmd = 'docker run -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
+		if True:
+			cmd = 'docker run -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
+		else:
+			cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp -d --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
+
 		#cmd = 'docker run --network="host" -d --name {} {}'.format(cont_name,img_name)
 		print(cmd)
 		os.system(cmd)
@@ -234,7 +239,11 @@ def start_edgeserver(es_name, migr_type, profile):
 			print('FC (2/3)-컨테이너 생성(실행 안함)')
 			#cmd = 'docker create -p {}:{}/udp --name {} {}'.format(my_port,my_port,cont_name,img_name)
 			# 여기서는 ap2_hostname이 정의되어 있다
-			cmd = 'docker create -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
+			if True:
+				cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
+			else:
+				cmd = 'docker create -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
+
 			#cmd = 'docker create --network="host" --name {} {}'.format(cont_name,img_name)
 			print(cmd)
 			os.system(cmd)
@@ -248,7 +257,11 @@ def start_edgeserver(es_name, migr_type, profile):
 		elif migr_type == MIGR_DC:
 			# 1. 컨테니어 생성 (실행 안함)
 			print('DC (1/3)-컨테이너 생성(실행 안함)')
-			cmd = 'docker create -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
+			if True:
+				cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" -p {}:{}/udp --name {} {}'.format(ENV_ES_NAME,es_name,my_port,my_port,cont_name,img_name)
+			else:
+				cmd = 'docker create -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
+
 			print(cmd)
 			os.system(cmd)
 

@@ -117,31 +117,70 @@ while(True):
 		: EdgeServer<서버번호> SVCR <같은 숫자>
 	"""
 	# 지금 어떤 AP에있는 ES인지를 매번 확인
-	try:
-		# ap2_hostname은 migr 후 ES2번을 실행할 때만 정의된다
-		_ = socket.gethostbyname(common.ap2_hostname)
-		# 오류가 없다면, 여기는 AP-2
-		my_ap_name = common.ap2_name  # AP 이름 바꿔주고,
-		my_name = common.edge_server2_name  # 내 이름 (ES)도 바꿔주자
-		# 최초로 한번은 READY 메시지를 보내주자
-		assert notified == 10 or notified == 110
-		if notified == 10:
-			send_msg = common.str2(my_name, common.ES_READY)
-			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
-			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
-			notified += 100
-			print('notified: ', notified)	
-	except:
-		# 오류가 있다면, 여기는 AP-1
-		my_ap_name = common.ap1_name
-		# 최초로 한번은 READY 메시지를 보내주자
-		assert notified == 0 or notified == 10
-		if notified == 0:
-			send_msg = common.str2(my_name, common.ES_READY)
-			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
-			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
-			notified += 10
-			print('notified: ', notified)	
+	# - 지금은 --add-host 명령으로 /etc/hosts 파일의 내용을 기반으로 판단
+	# - 근데, 환경변수를 사용해서 판단하는게 더 좋은듯?
+	if True:
+		try:
+			get_es_name = os.environ[common.ENV_ES_NAME]
+			if get_es_name == common.edge_server1_name:  # 여기는 AP-1
+				my_ap_name = common.ap1_name  # AP 이름 바꿔주고,
+				my_name = common.edge_server1_name
+				# 최초로 한번은 READY 메시지를 보내주자
+				assert notified == 0 or notified == 10  # 이외의 다른 값은 될 수 없음
+				if notified == 0:  # ES가 시작되고, 한번도 READY 메시지를 AP에게 보내지 않은 경우
+					send_msg = common.str2(my_name, common.ES_READY)
+					print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
+					common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
+					notified += 10
+					print('notified: ', notified)
+
+			elif get_es_name == common.edge_server2_name:  # 여기는 AP-2
+				my_ap_name = common.ap2_name  # AP 이름 바꿔주고,
+				my_name = common.edge_server2_name  # 내 이름 (ES)도 바꿔주자
+				# 최초로 한번은 READY 메시지를 보내주자
+				assert notified == 0 or notified == 10 or notified == 100 or notified == 110  # 이외의 다른 값은 될 수 없음
+				if notified == 0 or notified == 10:  # AP2에서 최초 실행이거나(LR), migr 후에 AP2에서 실행되는 경우
+					send_msg = common.str2(my_name, common.ES_READY)
+					print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
+					common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
+					notified += 100
+					print('notified: ', notified)	
+			else:
+				assert False, "잘못된 ENV_ES_NAME이 정의되어 있음"
+
+		except:
+			assert False, "ENV_ES_NAME 이 정의되어 있어야 함"
+	else:
+		try:
+			# ap2_hostname은 migr 후 ES2번을 실행할 때만 정의된다
+			_ = socket.gethostbyname(common.ap2_hostname)
+			# ------------------------------------------------------
+			# 오류가 없다면, 여기는 AP-2
+			# ------------------------------------------------------
+			my_ap_name = common.ap2_name  # AP 이름 바꿔주고,
+			my_name = common.edge_server2_name  # 내 이름 (ES)도 바꿔주자
+			# 최초로 한번은 READY 메시지를 보내주자
+			assert notified == 10 or notified == 110
+			if notified == 10:
+				send_msg = common.str2(my_name, common.ES_READY)
+				print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
+				common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
+				notified += 100
+				print('notified: ', notified)	
+		except:
+			# ------------------------------------------------------
+			# 오류가 있다면, 여기는 AP-1
+			# ------------------------------------------------------
+			my_ap_name = common.ap1_name
+			my_name = common.edge_server1_name
+			# 최초로 한번은 READY 메시지를 보내주자
+			assert notified == 0 or notified == 10
+			if notified == 0:
+				send_msg = common.str2(my_name, common.ES_READY)
+				print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
+				common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
+				notified += 10
+				print('notified: ', notified)
 
 	# 직접 연결된 AP로 부터 데이터 수신하기
 	recv_msg, _ = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
