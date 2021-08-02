@@ -211,11 +211,14 @@ def action_profile(es_name, profile):
 			assert migr_type == MIGR_LR
 
 		if es_name == edge_server1_name or es_name == edge_server2_name:
+			start_time = time.time()
 			for i in range(2):
 				cmd = 'truncate -s 10M /tmp/file-{}.file'.format(i)
 				print('action : ', cmd)
 				os.system(cmd)
 				time.sleep(3.0)
+			
+			print('action_profile took {} seconds'.foramt(time.time()-start_time))
 	else:
 		pass
 	
