@@ -139,6 +139,9 @@ while(True):
 			print('notified: ', notified)
 
 			# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
+			# debug
+			for k, v in sorted(os.environ.items()): print(k + ':', v)
+
 			common.action_profile(sock, my_name, profile)
 
 			# 'Log-Replay 작업이 완료되면' READY 메시지를 AP2에게 보내주기

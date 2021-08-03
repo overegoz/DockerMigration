@@ -196,8 +196,7 @@ def action_profile(sock, es_name, profile):
 	"""	    
 
 	# debug
-	for k, v in sorted(os.environ.items()):
-		print(k + ':', v)
+	for k, v in sorted(os.environ.items()): print(k + ':', v)
 
 	migr_type = ""
 	migr_type = os.environ[ENV_MIGR_TYPE]  # 환경변수가 없으면 예외 발생하고 종료함
