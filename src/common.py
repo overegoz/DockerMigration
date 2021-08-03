@@ -196,6 +196,7 @@ def action_profile(sock, es_name, profile):
 	"""	    
 
 	# debug
+	print("ENV: ")
 	for k, v in sorted(os.environ.items()): print(k + ':', v)
 
 	migr_type = ""
