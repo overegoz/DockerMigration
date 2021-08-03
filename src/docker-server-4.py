@@ -141,7 +141,8 @@ while(True):
 			# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
 			# debug
 			print("ENV: \n")
-			print(os.environ.items())
+			print("LEN: ", len(os.environ.items()))
+			print("ITEMS: ", os.environ.items())
 
 			common.action_profile(sock, my_name, profile)
 

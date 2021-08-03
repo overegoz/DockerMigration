@@ -197,7 +197,8 @@ def action_profile(sock, es_name, profile):
 
 	# debug
 	print("ENV: \n")
-	print(os.environ.items())
+	print("LEN: ", len(os.environ.items()))
+	print("ITEMS: ", os.environ.items())
 
 	migr_type = ""
 	migr_type = os.environ[ENV_MIGR_TYPE]  # 환경변수가 없으면 예외 발생하고 종료함
