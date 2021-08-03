@@ -117,7 +117,7 @@ while(True):
 	if curr_ap == old_ap:  # AP가 변경되지 않음
 		# 현재 연결된 AP 에게 서비스 요청 메시지 보내기
 		# 마지막에 숫자 카운터 번호를 넣어서 tracking 할 수 있도록...
-		if (last_sent is None) or ((datetime.now() - last_sent).total_seconds() > req_int):
+		if (last_sent is None) or ((datetime.now() - last_sent).total_seconds() >= req_int):
 			send_msg = common.str3(my_name, common.SVC_REQ, str(counter))
 			#common.udp_send(sock, my_name, curr_ap, send_msg, req_int/2.0)
 			common.udp_send(sock, my_name, curr_ap, send_msg, common.SHORT_SLEEP)
