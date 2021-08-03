@@ -136,7 +136,7 @@ while(True):
 								args=(sock, migr_type, my_name, other_ap, profile))
 			thr_migr.start()
 			# migr 시간 측정 : 로그에서, 여기서 부터 시간을 측정하면 됨.
-			common.send_log(sock, my_name, my_name, common.str2("migr begins : ", migr_type))
+			common.send_log(sock, my_name, my_name, common.str2("migr begins :", migr_type))
 		elif cmd == common.MIGR_DST:  # [AR3] migr 도착지, 시작! (참고: 마이그레이션 출발지는 other_ap)
 			assert edge_server_ready == False
 			assert len(migr_type) == 0

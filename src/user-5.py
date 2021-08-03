@@ -2,7 +2,7 @@
 import socket 
 import time
 import signal, os, sys
-import datetime
+from datetime import datetime
 import common
 
 """
@@ -104,6 +104,7 @@ while(True):
 # -------------------------------------------------------------------
 # 본격적으로 REQ-RES 시작!
 counter = 0  # req를 보낼건데, cnt 번호를 붙여서 tracking 가능하도록
+last_sent = None
 while(True):
 	"""
 	USER는 두 가지 통신만 한다.
@@ -116,12 +117,16 @@ while(True):
 	if curr_ap == old_ap:  # AP가 변경되지 않음
 		# 현재 연결된 AP 에게 서비스 요청 메시지 보내기
 		# 마지막에 숫자 카운터 번호를 넣어서 tracking 할 수 있도록...
-		send_msg = common.str3(my_name, common.SVC_REQ, str(counter))
-		common.udp_send(sock, my_name, curr_ap, send_msg, req_int/2.0)
-		counter += 1
+		if (last_sent is None) or ((datetime.now() - last_sent).total_seconds() > req_int):
+			send_msg = common.str3(my_name, common.SVC_REQ, str(counter))
+			#common.udp_send(sock, my_name, curr_ap, send_msg, req_int/2.0)
+			common.udp_send(sock, my_name, curr_ap, send_msg, common.SHORT_SLEEP)
+			counter += 1
+			last_sent = datetime.now()
 
 		# [UR1] 현재 연결된 AP로 부터 서비스 응답 메시지 수신하기
-		recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, req_int/2.0)
+		#recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, req_int/2.0)
+		recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP)
 		if len(recv_msg) > 0:  
 			print('recv msg: ', recv_msg)
 			words = recv_msg.split(common.delim)
@@ -146,12 +151,12 @@ while(True):
 		# [US2] new AP로 HELO 먼저 보내고,
 		send_msg = common.str2(my_name, common.USER_HELLO)
 		#print("send : ", send_msg)
-		common.udp_send(sock, my_name, curr_ap, send_msg, common.USER_HANDOVER_DELAY/2.0)
+		common.udp_send(sock, my_name, curr_ap, send_msg, common.USER_HANDOVER_DELAY)
 		
 		# [US3] 다음으로, old AP에 BYEE 보낸다.
 		send_msg = common.str2(my_name, common.USER_BYE)
 		#print("send : ", send_msg)
-		common.udp_send(sock, my_name, old_ap, send_msg, common.USER_HANDOVER_DELAY/2.0)
+		common.udp_send(sock, my_name, old_ap, send_msg, common.USER_HANDOVER_DELAY)
 		
 		"""
 		handover counter를 초기화
