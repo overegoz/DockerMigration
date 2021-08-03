@@ -145,7 +145,9 @@ while(True):
 				pass
 			else: assert False
 		else: 
-			print('recv nothing')
+			#print('recv nothing')
+			pass
+		
 	else:  # 접속 AP가 변경됨
 		print("핸드오버 발생 : {} => {}".format(old_ap, curr_ap))
 		# [US2] new AP로 HELO 먼저 보내고,
