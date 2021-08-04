@@ -196,10 +196,13 @@ def action_profile(sock, es_name, profile):
 	"""	    
 
 	migr_type = ""
-	if os.environ.get(ENV_MIGR_TYPE) == None:
-		migr_type = MIGR_AUTO  # 무엇인지 알 수 없을때는 AUTO로 설정해두기
-	else:
-		migr_type = os.environ.get(ENV_MIGR_TYPE)
+	try:
+		if os.environ.get(ENV_MIGR_TYPE) == None:
+			migr_type = MIGR_AUTO  # 무엇인지 알 수 없을때는 AUTO로 설정해두기
+		else:
+			migr_type = os.environ.get(ENV_MIGR_TYPE)
+	except:
+		migr_type = MIGR_AUTO
 
 	print('migr_type set to: {}'.format(migr_type))
 
