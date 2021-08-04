@@ -10,7 +10,7 @@ To implement THREE different docker migration methods.
 	- [공식 github](https://github.com/checkpoint-restore/criu)에서 다운받아서 설치했음
 	- 내가 사용한 CRIU 버전은 3.15 (저장된 폴더 : `./DockerCheckpoint`)
 	- CRIU 버전 확인 명령어는 ~~모르겠고~~, CRIU 공식 github에서 다운 받은 파일 중 `/Makefile.versions` 파일에 기록된 버전 정보로 확인함
-- Ubuntu 18.04 커널 버전 : 5.4.0-80-generic ($ uname -r 명령으로 확인)
+- Ubuntu 18.04 커널 버전 : 5.4.0-80-generic (`$ uname -r` 명령으로 확인)
 
 # 실행 방법 (1-6: 사전 준비, 7-: 실행)
 1. `Profile.py`
@@ -39,22 +39,26 @@ To implement THREE different docker migration methods.
 7. (`$GIT_HOME/src`로 이동 후) Logger 실행하기: `$ python3 ./logger-1.py`
 8. (`$GIT_HOME/src`로 이동 후) Controller 실행하기: `$ python3 ./controller-2.py`
 9. (`$GIT_HOME/src`로 이동 후) AP-1 실행하기:
-	- `$ sudo sh sudo-run-ap-1.sh <숫자>`를 실행해서, Profile-<숫자>에 해당하는 프로파일 실행하기('<'와 '>'는 입력하지 않음)
+	- `$ sudo sh sudo-run-ap-1.sh <숫자>`를 실행해서, Profile-<숫자>에 해당하는 프로파일 실행하기(`<`와 `>`는 입력하지 않음)
 	- AP-1은 ES-1을 자동으로 실행함
 10. (`$GIT_HOME/src`로 이동 후) AP-2 실행하기:
-	- `$ sudo sh sudo-run-ap-2.sh <숫자>`를 실행해서, Profile-<숫자>에 해당하는 프로파일 실행하기('<'와 '>'는 입력하지 않음)
+	- `$ sudo sh sudo-run-ap-2.sh <숫자>`를 실행해서, Profile-<숫자>에 해당하는 프로파일 실행하기(`<`와 `>`는 입력하지 않음)
 	- AP-2는 ES-2를 자동으로 실행하지 않음. 마이그레이션이 되면, 그 때 실행함
 99. 참고
 	- `$ docker logs <컨테이너 이름>` 입력하면, ES가 STDOUT에 출력하는 메시지를 볼 수 있음
 	- `$ docker inspect <컨테이너 이름>` 입력하면, 컨테이너 관련 정보를 확인할 수 있음
-		- "LogPath" : 로그가 저장된 JSON 파일 경로
-		- "HostConfig > PortBingdings" : 포트 포워딩 상태
-		- "HostConfig > ExtraHosts" : 도커 실행할 때, `--add-host`로 추가해 준 호스트 정보
-		- "GraphDriver > UpperDir" : `diff` 폴더가 저장된 경로
-		- "Config > Env" : 환경변수
-		- "Config > Image" : 실행한 도커 이미지
+		- `"LogPath"` : 로그가 저장된 JSON 파일 경로
+		- `"HostConfig > PortBingdings"` : 포트 포워딩 상태
+		- `"HostConfig > ExtraHosts"` : 도커 실행할 때, `--add-host`로 추가해 준 호스트 정보
+		- `"GraphDriver > UpperDir"` : `diff` 폴더가 저장된 경로
+		- `"Config > Env"` : 환경변수
+		- `"Config > Image"` : 실행한 도커 이미지
 	- `$ docker diff <컨테이너 이름>` : (writable layer) 파일/폴더 변경 내역
-	
+
+# Issues
+- 컨테이너를 마이그레이션 한 후 체크포인트로 재시작 할 때, ES-2에서 환경변수를 사용하는데 문제가 있음
+	- ES-2에서 Python으로 환경변수를 조회하는 것 조차 오류가 발생함(try-except로도 안잡힘)
+
 # Notes
 Code is partially from my collaborators (School of SW, Hallym Univ., South Korea)
 - https://github.com/GEONheong/migrate_docker_conatiner_diff.git
