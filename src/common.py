@@ -202,7 +202,7 @@ def action_profile(sock, es_name, profile):
 		그러니까 환경변수가 제대로 동작할거다
 		"""
 		migr_type = os.environ[ENV_MIGR_TYPE]  # 환경변수가 없으면 예외 발생하고 종료함
-	except:
+	except KeyError:
 		"""
 		체크포인트로 도커를 실행하면 환경변수를 읽어오지 못함
 		FC랑DC만 체크포인트를 사용하니까, auto로 입력해 두자
@@ -210,13 +210,13 @@ def action_profile(sock, es_name, profile):
 		migr_type = MIGR_AUTO
 	
 	if profile <= 0:
-		pass  # 테스트
+		print('Profile action : nothing to do!')
 	elif profile == 1:
-		pass  # 테스트, 할 일 없음
+		print('Profile action : nothing to do!')  # 테스트, 할 일 없음
 	elif profile == 2:
-		pass  # FC 테스트, 할 일 없음
+		print('Profile action : nothing to do!')  # FC 테스트, 할 일 없음
 	elif profile == 3:
-		pass  # DC 테스트, 할 일 없음
+		print('Profile action : nothing to do!')  # DC 테스트, 할 일 없음
 	elif profile == 4:  # LR 테스트
 		assert es_name == edge_server1_name or es_name == edge_server2_name
 		"""
@@ -245,7 +245,7 @@ def action_profile(sock, es_name, profile):
 	else:
 		assert False
 	
-	print('Profile action finished!')
+	print('Profile action : finished!')
 	
 def start_edgeserver(es_name, migr_type, profile):
 	"""
