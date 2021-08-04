@@ -86,6 +86,7 @@ thr_migr = None  # MIGR-SRC에서 실행하는 작업을 위한 스레드
 # 핸들러 등록
 def handler(signum, frame):
 	print(common.sigint_msg)
+	print('구동중인 컨테이너가 있으면 종료까지 최대 10초 가량 소요됩니다')
 	sock.close()
 	if edge_server_ready == True:
 		common.stop_edgeserver(profile)  # 여기서는 thread 쓰지말자
