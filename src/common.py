@@ -202,6 +202,8 @@ def action_profile(sock, es_name, profile):
 	print("ALL: ", os.environ)
 	print("MIGR_TYPE: ", os.environ.get(ENV_MIGR_TYPE))
 
+	time.sleep(1)
+
 	migr_type = ""
 	try:
 		migr_type = os.environ[ENV_MIGR_TYPE]  # 환경변수가 없으면 예외 발생하고 종료함
@@ -264,7 +266,7 @@ def start_edgeserver(es_name, migr_type, profile):
 
 		# 여기서는 ap1_hostname만 정의되어 있고, ap2_hostname은 없음
 		# AP1에서 실행하는 것이므로, ENV_MIGR_TYPE 환경변수를 설정할 수 없음
-		cmd = 'docker run -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
+		cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ENV_MIGR_TYPE,"",ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
 		#cmd = 'docker run --network="host" -d --name {} {}'.format(cont_name,img_name)
 		print(cmd)
 		os.system(cmd)

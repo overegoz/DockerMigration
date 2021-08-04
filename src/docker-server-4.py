@@ -146,6 +146,8 @@ while(True):
 			print("ALL: ", os.environ)
 			print("MIGR_TYPE: ", os.environ.get(common.ENV_MIGR_TYPE))
 
+			time.sleep(1)
+
 
 			common.action_profile(sock, my_name, profile)
 
