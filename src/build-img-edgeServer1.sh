@@ -17,7 +17,6 @@ cd ../../../
 cd docker-images/Profile-2/ES-1
 sh build.sh
 cd ../../../
-
 # FC migr 과정에서 만든 이미지 삭제하기
 docker rmi twoon/profile2:es2
 # -----------------------------

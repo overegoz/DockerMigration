@@ -195,13 +195,18 @@ def action_profile(sock, es_name, profile):
 	- migr_type : 어떤 migr 기법을 사용했는지...
 	"""	    
 
-	# debug
+	# debug : there
 	print("ENV: \n")
 	print("LEN: ", len(os.environ.items()))
 	print("ITEMS: ", os.environ.items())
+	print("ALL: ", os.environ)
+	print("MIGR_TYPE: ", os.environ.get(ENV_MIGR_TYPE))
 
 	migr_type = ""
-	migr_type = os.environ[ENV_MIGR_TYPE]  # 환경변수가 없으면 예외 발생하고 종료함
+	try:
+		migr_type = os.environ[ENV_MIGR_TYPE]  # 환경변수가 없으면 예외 발생하고 종료함
+	except:
+		assert False, 'os.environ[{}] 오류....'.format(ENV_MIGR_TYPE)
 	
 
 	if profile <= 0:

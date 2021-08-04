@@ -139,10 +139,13 @@ while(True):
 			print('notified: ', notified)
 
 			# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
-			# debug
+			# debug : here
 			print("ENV: \n")
 			print("LEN: ", len(os.environ.items()))
 			print("ITEMS: ", os.environ.items())
+			print("ALL: ", os.environ)
+			print("MIGR_TYPE: ", os.environ.get(common.ENV_MIGR_TYPE))
+
 
 			common.action_profile(sock, my_name, profile)
 
