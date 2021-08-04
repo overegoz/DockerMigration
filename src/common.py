@@ -2,7 +2,6 @@
 - 공통으로 사용하는 값을 정의
 - 참고: 도커가 인식하는 자신의 IP는 0.0.0.0이다
 """
-from posix import POSIX_FADV_NOREUSE
 import time, datetime, socket, sys, os
 from Profile import Profile
 import json
