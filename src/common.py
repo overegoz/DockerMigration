@@ -193,6 +193,9 @@ def action_profile(sock, es_name, profile):
 				EdgeServer2이면 migr 으로 실행된 것이다.
 	- profile : 프로파일 번호
 	- migr_type : 어떤 migr 기법을 사용했는지...
+	  . 환경 변수를 사용해서 ES-2에게 migr 기법을 알려주려 했는데, 
+	    환경 변수는 어떻게 해도 동작하지 않네...
+		try-except도 동작 안함
 	"""	    
 
 	migr_type = ""
