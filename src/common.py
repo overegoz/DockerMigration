@@ -208,6 +208,7 @@ def action_profile(sock, es_name, profile):
 	try:
 		migr_type = os.environ[ENV_MIGR_TYPE]  # 환경변수가 없으면 예외 발생하고 종료함
 	except:
+		print('Terminating...')
 		assert False, 'os.environ[{}] 오류....'.format(ENV_MIGR_TYPE)
 	
 

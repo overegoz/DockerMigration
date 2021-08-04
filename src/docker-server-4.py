@@ -169,6 +169,15 @@ while(True):
 			notified += 10
 			print('notified: ', notified)
 
+			# debug : here
+			print("ENV: \n")
+			print("LEN: ", len(os.environ.items()))
+			print("ITEMS: ", os.environ.items())
+			print("ALL: ", os.environ)
+			print("MIGR_TYPE: ", os.environ.get(common.ENV_MIGR_TYPE))
+
+			time.sleep(1)
+
 			# Log-Replay 경우 : AP1은 '스레드'를 사용해서 지정된 작업 수행
 			thr_action = Thread(target=common.action_profile, args=(sock, my_name, profile))
 			thr_action.start()
