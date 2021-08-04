@@ -139,16 +139,6 @@ while(True):
 			print('notified: ', notified)
 
 			# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
-			# debug : here
-			print("ENV: \n")
-			print("LEN: ", len(os.environ.items()))
-			print("ITEMS: ", os.environ.items())
-			print("ALL: ", os.environ)
-			print("MIGR_TYPE: ", os.environ.get(common.ENV_MIGR_TYPE))
-
-			time.sleep(1)
-
-
 			common.action_profile(sock, my_name, profile)
 
 			# 'Log-Replay 작업이 완료되면' READY 메시지를 AP2에게 보내주기
@@ -168,15 +158,6 @@ while(True):
 		if notified == 0:
 			notified += 10
 			print('notified: ', notified)
-
-			# debug : here
-			print("ENV: \n")
-			print("LEN: ", len(os.environ.items()))
-			print("ITEMS: ", os.environ.items())
-			print("ALL: ", os.environ)
-			print("MIGR_TYPE: ", os.environ.get(common.ENV_MIGR_TYPE))
-
-			time.sleep(1)
 
 			# Log-Replay 경우 : AP1은 '스레드'를 사용해서 지정된 작업 수행
 			thr_action = Thread(target=common.action_profile, args=(sock, my_name, profile))

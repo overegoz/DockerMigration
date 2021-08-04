@@ -195,23 +195,20 @@ def action_profile(sock, es_name, profile):
 	- migr_type : 어떤 migr 기법을 사용했는지...
 	"""	    
 
-	# debug : there
-	print("ENV: \n")
-	print("LEN: ", len(os.environ.items()))
-	print("ITEMS: ", os.environ.items())
-	print("ALL: ", os.environ)
-	print("MIGR_TYPE: ", os.environ.get(ENV_MIGR_TYPE))
-
-	time.sleep(1)
-
 	migr_type = ""
 	try:
+		"""
+		LR는 체크포인트가 아니라, 도커를 그냥 새로 시작하는거다
+		그러니까 환경변수가 제대로 동작할거다
+		"""
 		migr_type = os.environ[ENV_MIGR_TYPE]  # 환경변수가 없으면 예외 발생하고 종료함
 	except:
-		print('Terminating...')
-		assert False, 'os.environ[{}] 오류....'.format(ENV_MIGR_TYPE)
+		"""
+		체크포인트로 도커를 실행하면 환경변수를 읽어오지 못함
+		FC랑DC만 체크포인트를 사용하니까, auto로 입력해 두자
+		"""
+		migr_type = MIGR_AUTO
 	
-
 	if profile <= 0:
 		pass  # 테스트
 	elif profile == 1:
@@ -267,7 +264,7 @@ def start_edgeserver(es_name, migr_type, profile):
 
 		# 여기서는 ap1_hostname만 정의되어 있고, ap2_hostname은 없음
 		# AP1에서 실행하는 것이므로, ENV_MIGR_TYPE 환경변수를 설정할 수 없음
-		cmd = 'docker run -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ENV_MIGR_TYPE,"",ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
+		cmd = 'docker run -e "TZ=Asia/Seoul" --add-host {}:{} -p {}:{}/udp -d --name {} {}'.format(ap1_hostname,ip[ap1_hostname],my_port,my_port,cont_name,img_name)
 		#cmd = 'docker run --network="host" -d --name {} {}'.format(cont_name,img_name)
 		print(cmd)
 		os.system(cmd)
