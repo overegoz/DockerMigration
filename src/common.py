@@ -185,18 +185,19 @@ def udp_recv(sock, me, bufsize, t):
 
 	return msg, addr
 
+
+"""
+프로파일 번호에 따라서 사전에 정의된 동작을 수행함
+- es_name = EdgeServer1이면 최초에 실행한것이고, 
+			EdgeServer2이면 migr 으로 실행된 것이다.
+- profile : 프로파일 번호
+- migr_type : 어떤 migr 기법을 사용했는지...
+	. 환경 변수를 사용해서 ES-2에게 migr 기법을 알려주려 했는데, 
+	환경 변수는 어떻게 해도 동작하지 않네...
+	try-except도 동작 안함
+"""	 
 def action_profile(sock, es_name, profile):
 	print('Profile action begins!')
-	"""
-	프로파일 번호에 따라서 사전에 정의된 동작을 수행함
-	- es_name = EdgeServer1이면 최초에 실행한것이고, 
-				EdgeServer2이면 migr 으로 실행된 것이다.
-	- profile : 프로파일 번호
-	- migr_type : 어떤 migr 기법을 사용했는지...
-	  . 환경 변수를 사용해서 ES-2에게 migr 기법을 알려주려 했는데, 
-	    환경 변수는 어떻게 해도 동작하지 않네...
-		try-except도 동작 안함
-	"""	    
 
 	migr_type = ""
 	if prof.get_predetermined_migr(profile) == MIGR_AUTO:
