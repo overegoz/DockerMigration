@@ -118,11 +118,15 @@ while(True):
 		# 현재 연결된 AP 에게 서비스 요청 메시지 보내기
 		# 마지막에 숫자 카운터 번호를 넣어서 tracking 할 수 있도록...
 		if (last_sent is None) or ((datetime.now() - last_sent).total_seconds() >= req_int):
-			send_msg = common.str3(my_name, common.SVC_REQ, str(counter))
-			#common.udp_send(sock, my_name, curr_ap, send_msg, req_int/2.0)
-			common.udp_send(sock, my_name, curr_ap, send_msg, common.SHORT_SLEEP)
-			counter += 1
-			last_sent = datetime.now()
+			# 마지막으로 REQ 보낸 시점으로 부터, 지정된 시간이 흘렀다면...
+			if counter < common.prof.get_max_req(profile):
+				send_msg = common.str3(my_name, common.SVC_REQ, str(counter))
+				common.udp_send(sock, my_name, curr_ap, send_msg, common.SHORT_SLEEP)
+				counter += 1
+			else:
+				print('USER: 더 이상 REQ를 보내지 않습니다')
+
+			last_sent = datetime.now()  # 어쨋거나, 이건 업데이트 하자
 
 		# [UR1] 현재 연결된 AP로 부터 서비스 응답 메시지 수신하기
 		#recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, req_int/2.0)

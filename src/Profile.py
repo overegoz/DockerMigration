@@ -95,6 +95,13 @@ class Profile:
 							3:1.0,
 							4:1.0}
 	# -------------------------------------------------------------------
+	# user가 지정된 갯수의 REQ 보낸 후 더 이상 REQ 보내지 말게 하자
+	# 중간에 CTRL+C로 종료하면 REQ-RES 짝이 안맞는 경우 발생
+	max_req = {1:30,
+				2:30,
+				3:30,
+				4:30}
+	# -------------------------------------------------------------------
 	def __init__(self):
 		pass
 	# -------------------------------------------------------------------
@@ -128,6 +135,9 @@ class Profile:
 
 	def get_final_dir_name(self, p):
 		return self.final_dir_name[p]
+
+	def get_max_req(self, p):
+		return self.max_req[p]
 
 	def id_min(self):
 		"""
