@@ -81,11 +81,12 @@ ap1_bye_time = None  # done // AP1이 USER로 부터 BYEE 받은 시간
 # LogReplay 기법에서, replay 하는데 걸린 시간
 replay_time_ap1, replay_time_ap2 = None, None
 
-cnt = 1
+# cnt = 1  # 디버깅을 위한 코드...
 for line in f:
-	print('{} : {}'.format(cnt, line))
-	cnt += 1
-
+	# 디버깅을 위한 코드...
+	# print('{} : {}'.format(cnt, line))
+	# cnt += 1
+	
 	_words = line.split(common.delim)
 	words = []
 	for word in _words:
@@ -96,6 +97,7 @@ for line in f:
 	_you = words[2]
 
 	"""
+	# 디버깅을 위한 코드
 	if cnt == 143:
 		print('{} == {} ? {}'.format(words[1], common.ap2_name, words[1] == common.ap2_name))
 		print('{} == {} ? {}'.format(words[2],common.ap2_name,words[2] == common.ap2_name))

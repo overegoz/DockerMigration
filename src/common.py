@@ -2,6 +2,7 @@
 - 공통으로 사용하는 값을 정의
 - 참고: 도커가 인식하는 자신의 IP는 0.0.0.0이다
 """
+from posix import POSIX_FADV_NOREUSE
 import time, datetime, socket, sys, os
 from Profile import Profile
 import json
@@ -199,17 +200,30 @@ def udp_recv(sock, me, bufsize, t):
 def action_profile(sock, es_name, profile):
 	print('Profile action begins!')
 
-	migr_type = ""
-	if prof.get_predetermined_migr(profile) == MIGR_AUTO:
-		# 최적의 migr 기법을 자동(AUTO)으로 선택하기
-		infos = return_migr_info_ap1(profile)
-		migr_type = get_best_migr(infos)
+	"""
+	ES-2는 어떤 migr 기법을 사용되었는지를 알아야 한다.
+	- ES-2 도커 실행 시, 환경변수로 알려주기 : 실패
+	- 컨트롤러가 수행하는 로직을 재 실행해서 migr 기법을 알아내는 방식으로 구현
+	- 또 다른 가능한 방법들...
+	  . ES-2 도커 실행 시, add-host 트릭 사용하기
+	  . ES-2 도커 실행 시, AP-2에게 migr 기법이 무엇이었는지 물어보기
+	"""
+
+	migr_type = "Unknown"
+
+	if es_name == ap2_name:
+		if prof.get_predetermined_migr(profile) == MIGR_AUTO:
+			# 최적의 migr 기법을 자동(AUTO)으로 선택하기
+			infos = return_migr_info_ap1(profile)
+			migr_type = get_best_migr(infos)
+		else:
+			# 사전에 설정된 migr 기법이 있으면, 그것을 선택하기
+			migr_type = prof.get_predetermined_migr(profile)
+
+		print('migr_type set to: {}'.format(migr_type))
 	else:
-		# 사전에 설정된 migr 기법이 있으면, 그것을 선택하기
-		migr_type = prof.get_predetermined_migr(profile)
-
-	print('migr_type set to: {}'.format(migr_type))
-
+		# ES-1은 어떤 migr 기법을 사용할지 몰라도 됨
+		pass
 
 	if profile <= 0:
 		print('Profile action : nothing to do!')
@@ -221,14 +235,22 @@ def action_profile(sock, es_name, profile):
 		print('Profile action : nothing to do!')  # DC 테스트, 할 일 없음
 	elif profile == 4:  # LR 테스트
 		assert es_name == edge_server1_name or es_name == edge_server2_name
+
 		"""
-		ES1은 여기 정의된 행동을 무조건 수행한다. 스레드를 사용하여 병렬처리
-		ES2는 migr_type == MIGR_LR 인 경우에만 여기의 코드를 수행한다
-		(그 외의 migr_type인 경우, ES2는 여기 코드를 수행할 필요 없음)
+		ES1: 여기 정의된 행동을 무조건 수행한다. 스레드를 사용하여 병렬처리
+		ES2: migr_type == MIGR_LR 인 경우에만 여기의 코드를 수행한다
+		     (그 외의 migr_type인 경우, ES2는 여기 코드를 수행할 필요 없음)
 		"""
 		if es_name == edge_server2_name:
 			if migr_type != MIGR_LR:
 				return
+			else:  # LR 기법이면...
+				# ES-2에서 LR 기법으로 migr 되었으면 아래의 코드를 스레드 없이 실행함
+				pass
+		elif es_name == edge_server1_name:
+			pass  # ES-1은 여기 코드를 무조건 실행해야 함 (스레드로 실행)
+		else:
+			assert False  # es_name이 잘못되었다!
 
 		start_time = time.time()
 		""" predefined action starts """
