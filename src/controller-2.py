@@ -91,7 +91,7 @@ while(True):
 			best_migr = ""
 			if common.prof.get_predetermined_migr(profile) == common.MIGR_AUTO:
 				# 최적의 migr 기법을 자동(AUTO)으로 선택하기
-				best_migr = common.get_best_migr(infos, common.weight, common.MIGR_FC)
+				best_migr = common.get_best_migr(infos)
 			else:
 				# 사전에 설정된 migr 기법이 있으면, 그것을 선택하기
 				best_migr = common.prof.get_predetermined_migr(profile)

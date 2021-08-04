@@ -199,13 +199,13 @@ def action_profile(sock, es_name, profile):
 	"""	    
 
 	migr_type = ""
-	try:
-		if os.environ.get(ENV_MIGR_TYPE) == None:
-			migr_type = MIGR_AUTO  # 무엇인지 알 수 없을때는 AUTO로 설정해두기
-		else:
-			migr_type = os.environ.get(ENV_MIGR_TYPE)
-	except:
-		migr_type = MIGR_AUTO
+	if prof.get_predetermined_migr(profile) == MIGR_AUTO:
+		# 최적의 migr 기법을 자동(AUTO)으로 선택하기
+		infos = return_migr_info_ap1(profile)
+		migr_type = get_best_migr(infos)
+	else:
+		# 사전에 설정된 migr 기법이 있으면, 그것을 선택하기
+		migr_type = prof.get_predetermined_migr(profile)
 
 	print('migr_type set to: {}'.format(migr_type))
 
@@ -539,31 +539,28 @@ def return_migr_info_ap1(profile):
 	# .......................................................
 	
 
-def get_best_migr(infos, force):
+def get_best_migr(infos):
 	w = weight
-	if force == MIGR_AUTO:
-		info = infos.split(delimD)
-		C_s = float(info[0]) * 1.0
-		l_diff_bit = float(info[1]) * 1.0
-		l_check_bit = float(info[2]) * 1.0
-		l_log_bit = float(info[3]) * 1.0
-		t_replay_s = float(info[4]) * 1.0
-		th_bps = float(info[5]) * 1.0
-		# -------------------------------------------------
-		dc_mig_time = C_s + l_diff_bit / th_bps + l_check_bit / th_bps
-		dc_traffic = l_diff_bit + l_check_bit
-		dc_cost = dc_mig_time + w * dc_traffic
-		# -------------------------------------------------
-		lr_mig_time = C_s + l_log_bit / th_bps + t_replay_s
-		lr_traffic = l_log_bit
-		lr_cost = lr_mig_time + w * lr_traffic
-		# -------------------------------------------------
-		if dc_cost <= lr_cost:
-			return MIGR_DC
-		elif lr_cost <= dc_cost:
-			return MIGR_LR
-		else:
-			assert False
-			return ""
+
+	info = infos.split(delimD)
+	C_s = float(info[0]) * 1.0
+	l_diff_bit = float(info[1]) * 1.0
+	l_check_bit = float(info[2]) * 1.0
+	l_log_bit = float(info[3]) * 1.0
+	t_replay_s = float(info[4]) * 1.0
+	th_bps = float(info[5]) * 1.0
+	# -------------------------------------------------
+	dc_mig_time = C_s + l_diff_bit / th_bps + l_check_bit / th_bps
+	dc_traffic = l_diff_bit + l_check_bit
+	dc_cost = dc_mig_time + w * dc_traffic
+	# -------------------------------------------------
+	lr_mig_time = C_s + l_log_bit / th_bps + t_replay_s
+	lr_traffic = l_log_bit
+	lr_cost = lr_mig_time + w * lr_traffic
+	# -------------------------------------------------
+	if dc_cost <= lr_cost:
+		return MIGR_DC
+	elif lr_cost <= dc_cost:
+		return MIGR_LR
 	else:
-		return force
+		assert False
