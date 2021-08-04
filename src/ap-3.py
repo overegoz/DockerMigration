@@ -178,12 +178,17 @@ while(True):
 				print('[서비스 응답] 연결된 사용자가 없어서 다른 AP로 전달')
 				common.udp_send(sock, my_name, other_ap, send_msg, common.SHORT_SLEEP)
 		elif cmd == common.ES_STOP:  # [AR11] edge server 정지하기
-			# AP-2에서 ES가 준비 완료되면, AP-1에게 이 메시지를 전해줄거야...
-			print("ES 종료 시작!")
-			edge_server_ready = False  # 이걸 먼저하자. ES STOP에 시간이 좀 걸리더라...
-			# ES 종료는 스레드로 처리하자 // join은 시그널 핸들러에서...
-			thr_stop = Thread(target=common.stop_edgeserver, args=(profile,))  # 1 arg 일때는 컴마(,)
-			thr_stop.start()
+			# AP-2에서 ES가 준비 완료되면, AP-1은 이 메시지를 받는다
+			if True:
+				# 특히 FC에서, 미처 처리되지 못한 메시지가 남아 있는 경우가 있어서
+				# ES-1을 종료하지 않는 것으로 변경
+				print("ES 종료 요청 받음(BUT, 종료하지 않음)!")
+			else:
+				print("ES 종료 시작!")
+				edge_server_ready = False  # 이걸 먼저하자. ES STOP에 시간이 좀 걸리더라...
+				# ES 종료는 스레드로 처리하자 // join은 시그널 핸들러에서...
+				thr_stop = Thread(target=common.stop_edgeserver, args=(profile,))  # 1 arg 일때는 컴마(,)
+				thr_stop.start()
 		elif cmd == common.ES_START:  # [AR12] edge server 시작하기
 			# AP-1에서 migr에 필요한 데이터를 AP-2로 전송 완료한 후, AP-1이 AP-2에게 보내주는 메시지
 			assert sender == other_ap
