@@ -155,10 +155,8 @@ def send_log(sock, me, you, msg):
 
 def udp_send(sock, me, you, msg, t):
 	time.sleep(t)
+
 	# 메시지 보내기
-	#print("msg : ", msg)
-	#print("you : ", you)
-	#print(msg, ip[you], port[you])
 	sock.sendto(msg.encode(), (ip[you], port[you]))
 	if me == edge_server1_name or me == edge_server2_name:
 		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))

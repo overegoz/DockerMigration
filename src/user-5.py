@@ -121,6 +121,7 @@ while(True):
 			# 마지막으로 REQ 보낸 시점으로 부터, 지정된 시간이 흘렀다면...
 			if counter < common.prof.get_max_req(profile):
 				send_msg = common.str3(my_name, common.SVC_REQ, str(counter))
+				
 				common.udp_send(sock, my_name, curr_ap, send_msg, common.SHORT_SLEEP)
 				counter += 1
 			else:
