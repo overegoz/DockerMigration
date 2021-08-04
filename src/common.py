@@ -196,19 +196,23 @@ def action_profile(sock, es_name, profile):
 	"""	    
 
 	migr_type = ""
+	"""
 	try:
-		"""
-		LR는 체크포인트가 아니라, 도커를 그냥 새로 시작하는거다
-		그러니까 환경변수가 제대로 동작할거다
-		"""
+		# LR는 체크포인트가 아니라, 도커를 그냥 새로 시작하는거다
+		# 그러니까 환경변수가 제대로 동작할거다
 		migr_type = os.environ[ENV_MIGR_TYPE]  # 환경변수가 없으면 예외 발생하고 종료함
 	except KeyError:
-		"""
-		체크포인트로 도커를 실행하면 환경변수를 읽어오지 못함
-		FC랑DC만 체크포인트를 사용하니까, auto로 입력해 두자
-		"""
+		#체크포인트로 도커를 실행하면 환경변수를 읽어오지 못함
+		#FC랑DC만 체크포인트를 사용하니까, auto로 입력해 두자
 		migr_type = MIGR_AUTO
-	
+		print('migr type set to : {}'.format(MIGR_AUTO))
+	"""
+	if os.environ.get(ENV_MIGR_TYPE) == None:
+		migr_type = MIGR_AUTO  # 무엇인지 알 수 없을때는 AUTO로 설정해두기
+	else:
+		migr_type = os.environ.get(ENV_MIGR_TYPE)
+
+
 	if profile <= 0:
 		print('Profile action : nothing to do!')
 	elif profile == 1:
