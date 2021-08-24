@@ -338,7 +338,7 @@ def start_edgeserver(es_name, migr_type, profile):
 			os.system(cmd)
 		elif migr_type == MIGR_DC:
 			# 1. 컨테니어 생성 (실행 안함)
-			print('DC (1/3)-컨테이너 생성(실행 안함)')
+			print('DC (1/3)-컨테이너 생성(아직은 실행 안함)')
 			cmd = 'docker create -e "TZ=Asia/Seoul" -e "{}={}" --add-host {}:{} -p {}:{}/udp --name {} {}'.format(ENV_MIGR_TYPE,migr_type,ap2_hostname,ip[ap2_hostname],my_port,my_port,cont_name,img_name)
 			print(cmd)
 			os.system(cmd)

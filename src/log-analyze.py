@@ -255,12 +255,28 @@ for i in range(user_max_req):
 
 # svc_rtt 계산하기
 time_format = '%Y-%m-%d-%H-%M-%S-%f'
-for k in list(svc_req.keys()):
+avg_rtt = []
+#for k in list(svc_req.keys()):
+for k in range(user_max_req):
 	t_from = datetime.strptime(svc_req[k],time_format)
-	t_to = datetime.strptime(svc_res[k],time_format)
-	time_diff = t_to - t_from
-	time_diff_sec = time_diff.total_seconds()
+	if k in svc_res:
+		t_to = datetime.strptime(svc_res[k],time_format)
+		time_diff = t_to - t_from
+		time_diff_sec = time_diff.total_seconds()
+	else:
+		if k == 0:  # 아직은 평균값이 존재하지 않아
+			time_diff_sec = 1  # 일단은 의미없는 숫자를 넣자. 눈에 확 띄게 큰 숫자로...
+		else:
+			time_diff_sec = avg_rtt[k-1]
+	
 	svc_rtt[k] = time_diff_sec
+
+	# 평균 계산하기
+	if k > 0:
+		rtts = list(svc_rtt.values())
+		avg_rtt.append(sum(rtts) / len(rtts))
+	else:
+		avg_rtt.append(svc_rtt[k])
 
 # ------------------------------------------------------------
 # 결과 출력하기
@@ -271,7 +287,8 @@ rtt_list = []
 for i in range(user_max_req):
 	rtt_list.append(svc_rtt[i])
 
-plt.plot(list(range(user_max_req-20)), rtt_list[:80])
+plt.plot(list(range(len(rtt_list))), rtt_list)
+plt.plot(list(range(len(rtt_list))), avg_rtt)
 plt.title('RTT : From REQUEST to RESPONSE')
 plt.show()
 
