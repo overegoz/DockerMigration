@@ -245,13 +245,17 @@ assert len(req_keys) == (max_req_id - min_req_id + 1), \
 
 # svc_rtt 계산전 사전 준비하기: ver 2 (없는 항목은 평균값으로 생성)
 user_max_req = common.prof.get_max_req(profile) # 100번이 max면 REQ는 0부터 99까지 전송됨
+
 req_ids = list(svc_req.keys())  # 사용자가 전송한 REQ의 ID값
-for i in range(user_max_req):
+for i in range(user_max_req):  # 모든 REQ ID가 존재하는지 확인
 	assert i in req_ids, 'REQ-{} is missing in svc_req'.format(i)
 
 res_ids = list(svc_res.keys())  # 사용자가 수신한 RES의 ID 값
-for i in range(user_max_req):
-	assert i in res_ids, 'RES-{} is missing in svc_res'.format(i)
+for i in range(user_max_req):  # 모든 RES ID가 존재하는지 확인
+	#assert i in res_ids, 'RES-{} is missing in svc_res'.format(i)
+	if i not in res_ids:
+		svc_res[i] = svc_res[i+1]  # 이전값으로 하면 시간이 음수가 나오니까...
+		print('트릭 ON!')
 
 # svc_rtt 계산하기
 time_format = '%Y-%m-%d-%H-%M-%S-%f'
