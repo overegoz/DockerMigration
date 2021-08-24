@@ -65,7 +65,7 @@ class Profile:
 							3:MIGR_DC,
 							4:MIGR_LR,
 							111:MIGR_FC,
-							112:MIGR_FC}
+							112:MIGR_DC}
 	# -------------------------------------------------------------------
 	# 도커 이미지 이름 : AP-1에서 최초로 실행하는 이미지 이름
 	img_name_ap1 = {1:  'twoon/profile1:es1',
