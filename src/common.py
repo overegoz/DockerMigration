@@ -156,24 +156,26 @@ def send_log(sock, me, you, msg):
 	sock.sendto(log.encode(), (ip[logger_name], port[logger_name]))
 
 def udp_send(sock, me, you, msg, t):
-	time.sleep(t)
-
 	# 메시지 보내기
 	sock.sendto(msg.encode(), (ip[you], port[you]))
-	if me == edge_server1_name or me == edge_server2_name:
-		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))
-
 	# 로그에 기록하기
 	send_log(sock, me, you, msg + delim + "(sent)")
 
-def udp_recv(sock, me, bufsize, t):
 	time.sleep(t)
 
+	# 화면에 출력
+	if me == edge_server1_name or me == edge_server2_name:
+		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))
+	
+	
+	
+
+def udp_recv(sock, me, bufsize, t):
 	msg, addr = "", ""
 	try:
 		# 메시지 받기
 		bytes, addr = sock.recvfrom(bufsize)
-		# 수신 데이터 출력하기, decode 해서 string객체로 변환
+		# 수신 데이터 decode 해서 string객체로 변환
 		msg = bytes.decode()
 		# 로그에 기록하기
 		if me != logger_name:  # 내가 LOGGER가 아닌 경우에만...
@@ -183,6 +185,7 @@ def udp_recv(sock, me, bufsize, t):
 		# non-blocking recv: 빈손으로 리턴할때 예외가 발생하고, 이를 잡아줘야함
 		msg, addr = "", ""
 
+	time.sleep(t)
 	return msg, addr
 
 
