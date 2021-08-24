@@ -319,8 +319,8 @@ for i in range(len(rtt_list)):
 	else:
 		avg_rtt[i] = rtt_list[i]
 
-plt.plot(list(range(len(rtt_list))), rtt_list)
-plt.plot(list(range(len(rtt_list))), avg_rtt)
+plt.plot(list(range(len(rtt_list))), rtt_list, 'b-o')
+plt.plot(list(range(len(rtt_list))), avg_rtt, 'r-.')
 plt.title('[Revised] RTT: From REQUEST to RESPONSE')
 plt.show()
 
