@@ -172,7 +172,7 @@ class Profile:
 		return self.t_replay_sec[p]
 
 	def get_diff_bit(self, p):
-		return l_diff_bit[p]
+		return self.l_diff_bit[p]
 
 	def id_min(self):
 		"""
