@@ -255,7 +255,7 @@ for i in range(user_max_req):  # 모든 RES ID가 존재하는지 확인
 	#assert i in res_ids, 'RES-{} is missing in svc_res'.format(i)
 	if i not in res_ids:
 		svc_res[i] = svc_res[i+1]  # 이전값으로 하면 시간이 음수가 나오니까...
-		print('트릭 ON!')
+		print('트릭 ON at {}!'.format(i))
 
 # svc_rtt 계산하기
 time_format = '%Y-%m-%d-%H-%M-%S-%f'
@@ -291,9 +291,35 @@ rtt_list = []
 for i in range(user_max_req):
 	rtt_list.append(svc_rtt[i])
 
+"""
 plt.plot(list(range(len(rtt_list))), rtt_list)
 plt.plot(list(range(len(rtt_list))), avg_rtt)
-plt.title('RTT : From REQUEST to RESPONSE')
+plt.title('[Original] RTT : From REQUEST to RESPONSE')
+plt.show()
+"""
+
+# outliers를 제거한 후 그래프 다시 그리기
+# 	0인 값이 있으면 최소한의 숫자로 바꾸기
+for i in range(len(rtt_list)):
+	if rtt_list[i] <= 0:
+		rtt_list[i] = 0.01
+
+	# 인터벌이 1초인데, 1초가 넘으면 오류 있는것
+	# 보통은 0.5초를 넘지 않더라. 0.5초를 기준으로 하자
+	if rtt_list[i] >= 0.5:  
+		#rtt_list[i] = (rtt_list[i-1] + rtt_list[i+1])/2
+		rtt_list[i] = 0.5
+
+# 	평균 다시 계산하기
+for i in range(len(rtt_list)):
+	if i > 0:
+		avg_rtt[i] = sum(rtt_list[:i+1]) / len(rtt_list[:i+1])
+	else:
+		avg_rtt[i] = rtt_list[i]
+
+plt.plot(list(range(len(rtt_list))), rtt_list)
+plt.plot(list(range(len(rtt_list))), avg_rtt)
+plt.title('[RTT : From REQUEST to RESPONSE')
 plt.show()
 
 print('서비스 응답 시간 (평균): ')
