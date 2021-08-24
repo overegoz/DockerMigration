@@ -371,11 +371,21 @@ for iter in range(how_many):
 # migrtime_list_total = []
 rtt_avg_total = []
 for item in range(len(rtt_list_total[0])):
+	# 평균을 내는 방법
 	t_sum = 0
 	for iter in range(how_many):
 		t_sum = rtt_list_total[iter][item]
 	
 	rtt_avg_total.append(t_sum / how_many)
+
+	"""
+	# 최소값을 이용하는 방법
+	t_list = []
+	for iter in range(how_many):
+		t_list.append(rtt_list_total[iter][item])
+	
+	rtt_avg_total.append(min(t_list))
+	"""
 
 migrtime_avg_total = sum(migrtime_list_total) / len(migrtime_list_total)
 
