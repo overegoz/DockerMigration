@@ -31,12 +31,13 @@ ip = {controller_name : "127.0.0.1",
 		user_name : "127.0.0.1",
 		ap1_name : "127.0.0.1",
 		ap2_name : "127.0.0.1",
-		edge_server1_name : "127.0.0.1",
+		edge_server1_name : "127.0.0.1", 
 		edge_server2_name : "127.0.0.1"}
 """
 LOCAL_PC_IP = "192.168.0.2"
 VM1_IP = "192.168.0.116"
 VM2_IP = "192.168.0.117"
+USER_IP = "192.168.0.74"  # 근데, user ip 정보는 필요가 없음...
 ip = {controller_name : LOCAL_PC_IP,
 		logger_name : LOCAL_PC_IP,
 		user_name : LOCAL_PC_IP,
@@ -263,6 +264,18 @@ def action_profile(sock, es_name, profile):
 
 		# 소요 시간을 Logger에게 알릴까?
 		send_log(sock, es_name, es_name, str2("ReplayTime", str(time_taken_sec)))
+	elif profile == 111:
+		sz = prof.get_diff_bit(profile) / (1000.0 * 8.0)
+		cmd = 'truncate -s {}M /tmp/file.file'.format(sz)
+		print('action : ', cmd)
+		os.system(cmd)
+		time.sleep(prof.get_replay_sec(profile))
+	elif profile == 112:
+		sz = prof.get_diff_bit(profile) / (1000.0 * 8.0)
+		cmd = 'truncate -s {}M /tmp/file.file'.format(sz)
+		print('action : ', cmd)
+		os.system(cmd)
+		time.sleep(prof.get_replay_sec(profile))
 	else:
 		assert False
 	
