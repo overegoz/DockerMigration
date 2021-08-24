@@ -108,7 +108,8 @@ while(True):
 	recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP) 
 	# -------------------------------------------------------------------
 	if len(recv_msg) > 0:  # 수신한 데이터가 있으면...
-		print('recv: ', recv_msg)
+		if common.ENABLE_DEB_MSG:
+			print('recv: ', recv_msg)
 		words = recv_msg.split(common.delim)
 		
 		sender = words[0]
@@ -131,7 +132,8 @@ while(True):
 			assert migr_type == common.MIGR_NONE or migr_type == common.MIGR_FC \
 				or migr_type == common.MIGR_DC or migr_type == common.MIGR_LR
 			
-			print('MIGR 작업을 시작합니다 : {}'.format(migr_type))
+			if common.ENABLE_DEB_MSG:
+				print('MIGR 작업을 시작합니다 : {}'.format(migr_type))
 			
 			thr_migr = Thread(target=common.start_migr, \
 								args=(sock, migr_type, my_name, other_ap, profile))
@@ -143,7 +145,8 @@ while(True):
 			assert len(migr_type) == 0
 
 			migr_type = words[2]
-			print('MIGR_DST: ', migr_type)
+			if common.ENABLE_DEB_MSG:
+				print('MIGR_DST: ', migr_type)
 			# 여기선, 이 타이밍에서는 딱히 해줄 게 없어 
 			# base image를 pull 하도록 하자 => 프로파일용 img는 local img라서 pull 불가
 		elif cmd == common.SVC_REQ:  # 서비스 요청 [AR4][AR9]
@@ -152,11 +155,13 @@ while(True):
 			if edge_server_ready == True:  # 나의 ES가 정상 동작함
 				# [AS4.1][AS9.1] 수신 메시지를 edge server에게 전달해줌
 				common.udp_send(sock, my_name, my_edgeserver, send_msg, common.SHORT_SLEEP)
-				print('[서비스 요청] 나의 ES로 전달 {}/{}'.format(common.ip[my_edgeserver], 
-																common.port[my_edgeserver]))
+				if common.ENABLE_DEB_MSG:
+					print('[서비스 요청] 나의 ES로 전달 {}/{}'.format(common.ip[my_edgeserver], 
+																	common.port[my_edgeserver]))
 			else:  # 나의 ES가 down 상태임
 				# [AS4.2][AS9.2] 수신 메시지를 다른 AP에게 전달해줌
-				print('[서비스 요청] 동작하는 ES가 없어서 다른 AP로 전달')
+				if common.ENABLE_DEB_MSG:
+					print('[서비스 요청] 동작하는 ES가 없어서 다른 AP로 전달')
 				common.udp_send(sock, my_name, other_ap, send_msg, common.SHORT_SLEEP)
 		elif cmd == common.USER_HELLO:  # [AR5] 새로운 user가 접속했다
 			assert user_associated == False  # user는 한명 뿐이거든...
@@ -174,9 +179,11 @@ while(True):
 			send_msg = common.str3(my_name, words[1], words[2])
 			if user_associated == True:  # [AS7] 나에게 연결된 user로 보내기
 				common.udp_send(sock, my_name, common.user_name, send_msg, common.SHORT_SLEEP)
-				print('[서비스 응답] 직접 연결된 USER에게 전달: ', send_msg)
+				if common.ENABLE_DEB_MSG:
+					print('[서비스 응답] 직접 연결된 USER에게 전달: ', send_msg)
 			else:  # [AS8] 다른 AP로 relay 해주기
-				print('[서비스 응답] 연결된 사용자가 없어서 다른 AP로 전달')
+				if common.ENABLE_DEB_MSG:
+					print('[서비스 응답] 연결된 사용자가 없어서 다른 AP로 전달')
 				common.udp_send(sock, my_name, other_ap, send_msg, common.SHORT_SLEEP)
 		elif cmd == common.ES_STOP:  # [AR11] edge server 정지하기
 			# AP-2에서 ES가 준비 완료되면, AP-1은 이 메시지를 받는다

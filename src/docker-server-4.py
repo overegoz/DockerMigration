@@ -52,7 +52,8 @@ else:
 # --network="host" 일때만 의미있음
 #my_ap_name = socket.gethostname()
 # -------------------------------------------------------------------
-print('{} started at {}!'.format(my_name, my_ap_name))
+if common.ENABLE_DEB_MSG:
+	print('{} started at {}!'.format(my_name, my_ap_name))
 # -------------------------------------------------------------------
 profile = int(sys.argv[2])
 # -------------------------------------------------------------------
@@ -73,7 +74,8 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((localIP, localPort)) 
 sock.setblocking(0)  # non-blocking socket으로 만들기
 
-print('socket setup complete!')
+if common.ENABLE_DEB_MSG:
+	print('socket setup complete!')
 # -------------------------------------------------------------------
 # 스레드 변수 
 thr_action = None
@@ -104,7 +106,8 @@ profile = int(sys.argv[2])
 # +100 : ES2가 AP2에게 알림
 # 즉, 110이면 (ES1 -> ) AP1, (ES2 -> )AP2에게 알림
 notified = 0
-print('{} is ready to serve!'.format(my_name))
+if common.ENABLE_DEB_MSG:
+	print('{} is ready to serve!'.format(my_name))
 # -------------------------------------------------------------------
 #print('host name : ', socket.gethostname())
 # -------------------------------------------------------------------
@@ -136,14 +139,16 @@ while(True):
 		# 최초로 한번은 READY 메시지를 보내주자
 		if notified == 0 or notified == 10:
 			notified += 100
-			print('notified: ', notified)
+			if common.ENABLE_DEB_MSG:
+				print('notified: ', notified)
 
 			# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
 			common.action_profile(sock, my_name, profile)
 
 			# 'Log-Replay 작업이 완료되면' READY 메시지를 AP2에게 보내주기
 			send_msg = common.str2(my_name, common.ES_READY)
-			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
+			if common.ENABLE_DEB_MSG:
+				print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
 			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 			
 	except socket.gaierror:  # socket.gethostbyname 함수가 던지는 예외(getaddrinfo failed)
@@ -157,7 +162,8 @@ while(True):
 		#assert notified == 0 or notified == 10
 		if notified == 0:
 			notified += 10
-			print('notified: ', notified)
+			if common.ENABLE_DEB_MSG:
+				print('notified: ', notified)
 
 			# Log-Replay 경우 : AP1은 '스레드'를 사용해서 지정된 작업 수행
 			thr_action = Thread(target=common.action_profile, args=(sock, my_name, profile))
@@ -165,7 +171,8 @@ while(True):
 
 			# (action_profile 리턴을 기다리지 않고) AP에게 READY 메시지 보내기
 			send_msg = common.str2(my_name, common.ES_READY)
-			print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
+			if common.ENABLE_DEB_MSG:
+				print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
 			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
 
 	# 직접 연결된 AP로 부터 데이터 수신하기
@@ -173,7 +180,8 @@ while(True):
 
 	if len(recv_msg) > 0:
 		yes_recv_cnt += 1
-		print('recv: ', recv_msg)
+		if common.ENABLE_DEB_MSG:
+			print('recv: ', recv_msg)
 		words = recv_msg.split(common.delim)
 
 		# sender 정보가 맞는지 확인
@@ -206,4 +214,5 @@ while(True):
 		no_recv_cnt += 1
 
 	if 	((no_recv_cnt + yes_recv_cnt) % 100) == 0: 
-		print('recv : {}, no recv : {} on {} machine'.format(yes_recv_cnt, no_recv_cnt, my_ap_name))
+		if common.ENABLE_DEB_MSG:
+			print('recv : {}, no recv : {} on {} machine'.format(yes_recv_cnt, no_recv_cnt, my_ap_name))

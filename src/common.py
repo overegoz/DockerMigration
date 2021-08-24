@@ -6,6 +6,8 @@ import time, datetime, socket, sys, os
 from Profile import Profile
 import json
 
+
+ENABLE_DEB_MSG = True
 # -------------------------------------------------------------------
 # 총 4대의 VM을 사용하자
 # 1. controller + logger
