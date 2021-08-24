@@ -126,7 +126,8 @@ ENV_MIGR_TYPE="MIGR_TYPE"  # 환경변수
 # . 프로필 -1번 : 도커 없이 실행
 # . 프로필 0번 : 도커 있지만 migr 없음
 prof = Profile()
-profile_ids = list(range(prof.id_min(), prof.id_max()+1))
+#profile_ids = list(range(prof.id_min(), prof.id_max()+1))
+profile_ids = prof.get_ids()
 # -------------------------------------------------------------------
 # 공통으로 사용하는 함수를 정의하기
 def get_key_by_value(tab, value):

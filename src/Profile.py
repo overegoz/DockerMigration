@@ -188,4 +188,9 @@ class Profile:
 		return -1
 
 	def id_max(self):
-		return len(self.C_sec)
+		#return len(self.C_sec)
+		my_keys = list(self.C_sec.keys())
+		return max(my_keys)
+
+	def get_ids(self):
+		return list(self.C_sec.keys())
