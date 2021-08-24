@@ -36,7 +36,7 @@ ip = {controller_name : "127.0.0.1",
 """
 LOCAL_PC_IP = "192.168.0.2"
 VM1_IP = "192.168.0.116"
-VM2_IP = "192.168.0.117"
+VM2_IP = "192.168.0.101"
 USER_IP = "192.168.0.74"  # 근데, user ip 정보는 필요가 없음...
 ip = {controller_name : LOCAL_PC_IP,
 		logger_name : LOCAL_PC_IP,
