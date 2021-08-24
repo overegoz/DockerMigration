@@ -1,3 +1,4 @@
 #!/bin/bash
 
-tc qdisc add dev enp0s3 root tbf rate 80mbit burst 1024kbit latency 10ms
+# 88mbit로 해야 10MB/s가 나옴
+tc qdisc add dev enp0s3 root tbf rate 88mbit burst 1024kbit latency 10ms
