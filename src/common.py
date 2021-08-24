@@ -166,7 +166,7 @@ def udp_send(sock, me, you, msg, t):
 	time.sleep(t)
 
 	# 화면에 출력
-	if me == edge_server1_name or me == edge_server2_name:
+	if (ENABLE_DEB_MSG == True) and (me == edge_server1_name or me == edge_server2_name):
 		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))
 	
 	

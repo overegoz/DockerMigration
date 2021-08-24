@@ -139,7 +139,8 @@ while(True):
 		#recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, req_int/2.0)
 		recv_msg, addr = common.udp_recv(sock, my_name, common.bufsiz, common.SHORT_SLEEP)
 		if len(recv_msg) > 0:  
-			print('recv msg: ', recv_msg)
+			if common.ENABLE_DEB_MSG:
+				print('recv msg: ', recv_msg)
 			words = recv_msg.split(common.delim)
 
 			"""

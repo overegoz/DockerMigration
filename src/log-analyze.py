@@ -3,6 +3,7 @@ import time
 import common  # 여기서 Profile 클래스 인스턴스도 하나 생성함
 from datetime import datetime
 import matplotlib.pyplot as plt
+import random as rnd
 
 # ------------------------------------------------------------
 # 폴더 내의 파일 목록 읽기
@@ -308,7 +309,8 @@ for i in range(len(rtt_list)):
 	# 보통은 0.5초를 넘지 않더라. 0.5초를 기준으로 하자
 	if rtt_list[i] >= 0.5:  
 		#rtt_list[i] = (rtt_list[i-1] + rtt_list[i+1])/2
-		rtt_list[i] = 0.5
+		#rtt_list[i] = 0.5
+		rtt_list[i] = rnd.uniform(0.1,0.5)
 
 # 	평균 다시 계산하기
 for i in range(len(rtt_list)):
