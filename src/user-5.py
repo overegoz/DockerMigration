@@ -102,7 +102,13 @@ while(True):
 	else:
 		pass
 # -------------------------------------------------------------------
+# AP-1의 ES-1 가 안정화 되기까지 대기
+print('ES-1 안정화를 위해 잠시 대기합니다')
+time.sleep(common.prof.get_replay_sec(profile))
+
+# -------------------------------------------------------------------
 # 본격적으로 REQ-RES 시작!
+print('USER 시작 : sending REQUEST!')
 counter = 0  # req를 보낼건데, cnt 번호를 붙여서 tracking 가능하도록
 last_sent = None
 while(True):
