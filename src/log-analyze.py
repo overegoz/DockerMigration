@@ -18,6 +18,7 @@ file_dic = {}
 for i in range(nItems):
     file_dic[i] = file_list[i]  # dict에 item 추가하기
 
+# 로그파일 목록을 화면에 출력
 #print(file_dic)
 dic_keys = list(file_dic.keys())
 dic_values = list(file_dic.values())
@@ -321,6 +322,8 @@ for i in range(len(rtt_list)):
 
 plt.plot(list(range(len(rtt_list))), rtt_list, 'b-o')
 plt.plot(list(range(len(rtt_list))), avg_rtt, 'r-.')
+plt.xlim(0, 200)
+plt.ylim(0.0, 1.0)
 plt.title('[Revised] RTT: From REQUEST to RESPONSE')
 plt.show()
 
