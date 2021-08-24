@@ -371,26 +371,34 @@ for iter in range(how_many):
 # migrtime_list_total = []
 rtt_avg_total = []
 for item in range(len(rtt_list_total[0])):
+	"""
 	# 평균을 내는 방법
+	print('avg 값을 사용합니다.')
 	t_sum = 0
 	for iter in range(how_many):
-		t_sum = rtt_list_total[iter][item]
+		t_sum += rtt_list_total[iter][item]
 	
 	rtt_avg_total.append(t_sum / how_many)
-
 	"""
 	# 최소값을 이용하는 방법
+	print('min 값을 사용합니다.')
 	t_list = []
 	for iter in range(how_many):
 		t_list.append(rtt_list_total[iter][item])
 	
 	rtt_avg_total.append(min(t_list))
-	"""
 
-migrtime_avg_total = sum(migrtime_list_total) / len(migrtime_list_total)
 
+print(rtt_avg_total)
+rtt_avg_avg_total = sum(rtt_avg_total) / len(rtt_avg_total)
+
+migrtime_avg = sum(migrtime_list_total) / len(migrtime_list_total)
+print('Migration에 걸린 평균 시간 : {}'.format(migrtime_avg))
+
+"""
 plt.plot(list(range(len(rtt_avg_total))), rtt_avg_total, 'b-o')
 plt.xlim(0, 200)
 plt.ylim(0.0, 0.4)
-plt.title('RTT: From REQUEST to RESPONSE')
+plt.title('RTT: From REQUEST to RESPONSE (avg: {})'.format(rtt_avg_avg_total))
 plt.show()
+"""
