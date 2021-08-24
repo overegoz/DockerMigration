@@ -319,7 +319,7 @@ for i in range(len(rtt_list)):
 
 plt.plot(list(range(len(rtt_list))), rtt_list)
 plt.plot(list(range(len(rtt_list))), avg_rtt)
-plt.title('[RTT : From REQUEST to RESPONSE')
+plt.title('[Revised] RTT: From REQUEST to RESPONSE')
 plt.show()
 
 print('서비스 응답 시간 (평균): ')
