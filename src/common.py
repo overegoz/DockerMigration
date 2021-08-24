@@ -273,7 +273,7 @@ def action_profile(sock, es_name, profile):
 		time.sleep(prof.get_replay_sec(profile))
 	elif profile == 112:
 		sz = prof.get_diff_bit(profile) / (1000.0 * 8.0)
-		cmd = 'truncate -s {}M /tmp/file.file'.format(sz)
+		cmd = 'truncate -s {}M /tmp/file.file'.format(int(sz))
 		print('action : ', cmd)
 		os.system(cmd)
 		time.sleep(prof.get_replay_sec(profile))
