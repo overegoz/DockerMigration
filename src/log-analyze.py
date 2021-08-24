@@ -2,6 +2,7 @@ import os
 import time
 import common  # 여기서 Profile 클래스 인스턴스도 하나 생성함
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 # ------------------------------------------------------------
 # 폴더 내의 파일 목록 읽기
@@ -111,13 +112,13 @@ for line in f:
 		if _event == common.start_msg:
 			# 프로필 번호 확인하기 : AP1, ES1, USER 에서만 확인하기
 			if _me == common.ap1_name or _me == common.edge_server1_name:
-				p = words[6].replace("]","").replace("'","")
+				p = int(words[6].replace("]","").replace("'",""))
 				if profile is None: profile = p
 				else: assert profile == p
 				continue
 
 			elif _me == common.user_name:
-				p = words[5].replace("]","").replace("'","")
+				p = int(words[5].replace("]","").replace("'",""))
 				if profile is None: profile = p
 				else: assert profile == p
 				continue
@@ -153,7 +154,7 @@ for line in f:
 			# USER가 SVC REQ를 최초로 sent한 시간
 			if words[3] == common.user_name and words[4] == common.SVC_REQ:
 				_key = words[5]  # req-id를 의미
-				if _key not in svc_req: svc_req[_key] = _time
+				if _key not in svc_req: svc_req[int(_key)] = _time
 				else: 
 					# 최초 1회만 dict에 추가
 					print('common.SVC_REQ 중복은 skip : {}'.format(line))
@@ -163,7 +164,7 @@ for line in f:
 		if _you == common.ip[common.ap1_name] or _you == common.ip[common.ap2_name]:
 			if words[4] == common.SVC_RES:
 				_key = words[5]
-				if _key not in svc_res: svc_res[_key] = _time
+				if _key not in svc_res: svc_res[int(_key)] = _time
 				else:
 					# 최초 1회만 dict에 추가
 					print('common.SVC_RES 중복은 skip : {}'.format(line))
@@ -209,9 +210,10 @@ for line in f:
 
 
 
-# print(svc_req)
+#print(svc_req)
 
-# svc_rtt 계산하기
+# svc_rtt 계산전 사전 준비하기: ver 1 (없는 항목 삭제)
+"""
 # svc_req, svc_res에서 대응되는게 없는 항목은 삭제하기
 keys_to_del_from_req = []
 keys_to_del_from_res = []
@@ -239,7 +241,19 @@ max_req_id = max(req_keys)
 assert min_req_id == 0
 assert len(req_keys) == (max_req_id - min_req_id + 1), \
 	'ERR: {} vs {}'.format(len(req_keys),(max_req_id - min_req_id + 1))
+"""
 
+# svc_rtt 계산전 사전 준비하기: ver 2 (없는 항목은 평균값으로 생성)
+user_max_req = common.prof.get_max_req(profile) # 100번이 max면 REQ는 0부터 99까지 전송됨
+req_ids = list(svc_req.keys())  # 사용자가 전송한 REQ의 ID값
+for i in range(user_max_req):
+	assert i in req_ids, 'REQ-{} is missing in svc_req'.format(i)
+
+res_ids = list(svc_res.keys())  # 사용자가 수신한 RES의 ID 값
+for i in range(user_max_req):
+	assert i in res_ids, 'RES-{} is missing in svc_res'.format(i)
+
+# svc_rtt 계산하기
 time_format = '%Y-%m-%d-%H-%M-%S-%f'
 for k in list(svc_req.keys()):
 	t_from = datetime.strptime(svc_req[k],time_format)
@@ -251,8 +265,15 @@ for k in list(svc_req.keys()):
 # ------------------------------------------------------------
 # 결과 출력하기
 print('프로파일 번호 :', profile )
-print('서비스 응답 시간: ')
-print(svc_rtt )
+#print('서비스 응답 시간: ')
+#print(svc_rtt)
+rtt_list = []
+for i in range(user_max_req):
+	rtt_list.append(svc_rtt[i])
+
+plt.plot(list(range(user_max_req-20)), rtt_list[:80])
+plt.title('RTT : From REQUEST to RESPONSE')
+plt.show()
 
 print('서비스 응답 시간 (평균): ')
 print( sum(svc_rtt.values()) / len(svc_rtt) )
