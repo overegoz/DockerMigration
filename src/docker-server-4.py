@@ -88,6 +88,7 @@ if common.ENABLE_DEB_MSG:
 # -------------------------------------------------------------------
 # 병렬처리
 process_jobs = []
+shared_dict['thr_action'] = None
 # -------------------------------------------------------------------
 # SIGINT 시그널 핸들러 등록... 이게 진짜 실행이 되나..?
 def handler(signum, frame):
@@ -191,9 +192,10 @@ def hostcheck(shared_dict):
 			print('알려지지 않은 예외?')
 
 
+
 # -------------------------------------------------------------------
 # host를 확인하는 것을 멀티-프로세스로 구성
-shared_dict['thr_action'] = None
+
 
 
 p = multiprocessing.Process(target=hostcheck, args=(shared_dict,))

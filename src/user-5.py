@@ -73,6 +73,7 @@ elif profile == 0:  # test
 	handover_counter = 5
 else:
 	pass  # 테스트용
+
 # -------------------------------------------------------------------
 def check_ap(current_ap, handover):
 	# 어떤 AP와 연결할지에 대한 결정을 하는 함수
