@@ -183,6 +183,9 @@ def hostcheck(shared_dict):
 					print('{} -> {} : {}'.format(shared_dict['my_name'], shared_dict['my_ap_name'], send_msg))
 				common.udp_send(shared_dict['sock'], shared_dict['my_name'], 
 								shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)	
+		except:
+			print('알려지지 않은 예외?')
+			
 
 # -------------------------------------------------------------------
 # host를 확인하는 것을 멀티-프로세스로 구성
