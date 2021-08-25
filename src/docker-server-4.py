@@ -36,7 +36,7 @@ if len(err_msg) > 0:
 	# 오류가 있었다는 것임
 	# 도커는 터미널 출력을 보기 어려우니까, 오류 메시지를 로그로 전송
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	common.send_log(sock, "EdgeServer-X", "EdgeServer-X", err_msg)
+	common.send_log(None, sock, "EdgeServer-X", "EdgeServer-X", err_msg)
 	sock.close()
 	exit()  # 즉시 종료
 # -------------------------------------------------------------------
@@ -92,7 +92,7 @@ if thr_action is not None:
 signal.signal(signal.SIGTERM, handler)  # container stop 하면 SIGTERM -> SIGKILL 전달된다
 # -------------------------------------------------------------------
 # 실행 되었다는 것을 Logger에 알리기
-common.send_log(sock, my_name, my_name, 
+common.send_log(None, sock, my_name, my_name, 
 				common.str2(common.start_msg, str(sys.argv)))
 # -------------------------------------------------------------------
 # 프로파일에 따라서 사전 작업을 수행함
@@ -195,13 +195,13 @@ while(True):
 
 		# [ER1][ER2] 서비스 요청 메시지가 맞는지 확인
 		if words[1] != common.SVC_REQ:
-			common.send_log(sock, my_name, my_name, \
+			common.send_log(None, sock, my_name, my_name, \
 							common.str2("invalid-command-received", recv_msg))
 			assert False
 
 		# 수신 메시지가 형식에 맞는지 확인하기
 		if len(words) != 3:
-			common.send_log(sock, my_name, my_name, 
+			common.send_log(None, sock, my_name, my_name, 
 							common.str2("wrong-msg-format", recv_msg))
 			assert False
 

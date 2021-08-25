@@ -115,10 +115,10 @@ bufsiz = 1024
 delim = " "
 delimD = "-"
 #SHORT_SLEEP = 0.05
-SHORT_SLEEP = 0.01
+SHORT_SLEEP = 0.001
 USER_REQ_INTERVAL = 1.0
 #USER_HANDOVER_DELAY = 1.0
-USER_HANDOVER_DELAY = 0.01
+USER_HANDOVER_DELAY = 0.001
 INTMAX = sys.maxsize  # 참고: 파이썬2 에서는 sys.maxint
 weight = 10  # 최적의 migr 기법 선택 시, 가중치
 #ENV_ES_NAME="EDGE_SERVER_NAME"  # 환경변수로 사용할 변수명
@@ -150,18 +150,22 @@ def str4(a,b,c,d):
 def get_now():  # 현재 시간을 문자열로 리턴
 	return datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
 	
-def send_log(sock, me, you, msg):
+def send_log(tt, sock, me, you, msg):
 	# 로그 메시지 만들기
-	log = get_now() + delim + me + delim + you + delim + msg
+	if tt is None:
+		log = get_now() + delim + me + delim + you + delim + msg
+	else:
+		log = tt + delim + me + delim + you + delim + msg
 	# Logger에게 전송하기
 	# udp_send(sock, me, logger_name, log, SHORT_SLEEP)  # 이렇게 하면 무한 루프
 	sock.sendto(log.encode(), (ip[logger_name], port[logger_name]))
 
 def udp_send(sock, me, you, msg, t):
+	tt = get_now()
 	# 메시지 보내기
 	sock.sendto(msg.encode(), (ip[you], port[you]))
 	# 로그에 기록하기
-	send_log(sock, me, you, msg + delim + "(sent)")
+	send_log(tt, sock, me, you, msg + delim + "(sent)")
 
 	time.sleep(t)
 
@@ -169,19 +173,18 @@ def udp_send(sock, me, you, msg, t):
 	if (ENABLE_DEB_MSG == True) and (me == edge_server1_name or me == edge_server2_name):
 		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))
 	
-	
-	
 
 def udp_recv(sock, me, bufsize, t):
 	msg, addr = "", ""
 	try:
+		tt = get_now()
 		# 메시지 받기
 		bytes, addr = sock.recvfrom(bufsize)
 		# 수신 데이터 decode 해서 string객체로 변환
 		msg = bytes.decode()
 		# 로그에 기록하기
 		if me != logger_name:  # 내가 LOGGER가 아닌 경우에만...
-			send_log(sock, me, addr[0], msg + delim + "(recvd)")
+			send_log(tt, sock, me, addr[0], msg + delim + "(recvd)")
 
 	except socket.error:
 		# non-blocking recv: 빈손으로 리턴할때 예외가 발생하고, 이를 잡아줘야함
@@ -269,7 +272,7 @@ def action_profile(sock, es_name, profile):
 		print('action_profile took {} seconds'.format(time_taken_sec))
 
 		# 소요 시간을 Logger에게 알릴까?
-		send_log(sock, es_name, es_name, str2("ReplayTime", str(time_taken_sec)))
+		send_log(None, sock, es_name, es_name, str2("ReplayTime", str(time_taken_sec)))
 	elif profile == 111:
 		sz = prof.get_diff_bit(profile) / (1000.0 * 8.0)
 		cmd = 'truncate -s {}M /tmp/file.file'.format( int(sz) )

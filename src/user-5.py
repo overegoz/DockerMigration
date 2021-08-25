@@ -51,7 +51,7 @@ def handler(signum, frame):  # CTRL+C 시그널 핸들러 만들기
 signal.signal(signal.SIGINT, handler)  # 시그널 핸들러 등록
 # -------------------------------------------------------------------
 # 실행 되었다는 것을 Logger에 알리기
-common.send_log(sock, my_name, my_name, common.str2(common.start_msg,str(sys.argv)))
+common.send_log(None, sock, my_name, my_name, common.str2(common.start_msg,str(sys.argv)))
 # -------------------------------------------------------------------
 # 처음에는 무조건 AP-1에 연결한다고 가정한다
 curr_ap = common.ap1_name

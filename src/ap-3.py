@@ -57,7 +57,7 @@ sock.bind((local_ip, local_port))
 sock.setblocking(0)  # non-blocking socket으로 만들기
 # -------------------------------------------------------------------
 # 실행 되었다는 것을 Logger에 알리기
-common.send_log(sock, my_name, my_name, common.str2(common.start_msg,str(sys.argv)))
+common.send_log(None, sock, my_name, my_name, common.str2(common.start_msg,str(sys.argv)))
 # -------------------------------------------------------------------
 # 상태 정보를 기록할 변수들
 profile = int(sys.argv[2])
@@ -71,7 +71,7 @@ if my_name == common.ap1_name:
 	# 여기서는 thread 쓰지말자
 	common.start_edgeserver(es_name=my_edgeserver, migr_type="no need", profile=profile)
 	#edge_server_ready = True
-	common.send_log(sock, my_name, common.edge_server1_name, 
+	common.send_log(None, sock, my_name, common.edge_server1_name, 
 					common.str2(common.start_msg, " (initial launch)"))
 elif my_name == common.ap2_name:
 	# AP2는 시작과 동시에 프로필을 시작할 필요 없음. 컨트롤러가 시키면 그 때 시작
@@ -139,7 +139,7 @@ while(True):
 								args=(sock, migr_type, my_name, other_ap, profile))
 			thr_migr.start()
 			# migr 시간 측정 : 로그에서, 여기서 부터 시간을 측정하면 됨.
-			common.send_log(sock, my_name, my_name, common.str2("migr begins :", migr_type))
+			common.send_log(None, sock, my_name, my_name, common.str2("migr begins :", migr_type))
 		elif cmd == common.MIGR_DST:  # [AR3] migr 도착지, 시작! (참고: 마이그레이션 출발지는 other_ap)
 			assert edge_server_ready == False
 			assert len(migr_type) == 0
@@ -217,7 +217,7 @@ while(True):
 				# user 에게는 알려줄 필요 없음
 				# migr 완료 로그 남기기
 				# migr 시간 측정 : 로그에서, 여기까지 소요된 시간을 측정하면 됨.
-				common.send_log(sock, my_name, my_name, "migr finished")
+				common.send_log(None, sock, my_name, my_name, "migr finished")
 				# [AS11] AP-1의 ES를 종료하라고 알려줘야지?
 				common.udp_send(sock, my_name, other_ap,
 								common.str2(my_name, common.ES_STOP), common.SHORT_SLEEP)
