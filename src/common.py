@@ -5,6 +5,7 @@
 import time, datetime, socket, sys, os
 from Profile import Profile
 import json
+from threading import Thread
 
 
 ENABLE_DEB_MSG = False
@@ -36,10 +37,13 @@ ip = {controller_name : "127.0.0.1",
 		edge_server1_name : "127.0.0.1", 
 		edge_server2_name : "127.0.0.1"}
 """
-LOCAL_PC_IP = "192.168.0.2"
+#LOCAL_PC_IP = "192.168.0.2"
+LOCAL_PC_IP = "192.168.0.5"
 VM1_IP = "192.168.0.116"
-VM2_IP = "192.168.0.101"
-USER_IP = "192.168.0.74"
+#VM2_IP = "192.168.0.101"
+VM2_IP = "192.168.0.117"
+#USER_IP = "192.168.0.74"
+USER_IP = "192.168.0.5"
 ip = {controller_name : LOCAL_PC_IP,
 		logger_name : LOCAL_PC_IP,
 		user_name : USER_IP,
@@ -160,6 +164,25 @@ def send_log(tt, sock, me, you, msg):
 	# udp_send(sock, me, logger_name, log, SHORT_SLEEP)  # 이렇게 하면 무한 루프
 	sock.sendto(log.encode(), (ip[logger_name], port[logger_name]))
 
+def actually_send(sock, me, you, msg):
+	time.sleep(0.100)
+
+	tt = get_now()
+	# 메시지 보내기
+	sock.sendto(msg.encode(), (ip[you], port[you]))
+	# 로그에 기록하기
+	send_log(tt, sock, me, you, msg + delim + "(sent)")
+
+	# 화면에 출력
+	if (ENABLE_DEB_MSG == True) and (me == edge_server1_name or me == edge_server2_name):
+		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))
+
+def udp_send(sock, me, you, msg, t):
+	time.sleep(t)
+	thr = Thread(target=actually_send, args=(sock, me, you, msg))
+	thr.start()
+
+"""
 def udp_send(sock, me, you, msg, t):
 	#time.sleep(t)
 	time.sleep(0.100)
@@ -173,11 +196,11 @@ def udp_send(sock, me, you, msg, t):
 	# 화면에 출력
 	if (ENABLE_DEB_MSG == True) and (me == edge_server1_name or me == edge_server2_name):
 		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))
-	
+"""
 
 def udp_recv(sock, me, bufsize, t):
 	time.sleep(t)
-	
+
 	msg, addr = "", ""
 	try:
 		tt = get_now()

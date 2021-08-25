@@ -298,7 +298,7 @@ plt.plot(list(range(len(rtt_list))), rtt_list)
 plt.plot(list(range(len(rtt_list))), avg_rtt)
 plt.title('[Original] RTT : From REQUEST to RESPONSE')
 plt.show()
-
+"""
 # outliers를 제거한 후 그래프 다시 그리기
 # 	0인 값이 있으면 최소한의 숫자로 바꾸기
 for i in range(len(rtt_list)):
@@ -307,7 +307,7 @@ for i in range(len(rtt_list)):
 
 	# 인터벌이 1초인데, 1초가 넘으면 오류 있는것
 	# 보통은 0.5초를 넘지 않더라. 0.5초를 기준으로 하자
-	if rtt_list[i] >= 0.5:  
+	if rtt_list[i] >= 1.0:  
 		#rtt_list[i] = (rtt_list[i-1] + rtt_list[i+1])/2
 		#rtt_list[i] = 0.5
 		rtt_list[i] = rnd.uniform(0.1,0.5)
@@ -319,12 +319,14 @@ for i in range(len(rtt_list)):
 	else:
 		avg_rtt[i] = rtt_list[i]
 
+
 plt.plot(list(range(len(rtt_list))), rtt_list, 'b-o')
 plt.plot(list(range(len(rtt_list))), avg_rtt, 'r-.')
 plt.xlim(0, 200)
 plt.ylim(0.0, 1.0)
 plt.title('[Revised] RTT: From REQUEST to RESPONSE')
 plt.show()
+"""
 
 print('서비스 응답 시간 (평균): ')
 print( sum(svc_rtt.values()) / len(svc_rtt) )
