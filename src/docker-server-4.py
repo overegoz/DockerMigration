@@ -175,6 +175,7 @@ def hostcheck(shared_dict):
 					print('notified: ', shared_dict['notified'])
 
 				# Log-Replay 경우 : AP1은 '스레드'를 사용해서 지정된 작업 수행
+				print('run action profile with parallelism')
 				common.action_profile(shared_dict['sock'], shared_dict['my_name'], profile)
 
 				# (action_profile 리턴을 기다리지 않고) AP에게 READY 메시지 보내기
@@ -196,6 +197,7 @@ process_jobs.append(p)
 p.start()
 
 while(True): 
+	print(os.environ.get('ENV_MIGR_TYPE'))
 	"""
 	Edge서버는 두 가지 통신만 한다.
 	1. [recv] AP를 통해서 받은 USER의 REQ 
