@@ -176,7 +176,7 @@ def hostcheck(msg):
 
 # -------------------------------------------------------------------
 # host를 확인하는 것을 스레드로 구성
-thr_hostcheck = Thread(target=hostcheck, args=('hello'))
+thr_hostcheck = Thread(target=hostcheck, args=('hello',))
 thr_hostcheck.start()
 
 while(True): 
