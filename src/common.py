@@ -177,6 +177,10 @@ def actually_send(sock, me, you, msg):
 	if (ENABLE_DEB_MSG == True) and (me == edge_server1_name or me == edge_server2_name):
 		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))
 
+"""
+send에서 병목이 생겨서 가끔은 딜레이가 너무 큰 상황이 생기는 것 같아서
+send를 스레드로 구현함
+"""
 def udp_send(sock, me, you, msg, t):
 	time.sleep(t)
 	thr = Thread(target=actually_send, args=(sock, me, you, msg))
@@ -198,6 +202,9 @@ def udp_send(sock, me, you, msg, t):
 		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))
 """
 
+"""
+recv는 리턴값이 있기 때문에 스레드로 구현하기 어려움
+"""
 def udp_recv(sock, me, bufsize, t):
 	time.sleep(t)
 

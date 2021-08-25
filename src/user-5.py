@@ -41,6 +41,7 @@ def handler(signum, frame):  # CTRL+C 시그널 핸들러 만들기
 # 코드마다 마무리 작업이 달라서, common 파일로 옮기지 못함
 	print(common.sigint_msg)
 	# ap에게 알려주기
+	# udp_send를 스레드로 만들고 나서는 오류 발생
 	common.udp_send(sock, my_name, curr_ap,
 					common.str2(my_name, common.USER_EXIT), 
 					common.SHORT_SLEEP)
