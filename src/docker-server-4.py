@@ -195,7 +195,8 @@ shared_dict['thr_action'] = thr_action
 shared_dict['sock'] = sock
 
 p = multiprocessing.Process(target=hostcheck, args=(shared_dict,))
-
+process_jobs.append(p)
+p.start()
 
 while(True): 
 	"""
