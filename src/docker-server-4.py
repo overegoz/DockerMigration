@@ -79,7 +79,6 @@ if common.ENABLE_DEB_MSG:
 # -------------------------------------------------------------------
 # 스레드 변수 
 thr_action = None
-thr_hostcheck = None
 # -------------------------------------------------------------------
 # 병렬처리
 process_jobs = []
@@ -90,9 +89,6 @@ def handler(signum, frame):
 	sock.close()
 if thr_action is not None:
 	thr_action.join()
-
-if thr_hostcheck is not None:
-	thr_hostcheck.join()
 
 for proc in process_jobs:
 	proc.join()
@@ -189,10 +185,8 @@ def hostcheck(shared_dict):
 								shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)	
 
 # -------------------------------------------------------------------
-# host를 확인하는 것을 스레드로 구성
-#thr_hostcheck = Thread(target=hostcheck, args=('hello',))
-#thr_hostcheck.start()
-manager = multiprocessing.Manager()
+# host를 확인하는 것을 멀티-프로세스로 구성
+manager = multiprocessing.Manager()  # 공유 변수를 위한 매니저
 shared_dict = manager.dict()
 shared_dict['notified'] = notified
 shared_dict['my_ap_name'] = my_ap_name
