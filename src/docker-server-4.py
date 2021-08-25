@@ -132,6 +132,8 @@ yes_recv_cnt = 0  # recv 성공적으로 받은 경우 카운트
 # -------------------------------------------------------------------
 # host를 확인하는 것을 스레드로 구성
 # 이것 때문에 ES-1에서의 딜레이가 불안정적이 되는 것 같아서...
+shared_dict['run_action_profile'] = 0
+
 def hostcheck(shared_dict):
 	#global notified, my_ap_name, my_name, thr_action
 	# 지금 어떤 AP에있는 ES인지를 매번 확인
@@ -156,14 +158,7 @@ def hostcheck(shared_dict):
 					print('notified: ', shared_dict['notified'])
 
 				# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
-				common.action_profile(shared_dict['sock'], shared_dict['my_name'], profile)
-
-				# 'Log-Replay 작업이 완료되면' READY 메시지를 AP2에게 보내주기
-				send_msg = common.str2(shared_dict['my_name'], common.ES_READY)
-				if common.ENABLE_DEB_MSG:
-					print('{} -> {} : {}'.format(shared_dict['my_name'], shared_dict['my_ap_name'], send_msg))
-				common.udp_send(shared_dict['sock'], shared_dict['my_name'], shared_dict['my_ap_name'], 
-								send_msg, common.SHORT_SLEEP)
+				shared_dict['run_action_profile'] = 1
 				
 		except socket.gaierror:  # socket.gethostbyname 함수가 던지는 예외(getaddrinfo failed)
 			# ------------------------------------------------------
@@ -195,6 +190,7 @@ def hostcheck(shared_dict):
 
 # -------------------------------------------------------------------
 # host를 확인하는 것을 멀티-프로세스로 구성
+
 p = multiprocessing.Process(target=hostcheck, args=(shared_dict,))
 process_jobs.append(p)
 p.start()
@@ -208,6 +204,22 @@ while(True):
 	2. [send] USER의 REQ에 대한 응답을 AP로 보내는 것
 		: EdgeServer<서버번호> SVCR <같은 숫자>
 	"""
+
+	# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
+	if shared_dict['my_name'] == common.edge_server2_name:
+		if shared_dict['run_action_profile'] == 1:
+			shared_dict['run_action_profile'] = 0
+			print('run action profile without parallelism')
+			common.action_profile(shared_dict['sock'], shared_dict['my_name'], profile)
+
+			# 'Log-Replay 작업이 완료되면' READY 메시지를 AP2에게 보내주기
+			send_msg = common.str2(shared_dict['my_name'], common.ES_READY)
+			if common.ENABLE_DEB_MSG:
+				print('{} -> {} : {}'.format(shared_dict['my_name'], shared_dict['my_ap_name'], send_msg))
+
+			common.udp_send(shared_dict['sock'], shared_dict['my_name'], shared_dict['my_ap_name'], 
+							send_msg, common.SHORT_SLEEP)
+
 
 	# 직접 연결된 AP로 부터 데이터 수신하기
 	recv_msg, _ = common.udp_recv(shared_dict['sock'], shared_dict['my_name'], common.bufsiz, common.SHORT_SLEEP) 
