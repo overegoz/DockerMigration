@@ -293,12 +293,11 @@ rtt_list = []
 for i in range(user_max_req):
 	rtt_list.append(svc_rtt[i])
 
-"""
+
 plt.plot(list(range(len(rtt_list))), rtt_list)
 plt.plot(list(range(len(rtt_list))), avg_rtt)
 plt.title('[Original] RTT : From REQUEST to RESPONSE')
 plt.show()
-"""
 
 # outliers를 제거한 후 그래프 다시 그리기
 # 	0인 값이 있으면 최소한의 숫자로 바꾸기
