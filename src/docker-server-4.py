@@ -40,12 +40,17 @@ if len(err_msg) > 0:
 	sock.close()
 	exit()  # 즉시 종료
 # -------------------------------------------------------------------
-my_name = sys.argv[1]
-my_ap_name = ""
-if my_name == common.edge_server1_name:
-	my_ap_name = common.ap1_name
-elif my_name == common.edge_server2_name:
-	my_ap_name = common.ap2_name
+manager = multiprocessing.Manager()  # 공유 변수를 위한 매니저
+shared_dict = manager.dict()
+# -------------------------------------------------------------------
+shared_dict['my_name'] = sys.argv[1]
+#my_name = sys.argv[1]
+shared_dict['my_ap_name'] = ""
+#my_ap_name = ""
+if shared_dict['my_name'] == common.edge_server1_name:
+	shared_dict['my_ap_name'] = common.ap1_name
+elif shared_dict['my_name'] == common.edge_server2_name:
+	shared_dict['my_ap_name'] = common.ap2_name
 else:
 	assert False
 # -------------------------------------------------------------------
@@ -53,7 +58,7 @@ else:
 #my_ap_name = socket.gethostname()
 # -------------------------------------------------------------------
 if common.ENABLE_DEB_MSG:
-	print('{} started at {}!'.format(my_name, my_ap_name))
+	print('{} started at {}!'.format(shared_dict['my_name'], shared_dict['my_ap_name']))
 # -------------------------------------------------------------------
 profile = int(sys.argv[2])
 # -------------------------------------------------------------------
@@ -64,21 +69,22 @@ profile = int(sys.argv[2])
 """
 # listen 소켓 생성
 if( profile == -1 ):  # 도커 없이 실행하는, 테스트용 run
-	localIP = common.ip[my_name]
+	localIP = common.ip[shared_dict['my_name']]
 else:
-	localIP = common.ip_fake[my_name]
+	localIP = common.ip_fake[shared_dict['my_name']]
 
-localPort = common.port[my_name]
+localPort = common.port[shared_dict['my_name']]
 #print("EdgeServer: ", localIP, ", ", localPort)
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
-sock.bind((localIP, localPort)) 
-sock.setblocking(0)  # non-blocking socket으로 만들기
+shared_dict['sock'] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+#sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+shared_dict['sock'].bind((localIP, localPort)) 
+shared_dict['sock'].setblocking(0)  # non-blocking socket으로 만들기
 
 if common.ENABLE_DEB_MSG:
 	print('socket setup complete!')
 # -------------------------------------------------------------------
 # 스레드 변수 
-thr_action = None
+
 # -------------------------------------------------------------------
 # 병렬처리
 process_jobs = []
@@ -86,9 +92,9 @@ process_jobs = []
 # SIGINT 시그널 핸들러 등록... 이게 진짜 실행이 되나..?
 def handler(signum, frame):
 	print(common.sigint_msg)
-	sock.close()
-if thr_action is not None:
-	thr_action.join()
+	shared_dict['sock'].close()
+if shared_dict['thr_action'] is not None:
+	shared_dict['thr_action'].join()
 
 for proc in process_jobs:
 	proc.join()
@@ -99,7 +105,7 @@ for proc in process_jobs:
 signal.signal(signal.SIGTERM, handler)  # container stop 하면 SIGTERM -> SIGKILL 전달된다
 # -------------------------------------------------------------------
 # 실행 되었다는 것을 Logger에 알리기
-common.send_log(None, sock, my_name, my_name, 
+common.send_log(None, shared_dict['sock'], shared_dict['my_name'], shared_dict['my_name'], 
 				common.str2(common.start_msg, str(sys.argv)))
 # -------------------------------------------------------------------
 # 프로파일에 따라서 사전 작업을 수행함
@@ -112,9 +118,9 @@ profile = int(sys.argv[2])
 # +10 : ES1이 AP1에게 알림
 # +100 : ES2가 AP2에게 알림
 # 즉, 110이면 (ES1 -> ) AP1, (ES2 -> )AP2에게 알림
-notified = 0
+shared_dict['notified'] = 0
 if common.ENABLE_DEB_MSG:
-	print('{} is ready to serve!'.format(my_name))
+	print('{} is ready to serve!'.format(shared_dict['my_name']))
 # -------------------------------------------------------------------
 #print('host name : ', socket.gethostname())
 # -------------------------------------------------------------------
@@ -173,9 +179,7 @@ def hostcheck(shared_dict):
 					print('notified: ', shared_dict['notified'])
 
 				# Log-Replay 경우 : AP1은 '스레드'를 사용해서 지정된 작업 수행
-				shared_dict['thr_action'] = Thread(target=common.action_profile, 
-													args=(shared_dict['sock'], shared_dict['my_name'], profile))
-				shared_dict['thr_action'].start()
+				common.action_profile(shared_dict['sock'], shared_dict['my_name'], profile)
 
 				# (action_profile 리턴을 기다리지 않고) AP에게 READY 메시지 보내기
 				send_msg = common.str2(shared_dict['my_name'], common.ES_READY)
@@ -185,17 +189,12 @@ def hostcheck(shared_dict):
 								shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)	
 		except:
 			print('알려지지 않은 예외?')
-			
+
 
 # -------------------------------------------------------------------
 # host를 확인하는 것을 멀티-프로세스로 구성
-manager = multiprocessing.Manager()  # 공유 변수를 위한 매니저
-shared_dict = manager.dict()
-shared_dict['notified'] = notified
-shared_dict['my_ap_name'] = my_ap_name
-shared_dict['my_name'] = my_name
-shared_dict['thr_action'] = thr_action
-shared_dict['sock'] = sock
+shared_dict['thr_action'] = None
+
 
 p = multiprocessing.Process(target=hostcheck, args=(shared_dict,))
 process_jobs.append(p)
@@ -212,7 +211,7 @@ while(True):
 	"""
 
 	# 직접 연결된 AP로 부터 데이터 수신하기
-	recv_msg, _ = common.udp_recv(sock, shared_dict['my_name'], common.bufsiz, common.SHORT_SLEEP) 
+	recv_msg, _ = common.udp_recv(shared_dict['sock'], shared_dict['my_name'], common.bufsiz, common.SHORT_SLEEP) 
 
 	if len(recv_msg) > 0:
 		yes_recv_cnt += 1
@@ -231,13 +230,13 @@ while(True):
 
 		# [ER1][ER2] 서비스 요청 메시지가 맞는지 확인
 		if words[1] != common.SVC_REQ:
-			common.send_log(None, sock, shared_dict['my_name'], shared_dict['my_name'], \
+			common.send_log(None, shared_dict['sock'], shared_dict['my_name'], shared_dict['my_name'], \
 							common.str2("invalid-command-received", recv_msg))
 			assert False
 
 		# 수신 메시지가 형식에 맞는지 확인하기
 		if len(words) != 3:
-			common.send_log(None, sock, shared_dict['my_name'], shared_dict['my_name'], 
+			common.send_log(None, shared_dict['sock'], shared_dict['my_name'], shared_dict['my_name'], 
 							common.str2("wrong-msg-format", recv_msg))
 			assert False
 
@@ -245,7 +244,7 @@ while(True):
 		counter = words[2]
 		send_msg = common.str3(shared_dict['my_name'], common.SVC_RES, counter)
 		# [ES1][ES2] 직접 연결된 AP에게 메시지 전송
-		common.udp_send(sock, shared_dict['my_name'], shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)
+		common.udp_send(shared_dict['sock'], shared_dict['my_name'], shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)
 	else:
 		no_recv_cnt += 1
 
