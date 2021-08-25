@@ -195,9 +195,6 @@ def hostcheck(shared_dict):
 
 # -------------------------------------------------------------------
 # host를 확인하는 것을 멀티-프로세스로 구성
-
-
-
 p = multiprocessing.Process(target=hostcheck, args=(shared_dict,))
 process_jobs.append(p)
 p.start()
@@ -246,7 +243,8 @@ while(True):
 		counter = words[2]
 		send_msg = common.str3(shared_dict['my_name'], common.SVC_RES, counter)
 		# [ES1][ES2] 직접 연결된 AP에게 메시지 전송
-		common.udp_send(shared_dict['sock'], shared_dict['my_name'], shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)
+		common.udp_send(shared_dict['sock'], shared_dict['my_name'], 
+						shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)
 	else:
 		no_recv_cnt += 1
 

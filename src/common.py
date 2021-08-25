@@ -8,7 +8,7 @@ import json
 from threading import Thread
 
 
-ENABLE_DEB_MSG = True
+ENABLE_DEB_MSG = False
 # -------------------------------------------------------------------
 # 총 4대의 VM을 사용하자
 # 1. controller + logger
@@ -39,9 +39,9 @@ ip = {controller_name : "127.0.0.1",
 """
 #LOCAL_PC_IP = "192.168.0.2"
 LOCAL_PC_IP = "192.168.0.5"
-VM1_IP = "192.168.0.116"
+VM1_IP = "192.168.0.117"
 #VM2_IP = "192.168.0.101"
-VM2_IP = "192.168.0.117"
+VM2_IP = "192.168.0.116"
 #USER_IP = "192.168.0.74"
 USER_IP = "192.168.0.5"
 ip = {controller_name : LOCAL_PC_IP,
