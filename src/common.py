@@ -167,7 +167,8 @@ def udp_send(sock, me, you, msg, t):
 	# 로그에 기록하기
 	send_log(tt, sock, me, you, msg + delim + "(sent)")
 
-	time.sleep(t)
+	#time.sleep(t)
+	time.sleep(0.100)
 
 	# 화면에 출력
 	if (ENABLE_DEB_MSG == True) and (me == edge_server1_name or me == edge_server2_name):
