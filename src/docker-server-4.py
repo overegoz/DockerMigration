@@ -120,59 +120,64 @@ if common.ENABLE_DEB_MSG:
 no_recv_cnt = 0  # recv 못한 경우 카운트
 yes_recv_cnt = 0  # recv 성공적으로 받은 경우 카운트
 
+# -------------------------------------------------------------------
+# host를 확인하는 것을 스레드로 구성
+# 이것 때문에 ES-1에서의 딜레이가 불안정적이 되는 것 같아서...
 def hostcheck(msg):
 	global notified, my_ap_name, my_name, thr_action
 	# 지금 어떤 AP에있는 ES인지를 매번 확인
 	# - 지금은 --add-host 명령으로 /etc/hosts 파일의 내용을 기반으로 판단
 	# - 환경변수를 사용해서 판단하려고 했는데, ES1에서 정의한 env 이름이 ES2에서
 	#   업데이트 되지 않아서, 그냥 기존의 add-hosts 방법을 사용하기로 함
-	try:
-		# ap2_hostname은 migr 후 ES2번을 실행할 때만 정의된다
-		_ = socket.gethostbyname(common.ap2_hostname)
-		# ------------------------------------------------------
-		# 오류가 없다면, 여기는 AP-2
-		# ------------------------------------------------------
-		#print('gethostbyname : success')
-		my_ap_name = common.ap2_name  # AP 이름 바꿔주고,
-		my_name = common.edge_server2_name  # 내 이름 (ES)도 바꿔주자
-		# 최초로 한번은 READY 메시지를 보내주자
-		if notified == 0 or notified == 10:
-			notified += 100
-			if common.ENABLE_DEB_MSG:
-				print('notified: ', notified)
+	while True:
+		time.sleep(0.010)
+		try:
+			# ap2_hostname은 migr 후 ES2번을 실행할 때만 정의된다
+			_ = socket.gethostbyname(common.ap2_hostname)
+			# ------------------------------------------------------
+			# 오류가 없다면, 여기는 AP-2
+			# ------------------------------------------------------
+			#print('gethostbyname : success')
+			my_ap_name = common.ap2_name  # AP 이름 바꿔주고,
+			my_name = common.edge_server2_name  # 내 이름 (ES)도 바꿔주자
+			# 최초로 한번은 READY 메시지를 보내주자
+			if notified == 0 or notified == 10:
+				notified += 100
+				if common.ENABLE_DEB_MSG:
+					print('notified: ', notified)
 
-			# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
-			common.action_profile(sock, my_name, profile)
+				# Log-Replay 경우 : AP2는 '스레드 없이' 지정된 작업 수행
+				common.action_profile(sock, my_name, profile)
 
-			# 'Log-Replay 작업이 완료되면' READY 메시지를 AP2에게 보내주기
-			send_msg = common.str2(my_name, common.ES_READY)
-			if common.ENABLE_DEB_MSG:
-				print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
-			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
-			
-	except socket.gaierror:  # socket.gethostbyname 함수가 던지는 예외(getaddrinfo failed)
-		# ------------------------------------------------------
-		# 오류가 있다면, 여기는 AP-1
-		# ------------------------------------------------------
-		#print('gethostbyname : failed')
-		my_ap_name = common.ap1_name
-		my_name = common.edge_server1_name
-		# 최초로 한번은 READY 메시지를 보내주자
-		#assert notified == 0 or notified == 10
-		if notified == 0:
-			notified += 10
-			if common.ENABLE_DEB_MSG:
-				print('notified: ', notified)
+				# 'Log-Replay 작업이 완료되면' READY 메시지를 AP2에게 보내주기
+				send_msg = common.str2(my_name, common.ES_READY)
+				if common.ENABLE_DEB_MSG:
+					print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
+				common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)
+				
+		except socket.gaierror:  # socket.gethostbyname 함수가 던지는 예외(getaddrinfo failed)
+			# ------------------------------------------------------
+			# 오류가 있다면, 여기는 AP-1
+			# ------------------------------------------------------
+			#print('gethostbyname : failed')
+			my_ap_name = common.ap1_name
+			my_name = common.edge_server1_name
+			# 최초로 한번은 READY 메시지를 보내주자
+			#assert notified == 0 or notified == 10
+			if notified == 0:
+				notified += 10
+				if common.ENABLE_DEB_MSG:
+					print('notified: ', notified)
 
-			# Log-Replay 경우 : AP1은 '스레드'를 사용해서 지정된 작업 수행
-			thr_action = Thread(target=common.action_profile, args=(sock, my_name, profile))
-			thr_action.start()
+				# Log-Replay 경우 : AP1은 '스레드'를 사용해서 지정된 작업 수행
+				thr_action = Thread(target=common.action_profile, args=(sock, my_name, profile))
+				thr_action.start()
 
-			# (action_profile 리턴을 기다리지 않고) AP에게 READY 메시지 보내기
-			send_msg = common.str2(my_name, common.ES_READY)
-			if common.ENABLE_DEB_MSG:
-				print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
-			common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)	
+				# (action_profile 리턴을 기다리지 않고) AP에게 READY 메시지 보내기
+				send_msg = common.str2(my_name, common.ES_READY)
+				if common.ENABLE_DEB_MSG:
+					print('{} -> {} : {}'.format(my_name, my_ap_name, send_msg))
+				common.udp_send(sock, my_name, my_ap_name, send_msg, common.SHORT_SLEEP)	
 
 # -------------------------------------------------------------------
 # host를 확인하는 것을 스레드로 구성
