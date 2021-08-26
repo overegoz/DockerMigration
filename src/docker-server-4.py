@@ -197,7 +197,7 @@ process_jobs.append(p)
 p.start()
 
 while(True): 
-	print(os.environ.get(common.ENV_MIGR_TYPE))
+	# print(os.environ.get(common.ENV_MIGR_TYPE))  # 이건 절대 안되는구만...
 	"""
 	Edge서버는 두 가지 통신만 한다.
 	1. [recv] AP를 통해서 받은 USER의 REQ 

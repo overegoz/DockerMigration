@@ -57,7 +57,14 @@ To implement THREE different docker migration methods.
 
 # Issues
 - 컨테이너를 마이그레이션 한 후 체크포인트로 재시작 할 때, ES-2에서 환경변수를 사용하는데 문제가 있음
-	- ES-2에서 Python으로 환경변수를 조회하는 것 조차 오류가 발생함(try-except로도 안잡힘)
+	- --add-host 로 해결하기
+- 파이썬 스레드는 제대로된(?) 병렬처리를 하지 못하는 것 같음
+	- 병렬처리가 반드시 필요한 작업은 multiprocessing으로 다시 코딩하기
+- (알수없는 이유로...) 일부 가상머신에서 딜레이가 불안정한 경향이 있음
+	- 사전 실험을 하고, 딜레이 변화를 미리 확인하기
+	- 불안정한 가상머신은 없애고, 안정적인 가상머신을 복제해서 사용
+- Logging 시점을 코드에서 잘못 잡으면 이벤트 로그의 시간이 늦게 기록됨
+	- 로깅 시점을 다시한번 확인하고, 정확한 지점에서 로깅을 수행하기
 
 # Notes
 Code is partially from my collaborators (School of SW, Hallym Univ., South Korea)
