@@ -202,7 +202,8 @@ def hostcheck(shared_dict, udp_send_threads):
 
 				thrr = common.udp_send(shared_dict['sock'], shared_dict['my_name'], 
 										shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)	
-				udp_send_threads.append(thrr)
+				#udp_send_threads.append(thrr)
+				thrr.join()
 		except:
 			print('알려지지 않은 예외?')
 
