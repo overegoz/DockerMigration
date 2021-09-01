@@ -16,11 +16,11 @@ class Profile:
 			2:FLOAT_ANY,
 			3:FLOAT_ANY,
 			4:FLOAT_ANY,
-			111:FLOAT_ANY,
-			112:FLOAT_ANY,
-			1111:FLOAT_ANY,
-			1112:FLOAT_ANY,
-			1113:FLOAT_ANY}
+			111:  FLOAT_ANY,
+			112:  FLOAT_ANY,
+			1111: FLOAT_ANY,
+			1112: FLOAT_ANY,
+			1113: FLOAT_ANY}
 	# -------------------------------------------------------------------
 	# diff 파일 전체 크기 (bit)
 	l_diff_bit = {1:FLOAT_ANY,
@@ -30,19 +30,19 @@ class Profile:
 				111: 40 * 1000 * 8,
 				112: 40 * 1000 * 8,
 				1111: 40 * 1000 * 8,
-				1112: FLOAT_ANY,
-				1113: FLOAT_ANY}
+				1112: 40 * 1000 * 8,
+				1113: 40 * 1000 * 8}  # 파일 크기 제대로 설정하기
 	# -------------------------------------------------------------------
 	# checkpoint 파일 전체 크기  (bit)
 	l_check_bit = {1:FLOAT_ANY,
 					2:FLOAT_ANY,
 					3:FLOAT_ANY,
 					4:FLOAT_ANY,
-					111:20 * 1000 * 8,
-					112:20 * 1000 * 8,
-					1111:20 * 1000 * 8,
-					1112:FLOAT_ANY,
-					1113:FLOAT_ANY}
+					111:  20 * 1000 * 8,
+					112:  20 * 1000 * 8,
+					1111: 20 * 1000 * 8,
+					1112: 20 * 1000 * 8,
+					1113: 20 * 1000 * 8}  # 체크 포인트 만들어서 크기 확인하고 입력하기
 	# -------------------------------------------------------------------
 	# log 파일 크기  (bit)
 	l_log_bit = {1:FLOAT_ANY,
@@ -52,8 +52,8 @@ class Profile:
 				111:  1 * 1000 * 8,
 				112:  1 * 1000 * 8,
 				1111: 1 * 1000 * 8,
-				1112: FLOAT_ANY,
-				1113: FLOAT_ANY} # 어차피 log 파일은 크기가 작으니까 1이라고 하자
+				1112: 1 * 1000 * 8,
+				1113: 1 * 1000 * 8} # 어차피 log 파일은 크기가 작으니까 1이라고 하자
 	# -------------------------------------------------------------------
 	# log-replay에 걸리는 시간 (second)
 	t_replay_sec = {1:FLOAT_ANY,
@@ -63,8 +63,8 @@ class Profile:
 					111: 5,
 					112: 5,
 					1111: 5,
-					1112: FLOAT_ANY,
-					1113: FLOAT_ANY}
+					1112: 5,
+					1113: 5}  # LR인 경우, 딜레이를 정확히 설정!
 	# -------------------------------------------------------------------
 	# effective throughput (bits/sec)
 	th_bps = {1:FLOAT_ANY,
@@ -74,8 +74,8 @@ class Profile:
 				111:  10 * 1000 * 8,
 				112: 100 * 1000 * 8,
 				1111: 10 * 1000 * 8,
-				1112: FLOAT_ANY,
-				1113: FLOAT_ANY}
+				1112: 10 * 1000 * 8,
+				1113: 10 * 1000 * 8}
 	# -------------------------------------------------------------------
 	# 특정한 migr 기법을 강제하고 싶을때: MIGR_FC,DC,LR,AUTO 
 	predetermined_migr = {1:MIGR_NONE, 
@@ -95,9 +95,9 @@ class Profile:
 					4:  'twoon/profile4:es1',
 					111:'twoon/profile111:es1',
 					112:'twoon/profile112:es1',
-					1111:'twoon/profile1111:es1',
-					1112:'twoon/profile1112:es1',
-					1113:'twoon/profile1113:es1'}
+					1111: 'twoon/profile1111:es1',
+					1112: 'twoon/profile1112:es1',
+					1113: 'twoon/profile1113:es1'}
 	# -------------------------------------------------------------------
 	# 도커 이미지 이름 : migr 목적지(AP-2)에서 실행하는 이미지 이름
 	img_name_ap2 = {1:  'twoon/profile1:es2',
@@ -106,9 +106,9 @@ class Profile:
 					4:  'twoon/profile4:es2',
 					111:'twoon/profile111:es2',
 					112:'twoon/profile112:es2',
-					1111:'twoon/profile1111:es2',
-					1112:'twoon/profile1112:es2',
-					1113:'twoon/profile1113:es2'}
+					1111: 'twoon/profile1111:es2',
+					1112: 'twoon/profile1112:es2',
+					1113: 'twoon/profile1113:es2'}
 	# -------------------------------------------------------------------
 	# 컨테이너 이름 (ES1과 ES2에서 동일한 이름을 사용하게 하자)
 	container_name = {1:'profile1',
@@ -117,9 +117,9 @@ class Profile:
 						4:'profile4',
 						111:'profile111',
 						112:'profile112',
-						1111:'profile1111',
-						1112:'profile1112',
-						1113:'profile1113'}
+						1111: 'profile1111',
+						1112: 'profile1112',
+						1113: 'profile1113'}
 	# -------------------------------------------------------------------
 	# 체크포인트 이름
 	checkpoint_name = {1:'none',
@@ -128,9 +128,9 @@ class Profile:
 						4:'no need ...',
 						111:'profile111checkpoint',
 						112:'profile112checkpoint',
-						1111:'profile1111checkpoint',
-						1112:'profile1112checkpoint',
-						1113:'profile1113checkpoint'}
+						1111: 'profile1111checkpoint',
+						1112: 'profile1112checkpoint',
+						1113: 'profile1113checkpoint'}
 	# 체크포인트 이외에 전송할 파일을 저장할 폴더 이름
 	final_dir_name = {1:'none',
 						2:'profile2',
@@ -138,9 +138,9 @@ class Profile:
 						4:'profile4',
 						111:'profile111',
 						112:'profile112',
-						1111:'profile1111',
-						1112:'profile1112',
-						1113:'profile1113'}
+						1111: 'profile1111',
+						1112: 'profile1112',
+						1113: 'profile1113'}
 	# -------------------------------------------------------------------
 	# user가 몇번의 REQ를 보낸 후 handover 할지 / integer
 	ho_cnt = {1:10,
@@ -149,9 +149,9 @@ class Profile:
 			4:10,
 			111:50,
 			112:50,
-			1111:50,
-			1112:50,
-			1113:50}
+			1111: 50,
+			1112: 50,
+			1113: 50}
 	# -------------------------------------------------------------------
 	# user가 몇초에 한번씩 REQ 보낼 지 / float
 	request_interval_sec = {1:1.0,
@@ -160,9 +160,9 @@ class Profile:
 							4:1.0,
 							111:1.0,
 							112:1.0,
-							1111:1.0,
-							1112:1.0,
-							1113:1.0}
+							1111: 1.0,
+							1112: 1.0,
+							1113: 1.0}
 	# -------------------------------------------------------------------
 	# user가 지정된 갯수의 REQ 보낸 후 더 이상 REQ 보내지 말게 하자
 	# 중간에 CTRL+C로 종료하면 REQ-RES 짝이 안맞는 경우 발생
@@ -172,9 +172,9 @@ class Profile:
 				4:30,
 				111:200,
 				112:200,
-				1111:200,
-				1112:200,
-				1113:200}
+				1111: 200,
+				1112: 200,
+				1113: 200}
 	# -------------------------------------------------------------------
 	def __init__(self):
 		pass

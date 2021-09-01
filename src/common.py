@@ -326,11 +326,14 @@ def action_profile(es_name, profile):
 		# 소켓을 사용하지 말자... 충돌이 나는 것 같다.
 		# send_log(None, sock, es_name, es_name, str2("ReplayTime", str(time_taken_sec)))		
 	else:  # 진짜 실험에 사용하는 부분
+		delay = prof.get_replay_sec(profile)
+		print('{} 초간 sleep 합니다.'.format(delay))
+		time.sleep(delay)
+		
 		sz = prof.get_diff_bit(profile) / (1000.0 * 8.0)
 		cmd = 'truncate -s {}M /tmp/file.file'.format( int(sz) )
 		print('action : ', cmd)
 		os.system(cmd)
-		time.sleep(prof.get_replay_sec(profile))
 	
 	print('Profile action : finished!')
 	
