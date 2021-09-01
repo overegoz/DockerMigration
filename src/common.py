@@ -172,7 +172,10 @@ def actually_send(sock, me, you, msg):
 	# 화면에 출력
 	if (ENABLE_DEB_MSG == True) and (me == edge_server1_name or me == edge_server2_name):
 		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))	
-	#time.sleep(TX_DELAY)
+	
+	if (me == ap1_name and you == ap2_name) \
+		or (me == ap2_name and you == ap1_name):
+		time.sleep(TX_DELAY)
 
 	tt = get_now()  # 시간을 여기서 측정했으니까, 로그를 즉시 안보내도 OK
 	# 메시지 보내기
@@ -180,7 +183,7 @@ def actually_send(sock, me, you, msg):
 	#print('actually_send: ', ip[you])
 	#print('actually_send: ', port[you])
 	sock.sendto(msg.encode(), (ip[you], port[you]))
-	
+
 	# 로그에 기록하기
 	send_log(tt, sock, me, you, msg + delim + "(sent)")
 
@@ -215,8 +218,6 @@ def udp_send(sock, me, you, msg, t):
 recv는 리턴값이 있기 때문에 스레드로 구현하기 어려움
 """
 def udp_recv(sock, me, bufsize, t):
-	time.sleep(t)
-
 	msg, addr = "", ""
 	try:
 		tt = get_now()
@@ -232,6 +233,7 @@ def udp_recv(sock, me, bufsize, t):
 		# non-blocking recv: 빈손으로 리턴할때 예외가 발생하고, 이를 잡아줘야함
 		msg, addr = "", ""
 
+	time.sleep(t)
 	return msg, addr
 
 

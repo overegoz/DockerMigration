@@ -55,7 +55,7 @@ def handler(signum, frame):  # CTRL+C 시그널 핸들러 만들기
 	
 	# 소켓 닫기	
 	sock.close()  
-	
+
 	exit()
 
 signal.signal(signal.SIGINT, handler)  # 시그널 핸들러 등록
@@ -136,7 +136,7 @@ while(True):
 		# 현재 연결된 AP 에게 서비스 요청 메시지 보내기
 		# 마지막에 숫자 카운터 번호를 넣어서 tracking 할 수 있도록...
 		if (last_sent is None) or ((datetime.now() - last_sent).total_seconds() >= req_int):
-			# 마지막으로 REQ 보낸 시점으로 부터, 지정된 시간이 흘렀다면...
+			# 마지막으로 REQ 보낸 시점으로 부터, 지정된 시간(request interval)이 흘렀다면...
 			if counter < common.prof.get_max_req(profile):
 				send_msg = common.str3(my_name, common.SVC_REQ, str(counter))
 				
@@ -154,21 +154,21 @@ while(True):
 		if len(recv_msg) > 0:  
 			if common.ENABLE_DEB_MSG:
 				print('recv msg: ', recv_msg)
-			words = recv_msg.split(common.delim)
 
+			words = recv_msg.split(common.delim)
 			"""
 			- 현재 연결된 AP로 부터 데이터를 수신한 것이 맞는지 확인 => 주석처리
 			- user의 NIC 큐에 버퍼링 된 수신 데이터가 있을경우, 오류가 발생하는 버그있음
 			sender = words[0]
 			assert sender == curr_ap, 'recv msg: {}'.format(recv_msg)
 			"""
-
 			cmd = words[1]
 			if cmd == common.SVC_RES:
 				# 서비스에 대한 응답이면 수신 메시지를 로그로 남겨주기만 하면 됨
 				# udp_recv에서 로그 남기니까, 그냥 pass 하면 됨
 				pass
-			else: assert False
+			else: 
+				assert False
 		else: 
 			#print('recv nothing')
 			pass

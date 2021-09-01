@@ -5,6 +5,17 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import random as rnd
 
+
+def mov_avg(v, window):
+    """이동평균 이용하여 초음파 거리 계산 (배치식)."""
+    avg = []
+    for i in range(len(v)):
+        if i < window-1:
+            avg.append(sum(v[:i+1]) / len(v[:i+1]))
+        else:
+            avg.append(sum(v[i-window+1:i+1]) / window)
+    return avg
+
 # ------------------------------------------------------------
 # 폴더 내의 파일 목록 읽기
 path_dir = './logs'  # 로그 파일이 저장된 폴더
@@ -294,9 +305,10 @@ for i in range(user_max_req):
 	rtt_list.append(svc_rtt[i])
 
 
-plt.plot(list(range(len(rtt_list))), rtt_list)
-plt.plot(list(range(len(rtt_list))), avg_rtt)
-#plt.ylim(0.0, 1.0)
+plt.plot(list(range(len(rtt_list))), rtt_list, 'k')
+plt.plot(list(range(len(rtt_list))), avg_rtt, 'b')
+plt.plot(list(range(len(rtt_list))), mov_avg(rtt_list,10), 'r')
+plt.ylim(0.0, 3.0)
 plt.title('[Original] RTT : From REQUEST to RESPONSE')
 plt.show()
 """

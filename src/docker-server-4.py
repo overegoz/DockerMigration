@@ -282,13 +282,13 @@ if __name__ == "__main__":
 				assert False
 			"""
 
-			# [ER1][ER2] 서비스 요청 메시지가 맞는지 확인
+			# 오류 처리: [ER1][ER2] 서비스 요청 메시지가 맞는지 확인
 			if words[1] != common.SVC_REQ:
 				common.send_log(None, sock, shared_dict['my_name'], shared_dict['my_name'], \
 								common.str2("invalid-command-received", recv_msg))
 				assert False
 
-			# 수신 메시지가 형식에 맞는지 확인하기
+			# 오류 처리: 수신 메시지가 형식에 맞는지 확인하기
 			if len(words) != 3:
 				common.send_log(None, sock, shared_dict['my_name'], shared_dict['my_name'], 
 								common.str2("wrong-msg-format", recv_msg))
