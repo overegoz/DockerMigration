@@ -58,7 +58,6 @@ ip = {controller_name : LOCAL_PC_IP,
 # --network="host" 옵션을 사용해도 0.0.0.0을 사용해야 한다
 ip_fake = {edge_server1_name : "0.0.0.0",
 			edge_server2_name : "0.0.0.0"}
-
 # -------------------------------------------------------------------
 # port number
 AP_PORT = 11003
