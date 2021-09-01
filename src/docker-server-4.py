@@ -94,7 +94,6 @@ shared_dict['thr_action'] = None
 # container stop 하면 SIGTERM -> SIGKILL 전달된다
 def handler(signum, frame):
 	print(common.sigint_msg)
-	shared_dict['sock'].close()
 	if shared_dict['thr_action'] is not None:
 		shared_dict['thr_action'].join()
 
