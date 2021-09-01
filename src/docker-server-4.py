@@ -42,7 +42,6 @@ if len(err_msg) > 0:
 # -------------------------------------------------------------------
 manager = multiprocessing.Manager()  # 공유 변수를 위한 매니저
 shared_dict = manager.dict()
-udp_send_threads = manager.list()
 # -------------------------------------------------------------------
 shared_dict['my_name'] = sys.argv[1]
 #my_name = sys.argv[1]
@@ -85,7 +84,7 @@ if common.ENABLE_DEB_MSG:
 	print('socket setup complete!')
 # -------------------------------------------------------------------
 # 스레드 변수 
-#udp_send_threads = []  # 위에서 manager.list 객체로 선언해서 공유하도록...
+udp_send_threads = []  # 위에서 manager.list 객체로 선언해서 공유하도록...
 # -------------------------------------------------------------------
 # 병렬처리
 process_jobs = []
@@ -101,6 +100,9 @@ def handler(signum, frame):
 
 	for proc in process_jobs:
 		proc.join()
+
+	for th in udp_send_threads:
+		th.join()
 
 	exit()
 
@@ -134,11 +136,10 @@ yes_recv_cnt = 0  # recv 성공적으로 받은 경우 카운트
 # 이것 때문에 ES-1에서의 딜레이가 불안정적이 되는 것 같아서...
 shared_dict['run_action_profile'] = 0
 
-def hostcheck(shared_dict, udp_send_threads):
+def hostcheck(shared_dict):
 	# 이 함수는 별도의 프로세스로 생성되는 것이다.
 	# 시그널 핸들러를 원래 값으로 돌려놓자. 종료 작업은 parent process가 처리함
 	signal.signal(signal.SIGTERM, original_handler)
-	sock = None
 	#global notified, my_ap_name, my_name, thr_action
 	# 지금 어떤 AP에있는 ES인지를 매번 확인
 	# - 지금은 --add-host 명령으로 /etc/hosts 파일의 내용을 기반으로 판단
@@ -188,32 +189,32 @@ def hostcheck(shared_dict, udp_send_threads):
 
 				#print('6')
 
-				# 소켓을 매번 새로 만들자! my_name 변경 가능성도 있으니까, 매번 만드는 걸로
-				localPort = common.TEMP_PORT_DOCKER
-				print(localPort)
-				localIP = common.ip_fake[shared_dict['my_name']]
-				print(localIP)
-				sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
-				sock.bind((localIP, localPort)) 
-				#sock.setblocking(0)  # non-blocking socket으로 만들기
-
 				# AP1은 지정된 작업을 병렬적으로 수행
 				# 여기 코드는 어차피 multiprocessing으로 처리되니까, 그냥 실행하면 됨
 				print('run action profile with parallelism')
-				common.action_profile(sock, shared_dict['my_name'], profile)
+				common.action_profile(shared_dict['my_name'], profile)
 				#print('7')
 				# (action_profile 리턴을 기다리지 않고) AP에게 READY 메시지 보내기
 				# 최초로 한번은 READY 메시지를 보냄
 				#print('8')
+
 				send_msg = common.str2(shared_dict['my_name'], common.ES_READY)
 				if common.ENABLE_DEB_MSG:
 					print('{} -> {} : {}'.format(shared_dict['my_name'], shared_dict['my_ap_name'], send_msg))
 
-				thrr = common.udp_send(sock, shared_dict['my_name'], 
+				# 소켓을 매번 새로 만들자! my_name 변경 가능성도 있으니까, 매번 만드는 걸로
+				localPort = common.TEMP_PORT_DOCKER
+				print('hostcheck: ', localPort)
+				localIP = common.ip_fake[shared_dict['my_name']]
+				print('hostcheck: ', localIP)
+				sock_fork = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+				sock_fork.bind((localIP, localPort)) 
+				#sock.setblocking(0)  # non-blocking socket으로 만들기
+
+				thrr = common.udp_send(sock_fork, shared_dict['my_name'], 
 										shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)	
-				#udp_send_threads.append(thrr)
 				thrr.join()
-				sock.close()
+				sock_fork.close()
 		except:
 			print('알려지지 않은 예외?')
 
@@ -222,7 +223,7 @@ def hostcheck(shared_dict, udp_send_threads):
 # -------------------------------------------------------------------
 # host를 확인하는 것을 멀티-프로세스로 구성
 # 이것 때문에, 반복적으로 인터럽트 걸려서 수행 시간에 지장을 줄 수 있으니까...
-p = multiprocessing.Process(target=hostcheck, args=(shared_dict,udp_send_threads))
+p = multiprocessing.Process(target=hostcheck, args=(shared_dict,))
 process_jobs.append(p)
 p.start()
 
@@ -249,7 +250,7 @@ if __name__ == "__main__":
 				
 				if migr_type == common.MIGR_LR:  # LR 일때만...
 					print('병렬처리 없이 action profile 코드를 실행합니다.')
-					common.action_profile(sock, shared_dict['my_name'], profile)
+					common.action_profile(shared_dict['my_name'], profile)
 				else:
 					print('action profile 실행하지 않습니다')
 
@@ -303,6 +304,6 @@ if __name__ == "__main__":
 		else:
 			no_recv_cnt += 1
 
-		if 	((no_recv_cnt + yes_recv_cnt) % 100) == 0: 
+		if 	((no_recv_cnt + yes_recv_cnt) % 1000) == 0: 
 			if common.ENABLE_DEB_MSG:
 				print('recv : {}, no recv : {} on {} machine'.format(yes_recv_cnt, no_recv_cnt, shared_dict['my_ap_name']))

@@ -244,7 +244,7 @@ def udp_recv(sock, me, bufsize, t):
 	환경 변수는 어떻게 해도 동작하지 않네...
 	try-except도 동작 안함
 """	 
-def action_profile(sock, es_name, profile):
+def action_profile(es_name, profile):
 	print('Profile action begins!')
 
 	"""
