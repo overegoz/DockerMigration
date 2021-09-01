@@ -43,7 +43,7 @@ VM1_IP = "192.168.0.105"
 #VM2_IP = "192.168.0.101"
 VM2_IP = "192.168.0.101"
 #USER_IP = "192.168.0.74"
-USER_IP = "192.168.0.74"
+USER_IP = "192.168.0.2"
 ip = {controller_name : LOCAL_PC_IP,
 		logger_name : LOCAL_PC_IP,
 		user_name : USER_IP,
