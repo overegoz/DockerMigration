@@ -77,10 +77,9 @@ else:
 
 localPort = common.port[shared_dict['my_name']]
 #print("EdgeServer: ", localIP, ", ", localPort)
-shared_dict['sock'] = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
-#sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
-shared_dict['sock'].bind((localIP, localPort)) 
-shared_dict['sock'].setblocking(0)  # non-blocking socket으로 만들기
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+sock.bind((localIP, localPort)) 
+sock.setblocking(0)  # non-blocking socket으로 만들기
 
 if common.ENABLE_DEB_MSG:
 	print('socket setup complete!')
@@ -110,7 +109,7 @@ def handler(signum, frame):
 original_handler = signal.signal(signal.SIGTERM, handler)  # container stop 하면 SIGTERM -> SIGKILL 전달된다
 # -------------------------------------------------------------------
 # 실행 되었다는 것을 Logger에 알리기
-common.send_log(None, shared_dict['sock'], shared_dict['my_name'], shared_dict['my_name'], 
+common.send_log(None, sock, shared_dict['my_name'], shared_dict['my_name'], 
 				common.str2(common.start_msg, str(sys.argv)))
 # -------------------------------------------------------------------
 # 서비스를 할 준비가 되었음을 AP에게 알림
@@ -146,7 +145,7 @@ def hostcheck(shared_dict, udp_send_threads):
 	# - 환경변수를 사용해서 판단하려고 했는데, ES1에서 정의한 env 이름이 ES2에서
 	#   업데이트 되지 않아서, 그냥 기존의 add-hosts 방법을 사용하기로 함
 	while True:
-		time.sleep(0.010)  # CPU 과도한 사용을 막기위함
+		time.sleep(0.100)  # CPU 과도한 사용을 막기위함
 		try:
 			print('1')
 			# ap2_hostname은 migr 후 ES2번을 실행할 때만 정의된다
@@ -188,10 +187,18 @@ def hostcheck(shared_dict, udp_send_threads):
 					print('notified: ', shared_dict['notified'])
 
 				print('6')
+
+				# 소켓을 매번 새로 만들자! my_name 변경 가능성도 있으니까, 매번 만드는 걸로
+				localPort = common.TEMP_PORT_DOCKER
+				localIP = common.ip[shared_dict['my_name']]
+				sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+				sock.bind((localIP, localPort)) 
+				sock.setblocking(0)  # non-blocking socket으로 만들기
+
 				# AP1은 지정된 작업을 병렬적으로 수행
 				# 여기 코드는 어차피 multiprocessing으로 처리되니까, 그냥 실행하면 됨
 				print('run action profile with parallelism')
-				common.action_profile(shared_dict['sock'], shared_dict['my_name'], profile)
+				common.action_profile(sock, shared_dict['my_name'], profile)
 				print('7')
 				# (action_profile 리턴을 기다리지 않고) AP에게 READY 메시지 보내기
 				# 최초로 한번은 READY 메시지를 보냄
@@ -200,10 +207,11 @@ def hostcheck(shared_dict, udp_send_threads):
 				if common.ENABLE_DEB_MSG:
 					print('{} -> {} : {}'.format(shared_dict['my_name'], shared_dict['my_ap_name'], send_msg))
 
-				thrr = common.udp_send(shared_dict['sock'], shared_dict['my_name'], 
+				thrr = common.udp_send(sock, shared_dict['my_name'], 
 										shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)	
 				#udp_send_threads.append(thrr)
 				thrr.join()
+				sock.close()
 		except:
 			print('알려지지 않은 예외?')
 
@@ -239,7 +247,7 @@ if __name__ == "__main__":
 				
 				if migr_type == common.MIGR_LR:  # LR 일때만...
 					print('병렬처리 없이 action profile 코드를 실행합니다.')
-					common.action_profile(shared_dict['sock'], shared_dict['my_name'], profile)
+					common.action_profile(sock, shared_dict['my_name'], profile)
 				else:
 					print('action profile 실행하지 않습니다')
 
@@ -248,13 +256,13 @@ if __name__ == "__main__":
 				if common.ENABLE_DEB_MSG:
 					print('{} -> {} : {}'.format(shared_dict['my_name'], shared_dict['my_ap_name'], send_msg))
 
-				thrr = common.udp_send(shared_dict['sock'], shared_dict['my_name'], 
+				thrr = common.udp_send(sock, shared_dict['my_name'], 
 										shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)
 				udp_send_threads.append(thrr)
 
 		# ........................................................................
 		# 직접 연결된 AP로 부터 데이터 수신하기
-		recv_msg, _ = common.udp_recv(shared_dict['sock'], shared_dict['my_name'], common.bufsiz, common.SHORT_SLEEP) 
+		recv_msg, _ = common.udp_recv(sock, shared_dict['my_name'], common.bufsiz, common.SHORT_SLEEP) 
 
 		if len(recv_msg) > 0:
 			yes_recv_cnt += 1
@@ -273,13 +281,13 @@ if __name__ == "__main__":
 
 			# [ER1][ER2] 서비스 요청 메시지가 맞는지 확인
 			if words[1] != common.SVC_REQ:
-				common.send_log(None, shared_dict['sock'], shared_dict['my_name'], shared_dict['my_name'], \
+				common.send_log(None, sock, shared_dict['my_name'], shared_dict['my_name'], \
 								common.str2("invalid-command-received", recv_msg))
 				assert False
 
 			# 수신 메시지가 형식에 맞는지 확인하기
 			if len(words) != 3:
-				common.send_log(None, shared_dict['sock'], shared_dict['my_name'], shared_dict['my_name'], 
+				common.send_log(None, sock, shared_dict['my_name'], shared_dict['my_name'], 
 								common.str2("wrong-msg-format", recv_msg))
 				assert False
 
@@ -287,7 +295,7 @@ if __name__ == "__main__":
 			counter = words[2]
 			send_msg = common.str3(shared_dict['my_name'], common.SVC_RES, counter)
 			# [ES1][ES2] 직접 연결된 AP에게 메시지 전송
-			thrr = common.udp_send(shared_dict['sock'], shared_dict['my_name'], 
+			thrr = common.udp_send(sock, shared_dict['my_name'], 
 									shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)
 			udp_send_threads.append(thrr)
 		else:

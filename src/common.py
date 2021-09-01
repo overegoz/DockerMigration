@@ -72,7 +72,8 @@ port = {controller_name : 11000,
 		ap2_hostname : AP_PORT,
 		edge_server1_name : ES_PORT,
 		edge_server2_name : ES_PORT}
-TEMP_PORT = 11009		
+TEMP_PORT_DOCKER = 11008
+TEMP_PORT_AP = 11009
 # -------------------------------------------------------------------
 # directory
 account = "daniel"

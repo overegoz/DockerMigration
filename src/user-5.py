@@ -49,12 +49,13 @@ def handler(signum, frame):  # CTRL+C 시그널 핸들러 만들기
 						common.str2(my_name, common.USER_EXIT), 
 						common.SHORT_SLEEP)
 	udp_send_threads.append(thrr)
-	# 소켓 닫기	
-	sock.close()  
 	# 스레드 회수
 	for th in udp_send_threads:
 		th.join()
-
+	
+	# 소켓 닫기	
+	sock.close()  
+	
 	exit()
 
 signal.signal(signal.SIGINT, handler)  # 시그널 핸들러 등록

@@ -266,7 +266,7 @@ def start_migr(migr_type, my_name, other_ap, profile):
 
 	# 3. migr 관련 파일 전송이 완료되면 ES를 시작하라고 알려주기 [AS12]
 	# 소켓을 임시로 새로 만들어서 사용하자
-	localPort = common.TEMP_PORT
+	localPort = common.TEMP_PORT_AP
 	localIP = common.ip[my_name]
 	sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 	sock.bind((localIP, localPort)) 
