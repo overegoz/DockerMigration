@@ -170,6 +170,9 @@ def send_log(tt, sock, me, you, msg):
 	sock.sendto(log.encode(), (ip[logger_name], port[logger_name]))
 
 def actually_send(sock, me, you, msg):
+	# 화면에 출력
+	if (ENABLE_DEB_MSG == True) and (me == edge_server1_name or me == edge_server2_name):
+		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))	
 	time.sleep(TX_DELAY)
 
 	tt = get_now()
@@ -178,9 +181,6 @@ def actually_send(sock, me, you, msg):
 	# 로그에 기록하기
 	send_log(tt, sock, me, you, msg + delim + "(sent)")
 
-	# 화면에 출력
-	if (ENABLE_DEB_MSG == True) and (me == edge_server1_name or me == edge_server2_name):
-		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))
 
 """
 send에서 병목이 생겨서 가끔은 딜레이가 너무 큰 상황이 생기는 것 같아서
