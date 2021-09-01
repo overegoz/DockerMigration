@@ -231,7 +231,12 @@ def udp_recv(sock, me, bufsize, t):
 		if me != logger_name:  # 내가 LOGGER가 아닌 경우에만...
 			if me == user_name:
 				send_log(tt, sock, me, addr[0], msg + delim + "(recvd)")
-
+			elif msg == str2(user_name, USER_HELLO) \
+				or msg == str2(user_name, USER_BYE) \
+				or msg == str2(user_name, USER_EXIT):
+				send_log(tt, sock, me, addr[0], msg + delim + "(recvd)")
+			else:
+				pass
 	except socket.error:
 		# non-blocking recv: 빈손으로 리턴할때 예외가 발생하고, 이를 잡아줘야함
 		msg, addr = "", ""
