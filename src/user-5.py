@@ -4,6 +4,7 @@ import time
 import signal, os, sys
 from datetime import datetime
 import common
+from threading import Thread
 
 """
 실행 방법
@@ -37,16 +38,23 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # 주소와 IP로 Bind
 sock.bind((local_ip, local_port)) 
 sock.setblocking(0)  # non-blocking socket으로 만들기
 # -------------------------------------------------------------------
+udp_send_threads = []
+# -------------------------------------------------------------------
 def handler(signum, frame):  # CTRL+C 시그널 핸들러 만들기
 # 코드마다 마무리 작업이 달라서, common 파일로 옮기지 못함
 	print(common.sigint_msg)
 	# ap에게 알려주기
 	# udp_send를 스레드로 만들고 나서는 오류 발생
-	common.udp_send(sock, my_name, curr_ap,
-					common.str2(my_name, common.USER_EXIT), 
-					common.SHORT_SLEEP)
-	# 소켓 닫고 나가기	
+	thrr = common.udp_send(sock, my_name, curr_ap,
+						common.str2(my_name, common.USER_EXIT), 
+						common.SHORT_SLEEP)
+	udp_send_threads.append(thrr)
+	# 소켓 닫기	
 	sock.close()  
+	# 스레드 회수
+	for th in udp_send_threads:
+		th.join()
+
 	exit()
 
 signal.signal(signal.SIGINT, handler)  # 시그널 핸들러 등록
@@ -57,8 +65,9 @@ common.send_log(None, sock, my_name, my_name, common.str2(common.start_msg,str(s
 # 처음에는 무조건 AP-1에 연결한다고 가정한다
 curr_ap = common.ap1_name
 # user가 AP에 연결 되었음을 알리기 (HELLO)
-common.udp_send(sock, my_name, curr_ap, \
-				common.str2(my_name, common.USER_HELLO), common.SHORT_SLEEP)  
+thrr = common.udp_send(sock, my_name, curr_ap, \
+					common.str2(my_name, common.USER_HELLO), common.SHORT_SLEEP)  
+udp_send_threads.append(thrr)					
 # -------------------------------------------------------------------
 req_int = common.USER_REQ_INTERVAL
 handover_counter = common.INTMAX  # 핸드오버가 언제 발생하지 제어
@@ -130,7 +139,8 @@ while(True):
 			if counter < common.prof.get_max_req(profile):
 				send_msg = common.str3(my_name, common.SVC_REQ, str(counter))
 				
-				common.udp_send(sock, my_name, curr_ap, send_msg, common.SHORT_SLEEP)
+				thrr = common.udp_send(sock, my_name, curr_ap, send_msg, common.SHORT_SLEEP)
+				udp_send_threads.append(thrr)
 				counter += 1
 			else:
 				print('USER: 더 이상 REQ를 보내지 않습니다')
@@ -167,12 +177,14 @@ while(True):
 		# [US2] new AP로 HELO 먼저 보내고,
 		send_msg = common.str2(my_name, common.USER_HELLO)
 		#print("send : ", send_msg)
-		common.udp_send(sock, my_name, curr_ap, send_msg, common.USER_HANDOVER_DELAY)
+		thrr = common.udp_send(sock, my_name, curr_ap, send_msg, common.USER_HANDOVER_DELAY)
+		udp_send_threads.append(thrr)
 		
 		# [US3] 다음으로, old AP에 BYEE 보낸다.
 		send_msg = common.str2(my_name, common.USER_BYE)
 		#print("send : ", send_msg)
-		common.udp_send(sock, my_name, old_ap, send_msg, common.USER_HANDOVER_DELAY)
+		thrr = common.udp_send(sock, my_name, old_ap, send_msg, common.USER_HANDOVER_DELAY)
+		udp_send_threads.append(thrr)
 		
 		"""
 		handover counter를 초기화

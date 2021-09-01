@@ -72,6 +72,7 @@ port = {controller_name : 11000,
 		ap2_hostname : AP_PORT,
 		edge_server1_name : ES_PORT,
 		edge_server2_name : ES_PORT}
+TEMP_PORT = 11009		
 # -------------------------------------------------------------------
 # directory
 account = "daniel"
@@ -113,6 +114,8 @@ MIGR_DST = "MIGR-DST"  # migr 목적지로써, 준비하고 실행하라!
 ES_START = "ES-START"  # Edge Server 구동하기
 ES_STOP = "ES-STOP"  # Edge Server 정지하기
 ES_READY = "ES-READY"  # Edge Server 가 ready 상태가 되고, 서비스 가능함
+migr_types_compact = [MIGR_FC, MIGR_DC, MIGR_LR]
+migr_types_complete = [MIGR_FC, MIGR_DC, MIGR_LR, MIGR_AUTO, MIGR_NONE]
 # -------------------------------------------------------------------
 # 상수 정의
 bufsiz = 1024
@@ -127,6 +130,7 @@ INTMAX = sys.maxsize  # 참고: 파이썬2 에서는 sys.maxint
 weight = 10  # 최적의 migr 기법 선택 시, 가중치
 #ENV_ES_NAME="EDGE_SERVER_NAME"  # 환경변수로 사용할 변수명
 ENV_MIGR_TYPE="MIGR_TYPE"  # 환경변수
+TX_DELAY = 0.100  # 초단위
 # -------------------------------------------------------------------
 # 어떤 시나리오로 실험할 것인지를 프로필로 구성하자
 # . 프로필 -1번 : 도커 없이 실행
@@ -165,7 +169,7 @@ def send_log(tt, sock, me, you, msg):
 	sock.sendto(log.encode(), (ip[logger_name], port[logger_name]))
 
 def actually_send(sock, me, you, msg):
-	time.sleep(0.100)
+	time.sleep(TX_DELAY)
 
 	tt = get_now()
 	# 메시지 보내기
@@ -185,6 +189,7 @@ def udp_send(sock, me, you, msg, t):
 	time.sleep(t)
 	thr = Thread(target=actually_send, args=(sock, me, you, msg))
 	thr.start()
+	return thr
 
 """
 def udp_send(sock, me, you, msg, t):
@@ -440,154 +445,6 @@ def stop_edgeserver(profile):
 	os.system(cmd)
 	print('EdgeServer가 종료 되었습니다')
 
-# migr SRC 에서 migr 작업을 수행하기 위한 함수
-def start_migr(sock, migr_tech, my_name, other_ap, profile):  
-	assert my_name == ap1_name and other_ap == ap2_name
-	"""
-	1. 전송할 파일 만들기 : nothing to do
-	2. 파일을 other_ap에게 전송하기 : nothing to do
-	3. 전송이 완료되면 ES를 시작하라고 알려주기 [AS12]
-	"""
-	if migr_tech == MIGR_NONE:  # 테스트용, 1번 프로파일
-		# nothing to do
-		pass		
-	elif migr_tech == MIGR_FC:
-		"""
-		1.1 전송할 파일 만들기 : 
-		- 이미지 전체를 파일로 export
-		- 컨테이너를 정지하지 않는 방식으로 진행하자 (계속 서비스 제공 가능하도록...)
-		"""
-		print('FC (1/4)-이미지 파일 만들기')
-		cont_name = prof.get_cont_name(profile)
-		ap2_img_name = prof.get_img_name_ap2(profile)
-		cmd = 'docker commit --pause=false {} {}'.format(cont_name, ap2_img_name)
-		os.system(cmd)
-		cmd = 'docker save -o {}.tar {}'.format(fc_file_dir+cont_name, ap2_img_name)
-		os.system(cmd)
-
-		"""
-		1.2 이미지 전체를 파일 전송
-		"""
-		print('FC (2/4)-이미지 파일 전송')
-		cmd = 'scp {}.tar {}@{}:{}'.format(fc_file_dir+cont_name, account, ip[other_ap], fc_file_dir)
-		os.system(cmd)
-
-		"""
-		2.1 체크포인트 생성
-		"""
-		print('FC (3/4)-체크포인트 만들기')
-		cp_name = prof.get_checkpoint_name(profile)
-		cmd = 'docker checkpoint create --leave-running=true --checkpoint-dir={} {} {}'.format(fc_cp_dir, cont_name, cp_name)
-		os.system(cmd)
-
-		"""
-		2.2 체크포인트 전송 (디렉토리 전체를 복사)
-		"""
-		print('FC (4/4)-체크포인트 전송')
-		cmd = 'scp -r {} {}@{}:{}'.format(fc_cp_dir + cp_name, account, ip[other_ap], fc_cp_dir)
-		os.system(cmd)
-
-		# 3. AP2에게 ES 시작하라고 알리기 : 여기서 말고, 함수 마지막에서 수행
-	elif migr_tech == MIGR_DC:
-		# 1 전송할 파일 만들기 : diff 파일
-		print('DC (1/4)-전송할 diff 파일을 지정된 경로로 복사')
-		"""
-		docker inspect 로 보면 UpperDir이 diff 폴더인데, 그걸 통째로 보내주면 안되나?
-		docker diff 해서, 어떤 파일이 변경 되었는지... 이런거 분석 할 필요도 없어지는데?
-		아, 근데 삭제된 파일을 알아내려면, diff 명령을 확인하긴 해야겠네... 이것도 어쩌면 필요 없을듯?
-		그냥 diff 폴더 전체를 DST로 보내는  걸로 구현하자
-		"""
-
-		# 1.1 diff 디렉토리 절대경로 알아내서 경로를 파일에 쓰기
-		cont_name = prof.get_cont_name(profile)
-		output_filename = 'diff-src-dir-{}.txt'.format(cont_name)
-		cmd = 'docker inspect --format="{}" {} > {}'.format('{{.GraphDriver.Data.UpperDir}}', cont_name, output_filename)
-		os.system(cmd)
-
-		# 1.2 파일을 읽어서 diff 절대경로 획득하기
-		fp = open(output_filename, 'r')
-		diff_src_dir = fp.readline()
-		diff_src_dir = diff_src_dir.rstrip()  # 마지막에 '\n'이 붙는데, 이거 제거하기
-		fp.close()
-
-		# 1.3 diff 폴더 전체를 복사해오기 : 루트 권한 필요
-		diff_dst_dir = dc_file_dir + prof.get_final_dir_name(profile)
-		cmd = 'cp -r {} {}'.format(diff_src_dir, diff_dst_dir)
-		os.system(cmd)
-
-		# 1.4 diff 파일 전송 : 폴더 통째로 AP-2에게 전송하기
-		print('DC (2/4)-diff 파일 전송하기')
-		cmd = 'scp -r {} {}@{}:{}'.format(diff_dst_dir, account, ip[other_ap], dc_file_dir)
-		os.system(cmd)
-
-		# 2.1 체크포인트 생성
-		print('DC (3/4)-체크포인트 생성하기')
-		cp_name = prof.get_checkpoint_name(profile)
-		cmd = 'docker checkpoint create --leave-running=true --checkpoint-dir={} {} {}'.format(dc_cp_dir, cont_name, cp_name)
-		os.system(cmd)
-
-		# 2.2 체크포인트 전송
-		print('DC (4/4)-체크포인트 전송하기')
-		cmd = 'scp -r {} {}@{}:{}'.format(dc_cp_dir + cp_name, account, ip[other_ap], dc_cp_dir)
-		os.system(cmd)
-
-		# 3. AP2에게 ES 시작하라고 알리기 : 여기서 말고, 함수 마지막에서 수행
-		pass
-	elif migr_tech == MIGR_LR:
-		# 1.1 전송할 파일 만들기 : replay할 log
-		# JSON 형식의 로그 파일을 읽어서 parsing 하기 : 일단은 수행하기
-		cont_name = prof.get_cont_name(profile)
-		output_filename = 'log-file-path-{}.txt'.format(cont_name)  # 원본 로그 파일 경로명을 저장할 파일
-		cmd = 'docker inspect --format="{}" {} > {}'.format('{{.LogPath}}', cont_name, output_filename)
-		os.system(cmd)  # diff 절대경로를 파일에 기록
-		fp = open(output_filename, 'r')
-		log_file_src_path = fp.readline()  # 파일에서 diff 절대경로명 획득
-		log_file_src_path = log_file_src_path.rstrip()  # 마지막에 '\n'이 붙는데, 이거 제거하기
-		fp.close()
-
-		# full log를 저장할 폴더 생성
-		log_dst_dir = lr_file_dir + prof.get_final_dir_name(profile)
-		if os.path.isdir(log_dst_dir) == False:  # 존재하지 않으면
-			os.makedirs(log_dst_dir)
-
-		FULL_LOG_NAME = 'full-log-json.txt'
-		full_log_file_path = lr_file_dir + prof.get_final_dir_name(profile) + '/' + FULL_LOG_NAME
-
-		# full log를 복사
-		cmd = 'cp {} {}'.format(log_file_src_path, full_log_file_path)
-		os.system(cmd)
-
-		# 로그파일을 읽어서, 데이터를 추출해서, <시간> <command>로 출력하기
-		log_extract_filename = 'log-extract-{}.txt'.format(cont_name)
-		log_extract_file_path = log_dst_dir + '/' + log_extract_filename
-
-		f_dst = open(log_extract_file_path, 'w')
-		f_src = open(full_log_file_path, 'r')
-
-		line_cnt = 1
-		for line in f_src:
-			json_obj = json.loads(line.rstrip())
-			f_dst.write('{} {} {}\n'.format(line_cnt, json_obj.get("time").rstrip(), json_obj.get("log").rstrip()))
-			line_cnt += 1
-
-		f_dst.close()
-		f_src.close()
-
-		# 1.2 파일 전송 : replay-log 파일 전송
-		# parsing된 로그파일 전송하기 : 일단은 수행하기
-		# DST에서는 로그파일 수신 받으면, 로그가 박혀있는(함수로 구현하기) 도커를 실행할 것임
-		cmd = 'scp -r {} {}@{}:{}'.format(log_dst_dir, account, ip[other_ap], lr_file_dir)
-		os.system(cmd)
-
-		# 2. 체크포인트 : 필요 없음
-		# 3. AP2에게 ES 시작하라고 알리기 : 여기서 말고, 함수 마지막에서 수행
-		pass
-	else:
-		assert False
-
-	# 3. migr 관련 파일 전송이 완료되면 ES를 시작하라고 알려주기 [AS12]
-	udp_send(sock, my_name, other_ap, str2(my_name, ES_START), SHORT_SLEEP)
-	print('migr 준비 완료!')
 
 def return_migr_info_ap1(profile):
 	"""

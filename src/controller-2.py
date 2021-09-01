@@ -4,7 +4,7 @@ import time
 import signal, os
 import datetime
 import common
-
+from threading import Thread
 
 
 my_name = common.controller_name
@@ -15,10 +15,15 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # 주소와 IP로 Bind
 sock.bind((local_ip, local_port)) 
 sock.setblocking(0)  # non-blocking socket으로 만들기
 
+# 스레드 관리용
+udp_send_threads = []
+
 def handler(signum, frame):  # CTRL+C 시그널 핸들러 만들기
 	print(common.sigint_msg)
 	# 코드마다 마무리 작업이 달라서, common 파일로 옮기지 못함
 	sock.close()  
+	for th in udp_send_threads:
+		th.join()
 	exit()
 
 signal.signal(signal.SIGINT, handler)  # 시그널 핸들러 등록
@@ -64,7 +69,8 @@ while(True):
 
 					# [CS1] oldAP에게 '['migr 판단에 필요한 정보']'를 요청
 					send_msg = common.str2(my_name, common.INFO_REQ)
-					common.udp_send(sock, my_name, user_old_ap, send_msg, common.SHORT_SLEEP)
+					thrr = common.udp_send(sock, my_name, user_old_ap, send_msg, common.SHORT_SLEEP)
+					udp_send_threads.append(thrr)
 					print(user_old_ap, "에게 마이그레이션 정보 요청")
 
 				print('user_old_ap:', user_old_ap)
@@ -102,13 +108,15 @@ while(True):
 
 			# 최선의 migr 기법을 old AP와 new AP 에게 알려주기
 			# 1. migr 출발지 준비시작! [CS3.1]
-			common.udp_send(sock, my_name, user_old_ap, 
-							common.str3(my_name, common.MIGR_SRC, best_migr),
-							common.SHORT_SLEEP)
+			thrr = common.udp_send(sock, my_name, user_old_ap, 
+								common.str3(my_name, common.MIGR_SRC, best_migr),
+								common.SHORT_SLEEP)
+			udp_send_threads.append(thrr)
 			# 2. migr 목적지 준비시작! [CS3.2]
-			common.udp_send(sock, my_name, user_curr_ap, 
-							common.str3(my_name, common.MIGR_DST, best_migr),
-							common.SHORT_SLEEP)
+			thrr = common.udp_send(sock, my_name, user_curr_ap, 
+								common.str3(my_name, common.MIGR_DST, best_migr),
+								common.SHORT_SLEEP)
+			udp_send_threads.append(thrr)
 		else:  # 오류!
 			assert False
 
