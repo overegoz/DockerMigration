@@ -158,7 +158,7 @@ def str4(a,b,c,d):
 
 def get_now():  # 현재 시간을 문자열로 리턴
 	return datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S-%f")
-	
+
 def send_log(tt, sock, me, you, msg):
 	# 로그 메시지 만들기
 	if tt is None:
