@@ -146,10 +146,12 @@ def hostcheck(shared_dict, udp_send_threads):
 	# - 환경변수를 사용해서 판단하려고 했는데, ES1에서 정의한 env 이름이 ES2에서
 	#   업데이트 되지 않아서, 그냥 기존의 add-hosts 방법을 사용하기로 함
 	while True:
-		time.sleep(0.010)
+		time.sleep(0.010)  # CPU 과도한 사용을 막기위함
 		try:
+			print('1')
 			# ap2_hostname은 migr 후 ES2번을 실행할 때만 정의된다
 			_ = socket.gethostbyname(common.ap2_hostname)
+			print('2')
 			# ------------------------------------------------------
 			# 오류가 없다면, 여기는 AP-2
 			# ------------------------------------------------------
@@ -174,22 +176,26 @@ def hostcheck(shared_dict, udp_send_threads):
 			# 오류가 있다면, 여기는 AP-1
 			# ------------------------------------------------------
 			#print('gethostbyname : failed')
+			print('3')
 			shared_dict['my_ap_name'] = common.ap1_name
 			shared_dict['my_name'] = common.edge_server1_name
-			
+			print('4')
 			#assert notified == 0 or notified == 10
 			if shared_dict['notified'] == 0:
 				shared_dict['notified'] += 10
+				print('5')
 				if common.ENABLE_DEB_MSG:
 					print('notified: ', shared_dict['notified'])
 
+				print('6')
 				# AP1은 지정된 작업을 병렬적으로 수행
 				# 여기 코드는 어차피 multiprocessing으로 처리되니까, 그냥 실행하면 됨
 				print('run action profile with parallelism')
 				common.action_profile(shared_dict['sock'], shared_dict['my_name'], profile)
-
+				print('7')
 				# (action_profile 리턴을 기다리지 않고) AP에게 READY 메시지 보내기
 				# 최초로 한번은 READY 메시지를 보냄
+				print('8')
 				send_msg = common.str2(shared_dict['my_name'], common.ES_READY)
 				if common.ENABLE_DEB_MSG:
 					print('{} -> {} : {}'.format(shared_dict['my_name'], shared_dict['my_ap_name'], send_msg))
