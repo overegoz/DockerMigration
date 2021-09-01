@@ -310,20 +310,12 @@ def action_profile(sock, es_name, profile):
 
 		# 소요 시간을 Logger에게 알릴까?
 		send_log(None, sock, es_name, es_name, str2("ReplayTime", str(time_taken_sec)))
-	elif profile == 111:
+	else:  # 진짜 실험에 사용하는 부분
 		sz = prof.get_diff_bit(profile) / (1000.0 * 8.0)
 		cmd = 'truncate -s {}M /tmp/file.file'.format( int(sz) )
 		print('action : ', cmd)
 		os.system(cmd)
 		time.sleep(prof.get_replay_sec(profile))
-	elif profile == 112:
-		sz = prof.get_diff_bit(profile) / (1000.0 * 8.0)
-		cmd = 'truncate -s {}M /tmp/file.file'.format( int(sz) )
-		print('action : ', cmd)
-		os.system(cmd)
-		time.sleep(prof.get_replay_sec(profile))
-	else:
-		assert False
 	
 	print('Profile action : finished!')
 	
