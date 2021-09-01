@@ -38,12 +38,12 @@ ip = {controller_name : "127.0.0.1",
 		edge_server2_name : "127.0.0.1"}
 """
 #LOCAL_PC_IP = "192.168.0.2"
-LOCAL_PC_IP = "192.168.0.5"
+LOCAL_PC_IP = "192.168.0.2"
 VM1_IP = "192.168.0.105"
 #VM2_IP = "192.168.0.101"
-VM2_IP = "192.168.0.117"
+VM2_IP = "192.168.0.101"
 #USER_IP = "192.168.0.74"
-USER_IP = "192.168.0.5"
+USER_IP = "192.168.0.74"
 ip = {controller_name : LOCAL_PC_IP,
 		logger_name : LOCAL_PC_IP,
 		user_name : USER_IP,
