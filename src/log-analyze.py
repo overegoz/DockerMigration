@@ -142,12 +142,14 @@ for line in f:
 			user_start_time = _time
 			continue
 
+		# send_log로 남김
 		if _me == common.ap1_name and words[3] == "migr" and words[4] == "begins":
 			# AP1에서 migr을 시작한 시간
 			assert migr_begin is None
 			migr_begin = _time
 			continue
-
+		
+		# send_log로 남김
 		if _me == common.ap2_name and words[3] == "migr" and words[4] == "finished":
 			# AP2에서 migr이 완료된 시점
 			assert migr_finished is None

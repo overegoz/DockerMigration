@@ -186,7 +186,8 @@ def actually_send(sock, me, you, msg):
 	sock.sendto(msg.encode(), (ip[you], port[you]))
 
 	# 로그에 기록하기
-	send_log(tt, sock, me, you, msg + delim + "(sent)")
+	if me == user_name:
+		send_log(tt, sock, me, you, msg + delim + "(sent)")
 
 
 """
@@ -228,7 +229,8 @@ def udp_recv(sock, me, bufsize, t):
 		msg = bytes.decode()
 		# 로그에 기록하기
 		if me != logger_name:  # 내가 LOGGER가 아닌 경우에만...
-			send_log(tt, sock, me, addr[0], msg + delim + "(recvd)")
+			if me == user_name:
+				send_log(tt, sock, me, addr[0], msg + delim + "(recvd)")
 
 	except socket.error:
 		# non-blocking recv: 빈손으로 리턴할때 예외가 발생하고, 이를 잡아줘야함
