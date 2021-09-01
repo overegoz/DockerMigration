@@ -194,7 +194,7 @@ def hostcheck(shared_dict, udp_send_threads):
 				if sock is None:
 					localPort = common.TEMP_PORT_DOCKER
 					print(localPort)
-					localIP = common.ip[shared_dict['my_name']]
+					localIP = common.ip_fake[shared_dict['my_name']]
 					print(localIP)
 					sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
 					sock.bind((localIP, localPort)) 
