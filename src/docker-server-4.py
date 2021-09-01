@@ -211,7 +211,7 @@ def hostcheck(shared_dict, udp_send_threads):
 										shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)	
 				#udp_send_threads.append(thrr)
 				thrr.join()
-				sock.close()
+				#sock.close()
 		except:
 			print('알려지지 않은 예외?')
 
