@@ -175,6 +175,7 @@ def actually_send(sock, me, you, msg):
 	
 	if (me == ap1_name and you == ap2_name) \
 		or (me == ap2_name and you == ap1_name):
+		print('sleep for {}'.format(TX_DELAY))
 		time.sleep(TX_DELAY)
 
 	tt = get_now()  # 시간을 여기서 측정했으니까, 로그를 즉시 안보내도 OK
