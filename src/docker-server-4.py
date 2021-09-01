@@ -29,9 +29,6 @@ elif sys.argv[1] != common.edge_server1_name \
 elif int(sys.argv[2]) not in common.profile_ids:
 	# 정의되지 않은 프로필 번호가 주어짐	
 	err_msg = "Incorrect profile id! " + str(sys.argv[2])
-elif sys.argv[2] not in common.migr_types_compact:
-	# 잘못된 migr type 이름이 주어짐
-	err_msg = "Incorrect migr type name! " + str(sys.argv[3])
 else:  # 아무 문제가 없음
 	pass
 
