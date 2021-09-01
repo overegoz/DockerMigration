@@ -124,6 +124,7 @@ for line in f:
 		_event = words[3]
 		if _event == common.start_msg:
 			# 프로필 번호 확인하기 : AP1, ES1, USER 에서만 확인하기
+			"""
 			if _me == common.ap1_name or _me == common.edge_server1_name:
 				p = int(words[6].replace("]","").replace("'",""))
 				if profile is None: profile = p
@@ -131,10 +132,17 @@ for line in f:
 				continue
 
 			elif _me == common.user_name:
+			"""
+			if _me == common.user_name:
 				p = int(words[5].replace("]","").replace("'",""))
 				if profile is None: profile = p
 				else: assert profile == p
 				continue
+
+		elif _me == common.ap1_name and _event == "migr":
+			assert migr_type is None
+			migr_type = words[6]
+			#continue  # 여기서는 continue 하면 안됨
 
 		if _me == common.user_name and _event == common.start_msg:
 			# user가 시작한 시간
@@ -154,8 +162,7 @@ for line in f:
 			# AP2에서 migr이 완료된 시점
 			assert migr_finished is None
 			migr_finished = _time
-			continue
-		
+			continue		
 	
 	if _me == common.edge_server1_name:
 		if _you == common.ap1_name:
@@ -200,6 +207,7 @@ for line in f:
 				ap1_bye_time = _time
 				continue
 
+	"""
 	if _me == common.controller_name:
 		if _you == common.ap1_name:
 			if words[4] == common.MIGR_SRC:
@@ -207,6 +215,7 @@ for line in f:
 				assert migr_type is None
 				migr_type = words[5]
 				continue
+	"""
 
 	if _me == common.edge_server2_name:
 		if _you == common.ap2_name:
@@ -343,8 +352,7 @@ plt.title('[Revised] RTT: From REQUEST to RESPONSE')
 plt.show()
 """
 
-print('서비스 응답 시간 (평균): ')
-print( sum(svc_rtt.values()) / len(svc_rtt) )
+print('서비스 응답 시간 (평균): {}'.format(sum(svc_rtt.values()) / len(svc_rtt)))
 
 print('마이그레이션 :', migr_type )
 print('- 시작 :', migr_begin )
@@ -353,14 +361,14 @@ t_from = datetime.strptime(migr_begin,time_format)
 t_to = datetime.strptime(migr_finished,time_format)
 time_diff = t_to - t_from
 time_diff_sec = time_diff.total_seconds()
-print('- 기간(초) :', time_diff_sec)
+print('- 소요시간(초) :', time_diff_sec)
 
-print('사용자 시작 시간 :', user_start_time)
-print('ES-1 READY 시간 :', es1_ready_time)
-print('ES-1 STOP 시간 :', es1_terminate_time)
-print('ES-2 READY 시간 :', es2_ready_time)
-print('사용자가 AP-2에 접속한 시간 :', ap2_hello_time)
-print('사용자가 AP-1에 접속 끊긴 시간 :', ap1_bye_time )
+#print('사용자 시작 시간 :', user_start_time)
+#print('ES-1 READY 시간 :', es1_ready_time)
+#print('ES-1 STOP 시간 :', es1_terminate_time)
+#print('ES-2 READY 시간 :', es2_ready_time)
+#print('사용자가 AP-2에 접속한 시간 :', ap2_hello_time)
+#print('사용자가 AP-1에 접속 끊긴 시간 :', ap1_bye_time )
 # ------------------------------------------------------------
 # 파일 닫기
 f.close()

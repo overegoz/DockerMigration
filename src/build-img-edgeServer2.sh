@@ -17,5 +17,10 @@ cd docker-images/Profile-1112/ES-2
 sh build.sh
 cd ../../../
 # -----------------------------
+# 1113 : LR
+cd docker-images/Profile-1113/ES-2
+sh build.sh
+cd ../../../
+# -----------------------------
 docker image prune -f
 # -----------------------------
