@@ -175,7 +175,7 @@ def actually_send(sock, me, you, msg):
 	
 	if (me == ap1_name and you == ap2_name) \
 		or (me == ap2_name and you == ap1_name):
-		print('sleep for {}'.format(TX_DELAY))
+		print('AP간 릴레이를 위한 SLEEP {} second'.format(TX_DELAY))
 		time.sleep(TX_DELAY)
 
 	tt = get_now()  # 시간을 여기서 측정했으니까, 로그를 즉시 안보내도 OK
@@ -329,7 +329,7 @@ def action_profile(es_name, profile):
 		delay = prof.get_replay_sec(profile)
 		print('{} 초간 sleep 합니다.'.format(delay))
 		time.sleep(delay)
-		
+
 		sz = prof.get_diff_bit(profile) / (1000.0 * 8.0)
 		cmd = 'truncate -s {}M /tmp/file.file'.format( int(sz) )
 		print('action : ', cmd)
