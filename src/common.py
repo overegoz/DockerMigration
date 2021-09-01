@@ -309,7 +309,8 @@ def action_profile(sock, es_name, profile):
 		print('action_profile took {} seconds'.format(time_taken_sec))
 
 		# 소요 시간을 Logger에게 알릴까?
-		send_log(None, sock, es_name, es_name, str2("ReplayTime", str(time_taken_sec)))
+		# 소켓을 사용하지 말자... 충돌이 나는 것 같다.
+		# send_log(None, sock, es_name, es_name, str2("ReplayTime", str(time_taken_sec)))		
 	else:  # 진짜 실험에 사용하는 부분
 		sz = prof.get_diff_bit(profile) / (1000.0 * 8.0)
 		cmd = 'truncate -s {}M /tmp/file.file'.format( int(sz) )
