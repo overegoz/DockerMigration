@@ -189,16 +189,13 @@ def hostcheck(shared_dict, udp_send_threads):
 				#print('6')
 
 				# 소켓을 매번 새로 만들자! my_name 변경 가능성도 있으니까, 매번 만드는 걸로
-				#if sock is not None: sock.close()
-
-				if sock is None:
-					localPort = common.TEMP_PORT_DOCKER
-					print(localPort)
-					localIP = common.ip_fake[shared_dict['my_name']]
-					print(localIP)
-					sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
-					sock.bind((localIP, localPort)) 
-					#sock.setblocking(0)  # non-blocking socket으로 만들기
+				localPort = common.TEMP_PORT_DOCKER
+				print(localPort)
+				localIP = common.ip_fake[shared_dict['my_name']]
+				print(localIP)
+				sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+				sock.bind((localIP, localPort)) 
+				#sock.setblocking(0)  # non-blocking socket으로 만들기
 
 				# AP1은 지정된 작업을 병렬적으로 수행
 				# 여기 코드는 어차피 multiprocessing으로 처리되니까, 그냥 실행하면 됨
@@ -216,6 +213,7 @@ def hostcheck(shared_dict, udp_send_threads):
 										shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)	
 				#udp_send_threads.append(thrr)
 				thrr.join()
+				sock.close()
 		except:
 			print('알려지지 않은 예외?')
 
