@@ -176,6 +176,9 @@ def actually_send(sock, me, you, msg):
 
 	tt = get_now()
 	# 메시지 보내기
+	print(msg)
+	print(ip[you])
+	print(port[you])
 	sock.sendto(msg.encode(), (ip[you], port[you]))
 	# 로그에 기록하기
 	send_log(tt, sock, me, you, msg + delim + "(sent)")
