@@ -172,14 +172,15 @@ def actually_send(sock, me, you, msg):
 	# 화면에 출력
 	if (ENABLE_DEB_MSG == True) and (me == edge_server1_name or me == edge_server2_name):
 		print('send: {} -> {}, {}, {}, {}'.format(me, you, msg, ip[you], port[you]))	
-	time.sleep(TX_DELAY)
+	#time.sleep(TX_DELAY)
 
-	tt = get_now()
+	tt = get_now()  # 시간을 여기서 측정했으니까, 로그를 즉시 안보내도 OK
 	# 메시지 보내기
 	#print('actually_send: ', msg)
 	#print('actually_send: ', ip[you])
 	#print('actually_send: ', port[you])
 	sock.sendto(msg.encode(), (ip[you], port[you]))
+	
 	# 로그에 기록하기
 	send_log(tt, sock, me, you, msg + delim + "(sent)")
 
@@ -189,7 +190,7 @@ send에서 병목이 생겨서 가끔은 딜레이가 너무 큰 상황이 생�
 send를 스레드로 구현함
 """
 def udp_send(sock, me, you, msg, t):
-	time.sleep(t)
+	#time.sleep(t)
 	thr = Thread(target=actually_send, args=(sock, me, you, msg))
 	thr.start()
 	return thr

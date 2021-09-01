@@ -296,7 +296,7 @@ for i in range(user_max_req):
 
 plt.plot(list(range(len(rtt_list))), rtt_list)
 plt.plot(list(range(len(rtt_list))), avg_rtt)
-plt.ylim(0.0, 1.0)
+#plt.ylim(0.0, 1.0)
 plt.title('[Original] RTT : From REQUEST to RESPONSE')
 plt.show()
 """
