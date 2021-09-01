@@ -138,7 +138,7 @@ def hostcheck(shared_dict, udp_send_threads):
 	# 이 함수는 별도의 프로세스로 생성되는 것이다.
 	# 시그널 핸들러를 원래 값으로 돌려놓자. 종료 작업은 parent process가 처리함
 	signal.signal(signal.SIGTERM, original_handler)
-
+	sock = None
 	#global notified, my_ap_name, my_name, thr_action
 	# 지금 어떤 AP에있는 ES인지를 매번 확인
 	# - 지금은 --add-host 명령으로 /etc/hosts 파일의 내용을 기반으로 판단
@@ -189,11 +189,16 @@ def hostcheck(shared_dict, udp_send_threads):
 				#print('6')
 
 				# 소켓을 매번 새로 만들자! my_name 변경 가능성도 있으니까, 매번 만드는 걸로
-				localPort = common.TEMP_PORT_DOCKER
-				localIP = common.ip[shared_dict['my_name']]
-				sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
-				sock.bind((localIP, localPort)) 
-				sock.setblocking(0)  # non-blocking socket으로 만들기
+				#if sock is not None: sock.close()
+
+				if sock is None:
+					localPort = common.TEMP_PORT_DOCKER
+					print(localPort)
+					localIP = common.ip[shared_dict['my_name']]
+					print(localIP)
+					sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
+					sock.bind((localIP, localPort)) 
+					#sock.setblocking(0)  # non-blocking socket으로 만들기
 
 				# AP1은 지정된 작업을 병렬적으로 수행
 				# 여기 코드는 어차피 multiprocessing으로 처리되니까, 그냥 실행하면 됨
@@ -211,7 +216,6 @@ def hostcheck(shared_dict, udp_send_threads):
 										shared_dict['my_ap_name'], send_msg, common.SHORT_SLEEP)	
 				#udp_send_threads.append(thrr)
 				thrr.join()
-				#sock.close()
 		except:
 			print('알려지지 않은 예외?')
 
