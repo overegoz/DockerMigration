@@ -12,5 +12,10 @@ docker container prune -f
 # 대신, migr 으로 전달 받은게 있으면 지우자
 docker rmi twoon/profile2:es2
 # -----------------------------
+# 1112 : DC
+cd docker-images/Profile-1112/ES-2
+sh build.sh
+cd ../../../
+# -----------------------------
 docker image prune -f
 # -----------------------------

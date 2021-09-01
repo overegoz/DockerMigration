@@ -94,6 +94,7 @@ shared_dict['thr_action'] = None
 # container stop 하면 SIGTERM -> SIGKILL 전달된다
 def handler(signum, frame):
 	print(common.sigint_msg)
+
 	if shared_dict['thr_action'] is not None:
 		shared_dict['thr_action'].join()
 
@@ -190,7 +191,7 @@ def hostcheck(shared_dict):
 
 				# AP1은 지정된 작업을 병렬적으로 수행
 				# 여기 코드는 어차피 multiprocessing으로 처리되니까, 그냥 실행하면 됨
-				print('run action profile with parallelism')
+				print('action profile 을 병렬로 수행합니다.')
 				common.action_profile(shared_dict['my_name'], profile)
 				#print('7')
 				# (action_profile 리턴을 기다리지 않고) AP에게 READY 메시지 보내기
