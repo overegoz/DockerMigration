@@ -31,6 +31,7 @@ signal.signal(signal.SIGINT, handler)  # 시그널 핸들러 등록
 # 시작했다는 것을 로그로 남기기
 common.send_log(None, sock, my_name, my_name, common.start_msg)
 
+print('컨트롤러를 시작합니다!')
 # 현재, USER가 연결되어있는 AP
 # 처음에는 모른다고 하고, logger가 HELO 메시지를 전해주면 setting
 user_curr_ap = ""

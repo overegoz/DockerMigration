@@ -8,7 +8,7 @@ import json
 from threading import Thread
 
 
-ENABLE_DEB_MSG = False
+ENABLE_DEB_MSG = True
 # -------------------------------------------------------------------
 # 총 4대의 VM을 사용하자
 # 1. controller + logger
