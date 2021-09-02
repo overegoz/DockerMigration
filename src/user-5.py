@@ -28,9 +28,14 @@ else:
 if len(err_msg) > 0:
 	# 오류가 있었다는 것임. 로그 전송 하지 않고, 터미널 출력하자
 	assert False, "ERR MSG: " + err_msg
+
 # -------------------------------------------------------------------
 my_name = common.user_name
 profile = int(sys.argv[1])
+# -------------------------------------------------------------------
+# AP-1의 ES-1 가 안정화 되기까지 대기
+print('ES-1 안정화를 위해 잠시 대기합니다')
+time.sleep(common.prof.get_replay_sec(profile))
 # -------------------------------------------------------------------
 # listen 소켓 생성
 local_ip, local_port = common.ip[my_name], common.port[my_name]
@@ -113,10 +118,6 @@ while(True):
 			break
 	else:
 		pass
-# -------------------------------------------------------------------
-# AP-1의 ES-1 가 안정화 되기까지 대기
-print('ES-1 안정화를 위해 잠시 대기합니다')
-time.sleep(common.prof.get_replay_sec(profile))
 
 # -------------------------------------------------------------------
 # 본격적으로 REQ-RES 시작!
