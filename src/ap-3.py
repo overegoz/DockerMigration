@@ -414,7 +414,7 @@ if __name__ == "__main__":
 					# 이후로는 user에게 알려줄 필요 없다
 					thr = common.udp_send(sock, my_name, common.user_name, 
 										common.str2(my_name, cmd), common.SHORT_SLEEP)
-					udp_send_threads.append(thrr)
+					udp_send_threads.append(thr)
 
 				if my_name == common.ap2_name:  # migr 완료
 					# user 에게는 알려줄 필요 없음
