@@ -38,12 +38,12 @@ ip = {controller_name : "127.0.0.1",
 		edge_server2_name : "127.0.0.1"}
 """
 #LOCAL_PC_IP = "192.168.0.2"
-LOCAL_PC_IP = "192.168.0.2"
+LOCAL_PC_IP = "192.168.0.106"
 VM1_IP = "192.168.0.105"
 #VM2_IP = "192.168.0.101"
 VM2_IP = "192.168.0.101"
 #USER_IP = "192.168.0.74"
-USER_IP = "192.168.0.2"
+USER_IP = "192.168.0.106"
 ip = {controller_name : LOCAL_PC_IP,
 		logger_name : LOCAL_PC_IP,
 		user_name : USER_IP,
@@ -131,6 +131,7 @@ weight = 10  # 최적의 migr 기법 선택 시, 가중치
 #ENV_ES_NAME="EDGE_SERVER_NAME"  # 환경변수로 사용할 변수명
 ENV_MIGR_TYPE="MIGR_TYPE"  # 환경변수
 TX_DELAY = 0.100  # 초단위
+MB = 1000000.0 * 8.0  # 같은 상수가 prof 에도 정의되어 있음
 # -------------------------------------------------------------------
 # 어떤 시나리오로 실험할 것인지를 프로필로 구성하자
 # . 프로필 -1번 : 도커 없이 실행
@@ -330,7 +331,7 @@ def action_profile(es_name, profile):
 		print('{} 초간 sleep 합니다.'.format(delay))
 		time.sleep(delay)
 
-		sz = prof.get_diff_bit(profile) / (1000.0 * 8.0)
+		sz = prof.get_diff_bit(profile) / MB  # MB 단위로...
 		cmd = 'truncate -s {}M /tmp/file.file'.format( int(sz) )
 		print('action : ', cmd)
 		os.system(cmd)
