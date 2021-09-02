@@ -69,5 +69,15 @@ cd docker-images/Profile-2123/ES-2
 sh build.sh
 cd ../../../
 # -----------------------------
+# 2212 : DC
+cd docker-images/Profile-2212/ES-2
+sh build.sh
+cd ../../../
+# -----------------------------
+# 2213 : LR
+cd docker-images/Profile-2213/ES-2
+sh build.sh
+cd ../../../
+# -----------------------------
 docker image prune -f
 # -----------------------------
