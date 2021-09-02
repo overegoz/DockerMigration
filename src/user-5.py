@@ -121,7 +121,7 @@ while(True):
 
 # -------------------------------------------------------------------
 # 본격적으로 REQ-RES 시작!
-print('USER 시작 : sending REQUEST!')
+print('USER 시작 (프로필: {}) : sending REQUEST!'.format(profile))
 counter = 0  # req를 보낼건데, cnt 번호를 붙여서 tracking 가능하도록
 last_sent = None
 while(True):
