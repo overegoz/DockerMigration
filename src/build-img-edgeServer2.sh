@@ -39,13 +39,13 @@ cd docker-images/Profile-1123/ES-2
 sh build.sh
 cd ../../../
 # -----------------------------
-# 1212 : DC
-cd docker-images/Profile-1212/ES-2
+# 1222 : DC
+cd docker-images/Profile-1222/ES-2
 sh build.sh
 cd ../../../
 # -----------------------------
-# 1213 : LR
-cd docker-images/Profile-1213/ES-2
+# 1223 : LR
+cd docker-images/Profile-1223/ES-2
 sh build.sh
 cd ../../../
 # -----------------------------
