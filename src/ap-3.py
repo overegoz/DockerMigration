@@ -190,6 +190,10 @@ def start_migr(migr_type, my_name, other_ap, profile):
 		diff_dst_dir = common.dc_file_dir + common.prof.get_final_dir_name(profile)
 		cmd = 'cp -r {} {}'.format(diff_src_dir, diff_dst_dir)
 		os.system(cmd)
+		# 추가작업: truncate 로 만든 파일은 못가져오는 듯 => 다시 만들자
+		sz = common.prof.get_diff_bit(profile) / common.MB  # MB 단위로...
+		cmd = 'truncate -s {}M {}'.format(int(sz), diff_dst_dir + common.new_file_dir)
+		os.system(cmd)		
 
 		# 1.4 diff 파일 전송 : 폴더 통째로 AP-2에게 전송하기
 		print('DC (2/4)-diff 파일 전송하기')

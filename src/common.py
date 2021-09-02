@@ -132,6 +132,7 @@ weight = 10  # 최적의 migr 기법 선택 시, 가중치
 ENV_MIGR_TYPE="MIGR_TYPE"  # 환경변수
 TX_DELAY = 0.100  # 초단위
 MB = 1000000.0 * 8.0  # 같은 상수가 prof 에도 정의되어 있음
+new_file_dir = '/tmp/file.file'
 # -------------------------------------------------------------------
 # 어떤 시나리오로 실험할 것인지를 프로필로 구성하자
 # . 프로필 -1번 : 도커 없이 실행
@@ -332,7 +333,7 @@ def action_profile(es_name, profile):
 		time.sleep(delay)
 
 		sz = prof.get_diff_bit(profile) / MB  # MB 단위로...
-		cmd = 'truncate -s {}M /tmp/file.file'.format( int(sz) )
+		cmd = 'truncate -s {}M {}'.format(int(sz),new_file_dir)
 		print('action : ', cmd)
 		os.system(cmd)
 	
