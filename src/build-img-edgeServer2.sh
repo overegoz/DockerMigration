@@ -5,12 +5,12 @@
 docker stop $(docker ps -a -q)
 docker container prune -f
 # -----------------------------
-# FC를 할거니까, Profile-1111에서는 ES2의 img 만들지 말기
+# 1111은 FC를 할거니까, ES2의 img 만들지 말기
 # cd docker-images/Profile-1111/ES-2
 # sh build.sh
 # cd ../../../
 # 대신, migr 으로 전달 받은게 있으면 지우자
-docker rmi twoon/profile2:es2
+docker rmi twoon/profile1111:es2
 # -----------------------------
 # 1112 : DC
 cd docker-images/Profile-1112/ES-2
@@ -19,6 +19,23 @@ cd ../../../
 # -----------------------------
 # 1113 : LR
 cd docker-images/Profile-1113/ES-2
+sh build.sh
+cd ../../../
+# -----------------------------
+# 1121은 FC를 할거니까, ES2의 img 만들지 말기
+# cd docker-images/Profile-1121/ES-2
+# sh build.sh
+# cd ../../../
+# 대신, migr 으로 전달 받은게 있으면 지우자
+docker rmi twoon/profile1121:es2
+# -----------------------------
+# 1122 : DC
+cd docker-images/Profile-1122/ES-2
+sh build.sh
+cd ../../../
+# -----------------------------
+# 1123 : LR
+cd docker-images/Profile-1123/ES-2
 sh build.sh
 cd ../../../
 # -----------------------------
