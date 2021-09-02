@@ -90,6 +90,16 @@ cd docker-images/Profile-2213/ES-1
 sh build.sh
 cd ../../../
 # -----------------------------
+# 2222 : DC
+cd docker-images/Profile-2222/ES-1
+sh build.sh
+cd ../../../
+# -----------------------------
+# 2223 : LR
+cd docker-images/Profile-2223/ES-1
+sh build.sh
+cd ../../../
+# -----------------------------
 # 이름없는 이미지 삭제하기
 docker image prune -f
 # -----------------------------
